@@ -10,7 +10,7 @@ export default function Routing() {
         <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/play" element={<Play />} />
-            <Route path="how-to-play" element={<HowToPlay/>} />
+            <Route path="/how-to-play" element={<HowToPlay/>} />
         </Routes>
     </Router>
   )
