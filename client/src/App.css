@@ -5,3 +5,13 @@
 html, body, #root {
   height: 100vh;
 }
+
+.pkmn-card {
+  height: 6.125rem;
+  transition: 1.0s;
+  width: 4.375rem;
+}
+
+.pkmn-card:hover {
+  cursor: pointer;
+}
