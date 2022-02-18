@@ -13,6 +13,12 @@ export default class PokemonDeck {
     return draws;
   }
 
+  putBack(cards) {
+    cards.forEach((card) => {
+      this.cards.push(card);
+    });
+  }
+
   shuffle() {
     const n = this.cards.length - 1;
 

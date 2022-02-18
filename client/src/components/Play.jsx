@@ -25,11 +25,26 @@ export default function Play() {
     const socket = io("http://localhost:8080");
     socket.on("connect", () => console.log(socket.id));
     const deck = await fetchDeck(decklist_brushfire);
-    deck.shuffle();
-    setDeck(deck);
-    const hand = deck.draw(10);
-    setHand(hand);
+    preGameSetup(deck);
   }, []);
+
+  const preGameSetup = (deck) => {
+    let openingHandBasic = false;
+
+    while (!openingHandBasic) {
+      deck.shuffle();
+      const hand = deck.draw(7);
+      setHand(hand);
+
+      hand.forEach((card) => {
+        if (card.supertype.includes("Pok") && card.subtypes.includes("Basic"))
+          openingHandBasic = true;
+      });
+
+      if (!openingHandBasic) deck.putBack(hand);
+    }
+    setDeck(deck);
+  };
 
   return (
     <Container fluid className="bg-dark h-100 w-100 p-0">
