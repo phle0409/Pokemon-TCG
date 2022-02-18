@@ -5,13 +5,14 @@ const createDeck = (decklist, cardpool) => {
   let cards = [];
 
   decklist.forEach((card) => {
-    cardpool.forEach((cardpoolCard) => {
+    for (const cardpoolCard of cardpool) {
       if (cardpoolCard.name === card.name) {
         for (let i = 0; i < card.quantity; i++) {
           cards.push(new PokemonCard(cardpoolCard));
         }
+        break;
       }
-    });
+    }
   });
 
   return cards;

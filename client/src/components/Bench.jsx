@@ -1,6 +1,12 @@
 import React from "react";
 
 export default function Bench({ bench }) {
+  const handleClick = e => {
+    const [name, set, zone, index] = e.target.id.split("-");
+    const selectedPkmn = bench[index];
+    console.log(selectedPkmn.name)
+  };
+
   return (
     <div className="d-flex flex-row justify-content-center">
       {bench.length > 0 ? (
@@ -10,7 +16,7 @@ export default function Bench({ bench }) {
               className="m-1 pkmn-card"
               src={card.image}
               key={`hand-${index}`}
-              id={`${card.name}-${card.set.name}-hand-${index}`}
+              id={`${card.name}-${card.set.name}-bench-${index}`}
             />
           );
         })

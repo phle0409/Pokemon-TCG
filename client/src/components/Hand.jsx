@@ -4,10 +4,7 @@ export default function Hand({ hand, bench, active, setActive, setBench }) {
   const handleClick = (e) => {
     const [name, set, zone, index] = e.target.id.split("-");
     const selectedPkmn = hand[index];
-    if (
-      selectedPkmn.supertype === "Pokémon" &&
-      selectedPkmn.subtypes.includes("Basic")
-    ) {
+    if (selectedPkmn.supertype.includes("Pok") && selectedPkmn.subtypes.includes("Basic")) {
       hand.splice(index, 1);
       if (!active) setActive(selectedPkmn);
       else if (bench.length < 5) {
