@@ -10,7 +10,6 @@ export default function AttackModal({ show, handleClose, selected }) {
         onHide={handleClose}
         backdrop="static"
         keyboard={false}
-        size="lg"
       >
         <Modal.Header closeButton>
           <Modal.Title></Modal.Title>
