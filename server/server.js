@@ -12,9 +12,12 @@ const PKMN_API_KEY = process.env.PKMN_API_KEY;
 app.use(cors());
 
 app.get("/cards", async (req, res) => {
-  const promise = await axios("https://api.pokemontcg.io/v2/cards?q=set.id:base1", {
-    "X-Api-Key": PKMN_API_KEY,
-  })
+  const promise = await axios(
+    "https://api.pokemontcg.io/v2/cards?q=set.id:base1",
+    {
+      "X-Api-Key": PKMN_API_KEY,
+    }
+  )
     .then((res) => {
       return res.data;
     })
@@ -29,11 +32,35 @@ const io = socketio(server, {
   origins: ["http://localhost:3000"],
 });
 
+const players = [null, null];
+
 io.on("connection", (socket) => {
-  console.log(`connected: ${socket.id}`);
+  let player = -1;
+
+  for (const i in players)
+    if (players[i] === null) {
+      player = i;
+      break;
+    }
+
+  if (player === -1) return;
+
+  players[player] = socket;
+  console.log(`connected: player ${parseInt(player) + 1} ${socket.id}`);
+  socket.broadcast.emit("player-joined", socket.id);
+
+  socket.on("played-to-active", (card) => {
+    socket.broadcast.emit("opponent-played-to-active", card);
+  });
+  
+  socket.on("played-to-bench", (card) => {
+    socket.broadcast.emit("opponent-played-to-bench", card);
+  });
 
   socket.on("disconnect", () => {
-    console.log(`disconnected: ${socket.id}`);
+    console.log(`disconnected: player ${parseInt(player) + 1} ${socket.id}`);
+    players[player] = null;
+    socket.broadcast.emit("player-left", socket.id);
   });
 });
 
