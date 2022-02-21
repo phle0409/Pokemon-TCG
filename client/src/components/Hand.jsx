@@ -1,17 +1,27 @@
 import React from "react";
 
-export default function Hand({ hand, bench, active, setActive, setBench }) {
+export default function Hand({
+  hand,
+  bench,
+  active,
+  setActive,
+  setBench,
+  socket,
+}) {
   const handleClick = (e) => {
     const [name, set, zone, index] = e.target.id.split("-");
     const selectedPkmn = hand[index];
-    if (selectedPkmn.supertype.includes("Pok") && selectedPkmn.subtypes.includes("Basic")) {
+    if (
+      selectedPkmn.supertype.includes("Pokémon") &&
+      selectedPkmn.subtypes.includes("Basic")
+    ) {
       hand.splice(index, 1);
-      if (!active) setActive(selectedPkmn);
-      else if (bench.length < 5) {
-        let cards = [];
-        bench.forEach((card) => cards.push(card));
-        cards.push(selectedPkmn);
-        setBench(cards);
+      if (!active) {
+        setActive(selectedPkmn);
+        socket.emit("played-to-active", selectedPkmn);
+      } else if (bench.length < 5) {
+        setBench([...bench, selectedPkmn]);
+        socket.emit("played-to-bench", bench);
       }
     }
   };

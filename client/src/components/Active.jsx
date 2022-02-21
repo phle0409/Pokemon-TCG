@@ -1,7 +1,8 @@
 import React from "react";
 
-export default function Active({ active, setSelected, setShow }) {
+export default function Active({ active, setSelected, setShow, yourCard }) {
   const handleClick = (e) => {
+    if(!yourCard) return;
     const selectedPkmn = active;
     setSelected(selectedPkmn);
     setShow(true);
@@ -12,6 +13,7 @@ export default function Active({ active, setSelected, setShow }) {
       {active ? (
         <img
           className="m-1 pkmn-card"
+          style={yourCard ? {} : { transform: "rotate(180deg)" }}
           src={active.image}
           id={`${active.name}-${active.set.name}-active`}
           onClick={handleClick}
