@@ -374,7 +374,7 @@ export default function HowToPlay() {
           </section>
         </Tab>
       </Tabs>
-      <div className="text-center mt-4">
+      <div className="text-center my-4">
         <a href="/" className="btn btn-primary btn-lg">
           Back To Home
         </a>
