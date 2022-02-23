@@ -30,36 +30,36 @@ const PrePage = () => {
         <Col className="border border-dark bg-light my-3 mx-3 text-center">
           <h3 className="text-center mt-1">Select Desk</h3>
           <Row>
-            <Col className="border border-dark bg-light mx-2 my-2">
+            <Col className="border border-dark mx-2 my-2 pre-desk">
               <img
-                className="img-fluid"
-                src={require('../images/how_to_play/Brushfire_Deck.jpeg')}
+                className="img-fluid my-2"
+                src={require('../images/how_to_play/brushfire.png')}
                 width="150px"
                 alt="Brushfire_Deck"
               />
             </Col>
-            <Col className="border border-dark bg-light mx-2 my-2">
+            <Col className="border border-dark mx-2 my-2 pre-desk">
               <img
-                className="img-fluid"
-                src={require('../images/how_to_play/Blackout_Deck.jpeg')}
+                className="img-fluid my-2"
+                src={require('../images/how_to_play/blackout.png')}
                 width="150px"
                 alt="Brushfire_Deck"
               />
             </Col>
           </Row>
           <Row>
-            <Col className="border border-dark bg-light mx-2 my-2">
+            <Col className="border border-dark mx-2 my-2 pre-desk">
               <img
-                className="img-fluid"
-                src={require('../images/how_to_play/Overgrowth_Deck.jpeg')}
+                className="img-fluid my-2"
+                src={require('../images/how_to_play/overgrowth.png')}
                 width="150px"
                 alt="Brushfire_Deck"
               />
             </Col>
-            <Col className="border border-dark bg-light mx-2 my-2">
+            <Col className="border border-dark mx-2 my-2 pre-desk">
               <img
-                className="img-fluid"
-                src={require('../images/how_to_play/Zap_Deck.jpeg')}
+                className="img-fluid my-2"
+                src={require('../images/how_to_play/zap.png')}
                 width="150px"
                 alt="Brushfire_Deck"
               />
