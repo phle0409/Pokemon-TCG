@@ -4,7 +4,7 @@ import { Container, Form, Button, Row, Col } from 'react-bootstrap';
 
 const PrePage = () => {
   return (
-    <Container className="my-5">
+    <Container className="my-3">
       <Row
         style={{ maxWidth: '80%', marginLeft: '70px', marginRight: '70px' }}
         className="border border-dark bg-light"
@@ -28,21 +28,43 @@ const PrePage = () => {
         </div>
 
         <Col className="border border-dark bg-light my-3 mx-3">
-          <div> Test Select</div>
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. At
-            reiciendis hic asperiores ex, adipisci harum animi quod, libero
-            accusamus labore perferendis quas voluptatum provident beatae
-            quibusdam autem quos ratione eligendi, minus placeat aut molestiae
-            illum tempora. Rerum autem ducimus, optio ipsum at iste libero
-            labore voluptate modi, aliquam fugit, repellendus ea! Ratione
-            asperiores harum fugit nulla consectetur quidem, optio velit rem ea
-            repellat ad fuga, ullam sequi dolores ipsum eveniet nobis a iusto
-            eaque, exercitationem reiciendis corrupti? Consectetur unde labore
-            ullam incidunt quia reiciendis doloremque cum impedit ea cupiditate
-            explicabo dicta, dolorum possimus repellat voluptates aliquid velit?
-            Itaque, eos libero.
-          </p>
+          <h3 className="text-center mt-1">Select Desk</h3>
+          <Row>
+            <Col className="border border-dark bg-light mx-2 my-2">
+              <img
+                className="img-fluid"
+                src={require('../images/how_to_play/Brushfire_Deck.jpeg')}
+                width="150px"
+                alt="Brushfire_Deck"
+              />
+            </Col>
+            <Col className="border border-dark bg-light mx-2 my-2">
+              <img
+                className="img-fluid"
+                src={require('../images/how_to_play/Blackout_Deck.jpeg')}
+                width="150px"
+                alt="Brushfire_Deck"
+              />
+            </Col>
+          </Row>
+          <Row>
+            <Col className="border border-dark bg-light mx-2 my-2">
+              <img
+                className="img-fluid"
+                src={require('../images/how_to_play/Overgrowth_Deck.jpeg')}
+                width="150px"
+                alt="Brushfire_Deck"
+              />
+            </Col>
+            <Col className="border border-dark bg-light mx-2 my-2">
+              <img
+                className="img-fluid"
+                src={require('../images/how_to_play/Zap_Deck.jpeg')}
+                width="150px"
+                alt="Brushfire_Deck"
+              />
+            </Col>
+          </Row>
         </Col>
         <Col>
           <Form className=" my-3 mx-3">
