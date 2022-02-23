@@ -52,7 +52,7 @@ io.on("connection", (socket) => {
   socket.on("played-to-active", (card) => {
     socket.broadcast.emit("opponent-played-to-active", card);
   });
-  
+
   socket.on("played-to-bench", (card) => {
     socket.broadcast.emit("opponent-played-to-bench", card);
   });

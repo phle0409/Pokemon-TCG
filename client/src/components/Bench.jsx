@@ -1,8 +1,7 @@
 import React from "react";
 
-export default function Bench({ bench, setSelected, yourCard }) {
+export default function Bench({ bench, setSelected }) {
   const handleClick = (e) => {
-    if (!yourCard) return;
     const [name, set, zone, index] = e.target.id.split("-");
     const selectedPkmn = bench[index];
     console.log(selectedPkmn.name);
@@ -14,8 +13,7 @@ export default function Bench({ bench, setSelected, yourCard }) {
         bench.map((card, index) => {
           return (
             <img
-              className="m-1 pkmn-card"
-              style={yourCard ? {} : { transform: "rotate(180deg)" }}
+              className="mx-2 pkmn-card"
               src={card.image}
               key={`bench-${index}`}
               id={`${card.name}-${card.set.name}-bench-${index}`}
@@ -24,10 +22,7 @@ export default function Bench({ bench, setSelected, yourCard }) {
           );
         })
       ) : (
-        <div
-          className="m-1 pkmn-card"
-          style={{ backgroundColor: "#eee" }}
-        ></div>
+        <div className="pkmn-card"></div>
       )}
     </div>
   );

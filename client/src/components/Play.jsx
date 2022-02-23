@@ -1,21 +1,33 @@
 import React from "react";
 import { io } from "socket.io-client";
-import { Button, Container } from "react-bootstrap";
+import { Container } from "react-bootstrap";
 import { fetchDeck } from "../utils/createDeck.js";
 import { decklist_brushfire } from "../utils/precons.js";
 import Hand from "./Hand.jsx";
 import Bench from "./Bench.jsx";
 import Active from "./Active.jsx";
+import OpponentActive from "./OpponentActive.jsx";
+import OpponentBench from "./OpponentBench.jsx";
 import AttackModal from "./AttackModal.jsx";
 
 export default function Play() {
   const [socket, setSocket] = React.useState(null);
-  const [deck, setDeck] = React.useState(null);
+  const [yourName, setYourName] = React.useState("");
+  const [deck, setDeck] = React.useState([]);
   const [hand, setHand] = React.useState([]);
-  const [bench, setBench] = React.useState([]);
   const [active, setActive] = React.useState(null);
-  const [opponentBench, setOpponentBench] = React.useState([]);
+  const [bench, setBench] = React.useState([]);
+  const [prizes, setPrizes] = React.useState([]);
+  const [discard, setDiscard] = React.useState([]);
+  const [opponentName, setOpponentName] = React.useState(
+    "[Waiting on an opponent...]"
+  );
+  const [opponentDeck, setOpponentDeck] = React.useState([]);
   const [opponentActive, setOpponentActive] = React.useState(null);
+  const [opponentHand, setOpponentHand] = React.useState([]);
+  const [opponentBench, setOpponentBench] = React.useState([]);
+  const [opponentPrizes, setOpponentPrizes] = React.useState([]);
+  const [opponentDiscard, setOpponentDiscard] = React.useState([]);
   const [selected, setSelected] = React.useState(null);
   const [show, setShow] = React.useState(false);
 
@@ -33,8 +45,9 @@ export default function Play() {
 
   React.useEffect(() => {
     if (!socket) return;
-    socket.on("connect", () => console.log(socket.id));
-    socket.on("player-joined", (id) => alert(`${id} has joined`));
+    socket.on("connect", (id) => setYourName(socket.id));
+    socket.on("player-joined", (id) => setOpponentName(id));
+    socket.on("player-already-here", id => console.log(id));
     socket.on("opponent-played-to-active", (selectedPkmn) =>
       setOpponentActive(selectedPkmn)
     );
@@ -42,7 +55,7 @@ export default function Play() {
       setOpponentBench([...selectedPkmn]);
     });
     socket.on("player-left", (id) => {
-      alert(`${id} has left`);
+      setOpponentName("[Player left]");
       setOpponentActive(null);
       setOpponentBench([]);
     });
@@ -53,7 +66,7 @@ export default function Play() {
 
     while (!openingHandBasic) {
       deck.shuffle();
-      const hand = deck.draw(10);
+      const hand = deck.draw(7);
       setHand(hand);
 
       for (const card of hand) {
@@ -71,35 +84,44 @@ export default function Play() {
         console.log("Reshuffling...");
       }
     }
+    const prizes = deck.draw(6);
+    setPrizes(prizes);
     setDeck(deck);
   };
 
   return (
-    <Container fluid className="bg-dark h-100 w-100 p-0">
-      <Button
-        className="position-absolute top-0 left-0 m-4"
-        href="/"
-        variant="danger"
-      >
-        Forfeit
-      </Button>
+    <Container fluid className="bg-dark d-flex flex-row h-100 w-100 p-2">
       <AttackModal show={show} handleClose={handleClose} selected={selected} />
-      <Container
-        fluid
-        className="bg-dark d-flex flex-column align-items-center h-100 w-100"
-      >
-        <div className="bg-light m-2 p-2 d-flex flex-column justify-content-between h-100 w-100 border border-dark rounded">
-          <Bench bench={opponentBench} yourCard={false} />
-          <Active active={opponentActive} yourCard={false} />
-          <Active
-            active={active}
-            setSelected={setSelected}
-            setShow={setShow}
-            yourCard={true}
-          />
-          <Bench bench={bench} setSelected={setSelected} yourCard={true} />
+      <div className="bg-dark d-flex flex-column w-25 h-100">
+        <div className="bg-light d-flex flex-column m-2 p-2 h-25 border border-secondary border-2 rounded">
+          <span></span>
+          <span>
+            <strong>{yourName}</strong>
+          </span>
+          <span>Cards in deck: {deck.cards?.length}</span>
+          <span>Prize cards: {prizes.length}</span>
+          <span>Cards in hand: {hand.length}</span>
+          <span>Cards in discard: {discard.length}</span>
         </div>
-        <div className="mb-2 bg-primary rounded w-100">
+        <div className="bg-light d-flex flex-column m-2 p-2 h-25 border border-secondary border-2 rounded">
+          <span>
+            <strong>{opponentName}</strong>
+          </span>
+          <span>Cards in deck: {opponentDeck.cards?.length}</span>
+          <span>Prize cards: {opponentPrizes.length}</span>
+          <span>Cards in hand: {opponentHand.length}</span>
+          <span>Cards in discard: {opponentDiscard.length}</span>
+        </div>
+        <div className="bg-light d-flex flex-column m-2 p-2 h-50 border border-secondary border-2 rounded"></div>
+      </div>
+      <Container fluid className="bg-dark py-2 d-flex flex-column h-100 w-100">
+        <div className="bg-light d-flex flex-column p-2 justify-content-between h-100 w-100 border border-secondary border-3 rounded">
+          <OpponentBench opponentBench={opponentBench} />
+          <OpponentActive opponentActive={opponentActive} />
+          <Active active={active} setSelected={setSelected} setShow={setShow} />
+          <Bench bench={bench} setSelected={setSelected} />
+        </div>
+        <div className="d-flex flex-row mt-2 bg-primary border border-2 rounded w-100">
           <Hand
             hand={hand}
             active={active}

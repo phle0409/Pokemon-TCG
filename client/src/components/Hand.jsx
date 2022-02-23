@@ -21,7 +21,7 @@ export default function Hand({
         socket.emit("played-to-active", selectedPkmn);
       } else if (bench.length < 5) {
         setBench([...bench, selectedPkmn]);
-        socket.emit("played-to-bench", bench);
+        socket.emit("played-to-bench", [...bench]);
       }
     }
   };
