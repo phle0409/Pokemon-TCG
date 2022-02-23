@@ -11,8 +11,8 @@ export default function EnergyCost({ energies }) {
                 src={require(`../images/${energy}.png`)}
                 key={index}
                 className="m-1"
-                height="30rem"
-                width="30rem"
+                height="20rem"
+                width="20rem"
               />
             );
           })
