@@ -366,7 +366,9 @@ export default function HowToPlay() {
           <section>
             <h3 className="fw-bold text-info ps-2">More Rules & Info</h3>
             <div className="ps-4">
-              <p>For more rules and information, you can check this link:</p>
+              <p className="lead">
+                For more rules and information, you can check this link:
+              </p>
               <a href="https://www.pokemon.com/us/pokemon-tcg/">
                 https://www.pokemon.com/us/pokemon-tcg/
               </a>
@@ -374,7 +376,7 @@ export default function HowToPlay() {
           </section>
         </Tab>
       </Tabs>
-      <div className="text-center my-4">
+      <div className="text-center my-4 pb-4">
         <a href="/" className="btn btn-primary btn-lg">
           Back To Home
         </a>
