@@ -4,9 +4,9 @@ import { Container, Form, Button, Row, Col } from 'react-bootstrap';
 
 const PrePage = () => {
   return (
-    <Container className="my-3">
+    <Container className="my-4 justify-content-center ">
       <Row
-        style={{ maxWidth: '80%', marginLeft: '70px', marginRight: '70px' }}
+        style={{ maxWidth: '80%', marginLeft: '90px', marginRight: '70px' }}
         className="border border-dark bg-light"
       >
         <div>
@@ -27,7 +27,7 @@ const PrePage = () => {
           </h1>
         </div>
 
-        <Col className="border border-dark bg-light my-3 mx-3">
+        <Col className="border border-dark bg-light my-3 mx-3 text-center">
           <h3 className="text-center mt-1">Select Desk</h3>
           <Row>
             <Col className="border border-dark bg-light mx-2 my-2">
