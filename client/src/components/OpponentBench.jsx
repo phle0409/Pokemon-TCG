@@ -7,7 +7,7 @@ export default function OpponentBench({ opponentBench }) {
         opponentBench.map((card, index) => {
           return (
             <img
-              className="mx-2 pkmn-card"
+              className="mx-2 opp-pkmn-card"
               src={card.image}
               key={`bench-${index}`}
               id={`${card.name}-${card.set.name}-opponentbench-${index}`}

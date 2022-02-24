@@ -6,6 +6,9 @@ export default function Hand({
   active,
   setActive,
   setBench,
+  deck,
+  prizes,
+  discard,
   socket,
 }) {
   const handleClick = (e) => {
@@ -16,12 +19,28 @@ export default function Hand({
       selectedPkmn.subtypes.includes("Basic")
     ) {
       hand.splice(index, 1);
+      let newBench = null;
       if (!active) {
         setActive(selectedPkmn);
-        socket.emit("played-to-active", selectedPkmn);
+        socket.emit("played-card", {
+          deck,
+          hand,
+          active: selectedPkmn,
+          bench,
+          prizes,
+          discard,
+        });
       } else if (bench.length < 5) {
-        setBench([...bench, selectedPkmn]);
-        socket.emit("played-to-bench", [...bench]);
+        let newBench = [...bench, selectedPkmn];
+        setBench(newBench);
+        socket.emit("played-card", {
+          deck,
+          hand,
+          active,
+          bench: newBench,
+          prizes,
+          discard,
+        });
       }
     }
   };

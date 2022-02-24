@@ -5,7 +5,7 @@ export default function Active({ opponentActive }) {
     <div className="d-flex flex-row justify-content-center">
       {opponentActive ? (
         <img
-          className="pkmn-card"
+          className="opp-pkmn-card"
           src={opponentActive.image}
           id={`${opponentActive.name}-${opponentActive.set.name}-opponentactive`}
         />

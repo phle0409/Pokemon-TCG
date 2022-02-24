@@ -47,15 +47,11 @@ io.on("connection", (socket) => {
 
   players[player] = socket;
   console.log(`connected: player ${parseInt(player) + 1} ${socket.id}`);
-  socket.broadcast.emit("player-joined", socket.id);
-
-  socket.on("played-to-active", (card) => {
-    socket.broadcast.emit("opponent-played-to-active", card);
+  socket.on("player-joined", (id) => {
+    socket.broadcast.emit("player-name", id);
   });
 
-  socket.on("played-to-bench", (card) => {
-    socket.broadcast.emit("opponent-played-to-bench", card);
-  });
+  socket.on("other-player-name", id => socket.broadcast.emit("other-player-name", id));
 
   socket.on("disconnect", () => {
     console.log(`disconnected: player ${parseInt(player) + 1} ${socket.id}`);

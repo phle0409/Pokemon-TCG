@@ -1,4 +1,5 @@
 import React from "react";
+import { useLocation } from "react-router-dom";
 import { io } from "socket.io-client";
 import { Container } from "react-bootstrap";
 import { fetchDeck } from "../utils/createDeck.js";
@@ -10,18 +11,16 @@ import OpponentActive from "./OpponentActive.jsx";
 import OpponentBench from "./OpponentBench.jsx";
 import AttackModal from "./AttackModal.jsx";
 
-export default function Play() {
+export default function Play({ precon, name, roomID }) {
   const [socket, setSocket] = React.useState(null);
-  const [yourName, setYourName] = React.useState("");
+  const [yourName, setYourName] = React.useState("You");
   const [deck, setDeck] = React.useState([]);
   const [hand, setHand] = React.useState([]);
   const [active, setActive] = React.useState(null);
   const [bench, setBench] = React.useState([]);
   const [prizes, setPrizes] = React.useState([]);
   const [discard, setDiscard] = React.useState([]);
-  const [opponentName, setOpponentName] = React.useState(
-    "[Waiting on an opponent...]"
-  );
+  const [opponentName, setOpponentName] = React.useState(null);
   const [opponentDeck, setOpponentDeck] = React.useState([]);
   const [opponentActive, setOpponentActive] = React.useState(null);
   const [opponentHand, setOpponentHand] = React.useState([]);
@@ -30,6 +29,7 @@ export default function Play() {
   const [opponentDiscard, setOpponentDiscard] = React.useState([]);
   const [selected, setSelected] = React.useState(null);
   const [show, setShow] = React.useState(false);
+  const { state } = useLocation();
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
@@ -45,17 +45,27 @@ export default function Play() {
 
   React.useEffect(() => {
     if (!socket) return;
-    socket.on("connect", (id) => setYourName(socket.id));
-    socket.on("player-joined", (id) => setOpponentName(id));
-    socket.on("player-already-here", id => console.log(id));
-    socket.on("opponent-played-to-active", (selectedPkmn) =>
-      setOpponentActive(selectedPkmn)
-    );
-    socket.on("opponent-played-to-bench", (selectedPkmn) => {
-      setOpponentBench([...selectedPkmn]);
+    socket.on("connect", (id) => {
+      setYourName(socket.id);
+      socket.emit("player-joined", socket.id);
     });
+    socket.on("player-name", (id) => {
+      setOpponentName(id);
+      socket.emit("other-player-name", socket.id);
+    });
+    socket.on("other-player-name", id => setOpponentName(id));
+
+    socket.on("opponent-played-card", (board) => {
+      const { deck, hand, active, bench, prizes, discard } = board;
+      setOpponentDeck(deck);
+      setOpponentHand(hand);
+      setOpponentActive(active);
+      setOpponentBench(bench);
+      setOpponentPrizes(prizes);
+      setOpponentDiscard(discard);
+    });
+
     socket.on("player-left", (id) => {
-      setOpponentName("[Player left]");
       setOpponentActive(null);
       setOpponentBench([]);
     });
@@ -66,7 +76,7 @@ export default function Play() {
 
     while (!openingHandBasic) {
       deck.shuffle();
-      const hand = deck.draw(7);
+      const hand = deck.draw(11);
       setHand(hand);
 
       for (const card of hand) {
@@ -90,7 +100,11 @@ export default function Play() {
   };
 
   return (
-    <Container fluid className="bg-dark d-flex flex-row h-100 w-100 p-2">
+    <Container
+      fluid
+      className="bg-dark d-flex flex-row h-100 w-100 p-2"
+      style={{ overflow: "hidden" }}
+    >
       <AttackModal show={show} handleClose={handleClose} selected={selected} />
       <div className="bg-dark d-flex flex-column w-25 h-100">
         <div className="bg-light d-flex flex-column m-2 p-2 h-25 border border-secondary border-2 rounded">
@@ -105,7 +119,7 @@ export default function Play() {
         </div>
         <div className="bg-light d-flex flex-column m-2 p-2 h-25 border border-secondary border-2 rounded">
           <span>
-            <strong>{opponentName}</strong>
+            <strong>{opponentName || "Waiting on opponent..."}</strong>
           </span>
           <span>Cards in deck: {opponentDeck.cards?.length}</span>
           <span>Prize cards: {opponentPrizes.length}</span>
@@ -121,13 +135,16 @@ export default function Play() {
           <Active active={active} setSelected={setSelected} setShow={setShow} />
           <Bench bench={bench} setSelected={setSelected} />
         </div>
-        <div className="d-flex flex-row mt-2 bg-primary border border-2 rounded w-100">
+        <div className="d-flex flex-row mt-2 bg-primary border border-2 rounded h-25 w-100">
           <Hand
             hand={hand}
             active={active}
             setActive={setActive}
             bench={bench}
             setBench={setBench}
+            deck={deck}
+            prizes={prizes}
+            discard={discard}
             socket={socket}
           />
         </div>

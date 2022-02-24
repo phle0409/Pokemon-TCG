@@ -50,7 +50,6 @@ const PrePage = () => {
       setIsMissing(true);
     } else {
       setIsMissing(false);
-      console.log(selectedDeck);
       let desk = null;
       switch (selectedDeck) {
         case 'brush':
