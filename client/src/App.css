@@ -8,10 +8,11 @@ html, body, #root {
 
 .pkmn-card {
   height: 6.125rem;
-  transition: 1.0s;
+  transition: 0.5s;
   width: 4.375rem;
 }
 
 .pkmn-card:hover {
   cursor: pointer;
+  transform: translateY(-40px) scale(2);
 }
