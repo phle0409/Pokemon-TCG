@@ -1,14 +1,22 @@
 import React, { useState } from 'react';
 import { Container, Form, Button, Row, Col } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
+import {
+  decklist_brushfire,
+  decklist_overgrowth,
+  decklist_zap,
+  decklist_blackout,
+} from '../utils/precons';
 
 const PrePage = () => {
   const [isMissing, setIsMissing] = useState(false);
-  let selectedDesk = '';
+  let navigate = useNavigate();
+  let selectedDeck = '';
 
-  const handleClick = (deskName) => {
-    selectedDesk = deskName;
-    const desk = document.querySelector(`#pre-desk-${deskName}`);
-    const preDesksBackground = document.querySelectorAll('.pre-desk');
+  const handleClick = (deckName) => {
+    selectedDeck = deckName;
+    const desk = document.querySelector(`#pre-deck-${deckName}`);
+    const preDesksBackground = document.querySelectorAll('.pre-deck');
 
     preDesksBackground.forEach((desk) => {
       desk.style.backgroundColor = '#ffffff';
@@ -16,14 +24,14 @@ const PrePage = () => {
     desk.style.backgroundColor = '#a6f2ff';
   };
 
-  const handleMouseEnter = (deskName) => {
-    const desk = document.querySelector(`#pre-desk-${deskName}`);
+  const handleMouseEnter = (deckName) => {
+    const desk = document.querySelector(`#pre-deck-${deckName}`);
     if (desk.style.backgroundColor !== 'rgb(166, 242, 255)') {
       desk.style.backgroundColor = '#f2d2bd';
     }
   };
-  const handleMouseLeave = (deskName) => {
-    const desk = document.querySelector(`#pre-desk-${deskName}`);
+  const handleMouseLeave = (deckName) => {
+    const desk = document.querySelector(`#pre-deck-${deckName}`);
     if (desk.style.backgroundColor !== 'rgb(166, 242, 255)') {
       desk.style.backgroundColor = '#ffffff';
     }
@@ -31,21 +39,36 @@ const PrePage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const name = document.querySelector('#username');
-    const roomName = document.querySelector('#roomName').value;
-
-    console.log(roomName);
-    console.log(name.value);
-    console.log(selectedDesk);
+    const username = document.querySelector('#username');
+    const room = document.querySelector('#roomID').value;
     if (
-      !selectedDesk ||
-      !name ||
-      name.value === '' ||
-      roomName === 'Choose Room'
+      !selectedDeck ||
+      !username ||
+      username.value === '' ||
+      room === 'Choose Room'
     ) {
       setIsMissing(true);
     } else {
       setIsMissing(false);
+      console.log(selectedDeck);
+      let desk = null;
+      switch (selectedDeck) {
+        case 'brush':
+          desk = decklist_brushfire;
+          break;
+        case 'overgrowth':
+          desk = decklist_overgrowth;
+          break;
+        case 'black':
+          desk = decklist_blackout;
+          break;
+        case 'zap':
+          desk = decklist_zap;
+          break;
+      }
+      navigate('/play', {
+        state: { precon: desk, name: username.value, roomID: room },
+      });
     }
   };
 
@@ -74,14 +97,14 @@ const PrePage = () => {
         </div>
 
         <Col className="border border-dark bg-white my-3 mx-3 text-center">
-          <h3 className="text-center mt-1">Select Desk</h3>
+          <h3 className="text-center mt-1">Select Deck</h3>
           <Row>
             <Col
               onClick={(e) => handleClick('brush')}
               onMouseEnter={(e) => handleMouseEnter('brush')}
               onMouseLeave={(e) => handleMouseLeave('brush')}
-              className="border border-dark mx-2 my-2 pre-desk "
-              id="pre-desk-brush"
+              className="border border-dark mx-2 my-2 pre-deck "
+              id="pre-deck-brush"
             >
               <img
                 className="img-fluid my-2"
@@ -94,8 +117,8 @@ const PrePage = () => {
               onClick={(e) => handleClick('black')}
               onMouseEnter={(e) => handleMouseEnter('black')}
               onMouseLeave={(e) => handleMouseLeave('black')}
-              className="border border-dark mx-2 my-2 pre-desk"
-              id="pre-desk-black"
+              className="border border-dark mx-2 my-2 pre-deck"
+              id="pre-deck-black"
             >
               <img
                 className="img-fluid my-2"
@@ -110,8 +133,8 @@ const PrePage = () => {
               onClick={(e) => handleClick('overgrowth')}
               onMouseEnter={(e) => handleMouseEnter('overgrowth')}
               onMouseLeave={(e) => handleMouseLeave('overgrowth')}
-              className="border border-dark mx-2 my-2 pre-desk"
-              id="pre-desk-overgrowth"
+              className="border border-dark mx-2 my-2 pre-deck"
+              id="pre-deck-overgrowth"
             >
               <img
                 className="img-fluid my-2"
@@ -124,8 +147,8 @@ const PrePage = () => {
               onClick={(e) => handleClick('zap')}
               onMouseEnter={(e) => handleMouseEnter('zap')}
               onMouseLeave={(e) => handleMouseLeave('zap')}
-              className="border border-dark mx-2 my-2 pre-desk"
-              id="pre-desk-zap"
+              className="border border-dark mx-2 my-2 pre-deck"
+              id="pre-deck-zap"
             >
               <img
                 className="img-fluid my-2"
@@ -144,7 +167,7 @@ const PrePage = () => {
                 <Form.Control type="text" placeholder="e.g. Doug" />
               </Form.Group>
 
-              <Form.Select aria-label="Default select example" id="roomName">
+              <Form.Select aria-label="Default select example" id="roomID">
                 <option>Choose Room</option>
                 <option value="1">Red</option>
                 <option value="2">Lucas</option>
@@ -163,7 +186,7 @@ const PrePage = () => {
           </Form>
           {isMissing && (
             <div className="text-danger text-center">
-              Please select a desk, room name and provide username
+              Please select a deck, room name and provide username
             </div>
           )}
         </Col>
