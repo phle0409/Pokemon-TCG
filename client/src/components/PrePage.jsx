@@ -10,6 +10,7 @@ import {
 
 const PrePage = () => {
   const [isMissing, setIsMissing] = useState(false);
+  const [warningMessage, setWarningMessage] = useState('');
   let navigate = useNavigate();
   let selectedDeck = '';
 
@@ -48,6 +49,18 @@ const PrePage = () => {
       room === 'Choose Room'
     ) {
       setIsMissing(true);
+      const preDesksBackground = document.querySelectorAll('.pre-deck');
+
+      preDesksBackground.forEach((desk) => {
+        desk.style.backgroundColor = '#ffffff';
+      });
+      if (selectedDeck) {
+        setWarningMessage('Please provide username and room name');
+      } else if (username && room !== 'Choose Room') {
+        setWarningMessage('Please select deck again');
+      } else {
+        setWarningMessage('Please select deck');
+      }
     } else {
       setIsMissing(false);
       console.log(selectedDeck);
@@ -73,7 +86,7 @@ const PrePage = () => {
   };
 
   return (
-    <Container className="my-4 justify-content-center ">
+    <Container className="my-1 justify-content-center ">
       <Row
         style={{ maxWidth: '80%', marginLeft: '90px', marginRight: '70px' }}
         className="border border-dark bg-light"
@@ -96,7 +109,7 @@ const PrePage = () => {
           </h1>
         </div>
 
-        <Col className="border border-dark bg-white my-3 mx-3 text-center">
+        <Col className="border border-dark bg-white my-2 mx-3 text-center">
           <h3 className="text-center mt-1">Select Deck</h3>
           <Row>
             <Col
@@ -182,12 +195,17 @@ const PrePage = () => {
               >
                 Submit
               </Button>
+              <Button
+                href="/how-to-play"
+                className="btn btn-lg"
+                variant="outline-secondary"
+              >
+                How to Play
+              </Button>
             </div>
           </Form>
           {isMissing && (
-            <div className="text-danger text-center">
-              Please select a deck, room name and provide username
-            </div>
+            <div className="text-danger text-center">{warningMessage}</div>
           )}
         </Col>
       </Row>
