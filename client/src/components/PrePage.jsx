@@ -49,6 +49,11 @@ const PrePage = () => {
       room === 'Choose Room'
     ) {
       setIsMissing(true);
+      const preDesksBackground = document.querySelectorAll('.pre-deck');
+
+      preDesksBackground.forEach((desk) => {
+        desk.style.backgroundColor = '#ffffff';
+      });
       if (selectedDeck) {
         setWarningMessage('Please provide username and room name');
       } else if (username && room !== 'Choose Room') {
@@ -189,6 +194,13 @@ const PrePage = () => {
                 type="submit"
               >
                 Submit
+              </Button>
+              <Button
+                href="/how-to-play"
+                className="btn btn-lg"
+                variant="outline-secondary"
+              >
+                How to Play
               </Button>
             </div>
           </Form>
