@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Container, Form, Button, Row, Col } from 'react-bootstrap';
 
 const PrePage = () => {
+  const [isMissing, setIsMissing] = useState(false);
   let selectedDesk = '';
 
   const handleClick = (deskName) => {
@@ -25,6 +26,26 @@ const PrePage = () => {
     const desk = document.querySelector(`#pre-desk-${deskName}`);
     if (desk.style.backgroundColor !== 'rgb(166, 242, 255)') {
       desk.style.backgroundColor = '#ffffff';
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const name = document.querySelector('#username');
+    const roomName = document.querySelector('#roomName').value;
+
+    console.log(roomName);
+    console.log(name.value);
+    console.log(selectedDesk);
+    if (
+      !selectedDesk ||
+      !name ||
+      name.value === '' ||
+      roomName === 'Choose Room'
+    ) {
+      setIsMissing(true);
+    } else {
+      setIsMissing(false);
     }
   };
 
@@ -116,14 +137,14 @@ const PrePage = () => {
           </Row>
         </Col>
         <Col>
-          <Form className=" my-3 mx-3">
+          <Form onSubmit={handleSubmit} className=" my-3 mx-3">
             <div>
-              <Form.Group className="my-3 " controlId="formBasicUserName">
+              <Form.Group className="my-3" controlId="username">
                 <Form.Label>Username</Form.Label>
                 <Form.Control type="text" placeholder="e.g. Doug" />
               </Form.Group>
 
-              <Form.Select aria-label="Default select example">
+              <Form.Select aria-label="Default select example" id="roomName">
                 <option>Choose Room</option>
                 <option value="1">Red</option>
                 <option value="2">Lucas</option>
@@ -140,6 +161,11 @@ const PrePage = () => {
               </Button>
             </div>
           </Form>
+          {isMissing && (
+            <div className="text-danger text-center">
+              Please select a desk, room name and provide username
+            </div>
+          )}
         </Col>
       </Row>
     </Container>
