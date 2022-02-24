@@ -1,12 +1,6 @@
 import React, { useState } from 'react';
 import { Container, Form, Button, Row, Col } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import {
-  decklist_brushfire,
-  decklist_overgrowth,
-  decklist_zap,
-  decklist_blackout,
-} from '../utils/precons';
 
 const PrePage = () => {
   const [isMissing, setIsMissing] = useState(false);
@@ -64,23 +58,8 @@ const PrePage = () => {
     } else {
       setIsMissing(false);
       console.log(selectedDeck);
-      let desk = null;
-      switch (selectedDeck) {
-        case 'brush':
-          desk = decklist_brushfire;
-          break;
-        case 'overgrowth':
-          desk = decklist_overgrowth;
-          break;
-        case 'black':
-          desk = decklist_blackout;
-          break;
-        case 'zap':
-          desk = decklist_zap;
-          break;
-      }
       navigate('/play', {
-        state: { precon: desk, name: username.value, roomID: room },
+        state: { desklist: selectedDeck, name: username.value, roomID: room },
       });
     }
   };
