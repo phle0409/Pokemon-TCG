@@ -1,8 +1,33 @@
-import React from 'react';
-import '../styles/prepage.css';
+import React, { useState } from 'react';
 import { Container, Form, Button, Row, Col } from 'react-bootstrap';
 
 const PrePage = () => {
+  let selectedDesk = '';
+
+  const handleClick = (deskName) => {
+    selectedDesk = deskName;
+    const desk = document.querySelector(`#pre-desk-${deskName}`);
+    const preDesksBackground = document.querySelectorAll('.pre-desk');
+
+    preDesksBackground.forEach((desk) => {
+      desk.style.backgroundColor = '#ffffff';
+    });
+    desk.style.backgroundColor = '#a6f2ff';
+  };
+
+  const handleMouseEnter = (deskName) => {
+    const desk = document.querySelector(`#pre-desk-${deskName}`);
+    if (desk.style.backgroundColor !== 'rgb(166, 242, 255)') {
+      desk.style.backgroundColor = '#f2d2bd';
+    }
+  };
+  const handleMouseLeave = (deskName) => {
+    const desk = document.querySelector(`#pre-desk-${deskName}`);
+    if (desk.style.backgroundColor !== 'rgb(166, 242, 255)') {
+      desk.style.backgroundColor = '#ffffff';
+    }
+  };
+
   return (
     <Container className="my-4 justify-content-center ">
       <Row
@@ -27,10 +52,16 @@ const PrePage = () => {
           </h1>
         </div>
 
-        <Col className="border border-dark bg-light my-3 mx-3 text-center">
+        <Col className="border border-dark bg-white my-3 mx-3 text-center">
           <h3 className="text-center mt-1">Select Desk</h3>
           <Row>
-            <Col className="border border-dark mx-2 my-2 pre-desk">
+            <Col
+              onClick={(e) => handleClick('brush')}
+              onMouseEnter={(e) => handleMouseEnter('brush')}
+              onMouseLeave={(e) => handleMouseLeave('brush')}
+              className="border border-dark mx-2 my-2 pre-desk "
+              id="pre-desk-brush"
+            >
               <img
                 className="img-fluid my-2"
                 src={require('../images/how_to_play/brushfire.png')}
@@ -38,7 +69,13 @@ const PrePage = () => {
                 alt="Brushfire_Deck"
               />
             </Col>
-            <Col className="border border-dark mx-2 my-2 pre-desk">
+            <Col
+              onClick={(e) => handleClick('black')}
+              onMouseEnter={(e) => handleMouseEnter('black')}
+              onMouseLeave={(e) => handleMouseLeave('black')}
+              className="border border-dark mx-2 my-2 pre-desk"
+              id="pre-desk-black"
+            >
               <img
                 className="img-fluid my-2"
                 src={require('../images/how_to_play/blackout.png')}
@@ -48,7 +85,13 @@ const PrePage = () => {
             </Col>
           </Row>
           <Row>
-            <Col className="border border-dark mx-2 my-2 pre-desk">
+            <Col
+              onClick={(e) => handleClick('overgrowth')}
+              onMouseEnter={(e) => handleMouseEnter('overgrowth')}
+              onMouseLeave={(e) => handleMouseLeave('overgrowth')}
+              className="border border-dark mx-2 my-2 pre-desk"
+              id="pre-desk-overgrowth"
+            >
               <img
                 className="img-fluid my-2"
                 src={require('../images/how_to_play/overgrowth.png')}
@@ -56,7 +99,13 @@ const PrePage = () => {
                 alt="Brushfire_Deck"
               />
             </Col>
-            <Col className="border border-dark mx-2 my-2 pre-desk">
+            <Col
+              onClick={(e) => handleClick('zap')}
+              onMouseEnter={(e) => handleMouseEnter('zap')}
+              onMouseLeave={(e) => handleMouseLeave('zap')}
+              className="border border-dark mx-2 my-2 pre-desk"
+              id="pre-desk-zap"
+            >
               <img
                 className="img-fluid my-2"
                 src={require('../images/how_to_play/zap.png')}
