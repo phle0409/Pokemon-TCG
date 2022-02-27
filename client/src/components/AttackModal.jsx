@@ -3,7 +3,7 @@ import { Button, Col, Container, Modal, Row } from "react-bootstrap";
 import EnergyCost from "./EnergyCost.jsx";
 
 export default function AttackModal({ show, handleClose, selected }) {
-  if (!selected)
+  if (!selected || selected.supertype !== "Pokémon")
     return (
       <Modal
         show={show}

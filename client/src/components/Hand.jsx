@@ -9,40 +9,15 @@ export default function Hand({
   deck,
   prizes,
   discard,
+  setSelected,
+  setSelectedIndex,
   socket,
 }) {
   const handleClick = (e) => {
     const [name, set, zone, index] = e.target.id.split("-");
-    const selectedPkmn = hand[index];
-    if (
-      selectedPkmn.supertype.includes("Pokémon") &&
-      selectedPkmn.subtypes.includes("Basic")
-    ) {
-      hand.splice(index, 1);
-      let newBench = null;
-      if (!active) {
-        setActive(selectedPkmn);
-        socket.emit("played-card", {
-          deck,
-          hand,
-          active: selectedPkmn,
-          bench,
-          prizes,
-          discard,
-        });
-      } else if (bench.length < 5) {
-        let newBench = [...bench, selectedPkmn];
-        setBench(newBench);
-        socket.emit("played-card", {
-          deck,
-          hand,
-          active,
-          bench: newBench,
-          prizes,
-          discard,
-        });
-      }
-    }
+    const selected = hand[index];
+    setSelected(selected);
+    setSelectedIndex(index);
   };
 
   return (

@@ -9,6 +9,7 @@ import Bench from "./Bench.jsx";
 import Active from "./Active.jsx";
 import OpponentActive from "./OpponentActive.jsx";
 import OpponentBench from "./OpponentBench.jsx";
+import InfoPanel from "./InfoPanel.jsx";
 import AttackModal from "./AttackModal.jsx";
 
 export default function Play({ precon, name, roomID }) {
@@ -27,6 +28,7 @@ export default function Play({ precon, name, roomID }) {
   const [opponentBench, setOpponentBench] = React.useState([]);
   const [opponentPrizes, setOpponentPrizes] = React.useState([]);
   const [opponentDiscard, setOpponentDiscard] = React.useState([]);
+  const [selectedIndex, setSelectedIndex] = React.useState(null);
   const [selected, setSelected] = React.useState(null);
   const [show, setShow] = React.useState(false);
   const { state } = useLocation();
@@ -46,14 +48,14 @@ export default function Play({ precon, name, roomID }) {
   React.useEffect(() => {
     if (!socket) return;
     socket.on("connect", (id) => {
-      setYourName(socket.id);
+      setYourName(socket.id.substring(0, 5));
       socket.emit("player-joined", socket.id);
     });
     socket.on("player-name", (id) => {
-      setOpponentName(id);
+      setOpponentName(id.substring(0, 5));
       socket.emit("other-player-name", socket.id);
     });
-    socket.on("other-player-name", id => setOpponentName(id));
+    socket.on("other-player-name", (id) => setOpponentName(id.substring(0, 5)));
 
     socket.on("opponent-played-card", (board) => {
       const { deck, hand, active, bench, prizes, discard } = board;
@@ -108,7 +110,6 @@ export default function Play({ precon, name, roomID }) {
       <AttackModal show={show} handleClose={handleClose} selected={selected} />
       <div className="bg-dark d-flex flex-column w-25 h-100">
         <div className="bg-light d-flex flex-column m-2 p-2 h-25 border border-secondary border-2 rounded">
-          <span></span>
           <span>
             <strong>{yourName}</strong>
           </span>
@@ -126,7 +127,22 @@ export default function Play({ precon, name, roomID }) {
           <span>Cards in hand: {opponentHand.length}</span>
           <span>Cards in discard: {opponentDiscard.length}</span>
         </div>
-        <div className="bg-light d-flex flex-column m-2 p-2 h-50 border border-secondary border-2 rounded"></div>
+        <div className="bg-light d-flex flex-column m-2 p-2 h-50 border border-secondary border-2 rounded">
+          <InfoPanel
+            selected={selected}
+            setSelected={setSelected}
+            selectedIndex={selectedIndex}
+            deck={deck}
+            hand={hand}
+            active={active}
+            setActive={setActive}
+            bench={bench}
+            setBench={setBench}
+            prizes={prizes}
+            discard={discard}
+            socket={socket}
+          />
+        </div>
       </div>
       <Container fluid className="bg-dark py-2 d-flex flex-column h-100 w-100">
         <div className="bg-light d-flex flex-column p-2 justify-content-between h-100 w-100 border border-secondary border-3 rounded">
@@ -145,6 +161,8 @@ export default function Play({ precon, name, roomID }) {
             deck={deck}
             prizes={prizes}
             discard={discard}
+            setSelected={setSelected}
+            setSelectedIndex={setSelectedIndex}
             socket={socket}
           />
         </div>

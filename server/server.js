@@ -53,6 +53,10 @@ io.on("connection", (socket) => {
 
   socket.on("other-player-name", id => socket.broadcast.emit("other-player-name", id));
 
+  socket.on("played-card", board => {
+    socket.broadcast.emit("opponent-played-card", board);
+  });
+
   socket.on("disconnect", () => {
     console.log(`disconnected: player ${parseInt(player) + 1} ${socket.id}`);
     players[player] = null;
