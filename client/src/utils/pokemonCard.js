@@ -26,18 +26,17 @@ export default class PokemonCard {
     this.retreatCost = retreatCost;
     this.set = set;
     this.image = images.large || images.small;
-    this.attachments = [
-      {
-        damage: 0,
+    this.effects = {
+        attachments: [],
         energy: [],
+        damage: 0,
         statusConditions: {
           poisoned: false,
           asleep: false,
           confused: false,
           paralyzed: false,
         },
-        additionalEffects: [],
-      },
-    ];
+        misc: [],
+    }
   }
 } 

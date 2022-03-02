@@ -7,7 +7,6 @@ html, body, #root {
 }
 
 .pkmn-card {
-  animation: bounce-in-right 2s ease 1;
   height: 6.125rem;
   transition: 0.5s;
   width: 4.375rem;
@@ -19,7 +18,7 @@ html, body, #root {
 }
 
 .opp-pkmn-card {
-  animation: bounce-in-right 2s ease 1;
+  animation: fade-in-down;
   height: 6.125rem;
   transition: 0.5s;
   width: 4.375rem;
@@ -28,6 +27,18 @@ html, body, #root {
 .opp-pkmn-card:hover {
   cursor: pointer;
   transform: translateY(6.125rem) scale(3);
+}
+
+.hand-card {
+  animation: bounce-in-right 2s ease 1;
+}
+
+.table-card {
+  animation: fade-in-down 1s ease 1;
+}
+
+.energy {
+  animation: grow 0.5s ease 1;
 }
 
 @keyframes bounce-in-right {
@@ -41,4 +52,27 @@ html, body, #root {
   }
   80% { transform: translateX(10px); }
   100% { transform: translateX(0); }
+}
+
+@keyframes fade-in-down {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes gelatine {
+  from, to { transform: scale(1, 1); }
+  25% { transform: scale(0.9, 1.1); }
+  50% { transform: scale(1.1, 0.9); }
+  75% { transform: scale(0.95, 1.05); }
+}
+
+@keyframes grow {
+  from { transform: scale(0); }
+  to { transform: scale(1); }
 }

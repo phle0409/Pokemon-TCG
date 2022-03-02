@@ -36,7 +36,7 @@ export default function AttackModal({ show, handleClose, selected }) {
         <Modal.Title>{selected.name}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <Container className="d-flex flex-column">
+        <Container className="px-3">
           {selected.attacks.map((attack) => {
             const { name, cost, text, damage } = attack;
             return (
@@ -51,8 +51,8 @@ export default function AttackModal({ show, handleClose, selected }) {
                 <Col xs={1}>
                   <span className="fw-bold d-block">{damage}</span>
                 </Col>
-                <Col xs={2} className="d-flex flex-column">
-                  <Button variant="info">Select</Button>
+                <Col xs={2}>
+                  <Button variant="success">Select</Button>
                 </Col>
               </Row>
             );
@@ -67,23 +67,17 @@ export default function AttackModal({ show, handleClose, selected }) {
                 (You must discard energy in order to retreat.)
               </span>
             </Col>
-            <Col xs={2} className="d-flex flex-column">
+            <Col xs={2}>
               <Button variant="warning">Select</Button>
             </Col>
           </Row>
         </Container>
       </Modal.Body>
       <Modal.Footer>
-        <Container>
-          <Row>
-            <Col xs={10}></Col>
-            <Col xs={2} className="d-flex flex-column">
-              <Button variant="secondary" onClick={handleClose}>
-                Cancel
-              </Button>
-            </Col>
-          </Row>
-        </Container>
+        <Button variant="dark">Pass</Button>
+        <Button variant="secondary" onClick={handleClose}>
+          Cancel
+        </Button>
       </Modal.Footer>
     </Modal>
   );

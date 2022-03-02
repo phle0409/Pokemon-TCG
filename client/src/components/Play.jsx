@@ -30,6 +30,7 @@ export default function Play({ precon, name, roomID }) {
   const [opponentDiscard, setOpponentDiscard] = React.useState([]);
   const [selectedIndex, setSelectedIndex] = React.useState(null);
   const [selected, setSelected] = React.useState(null);
+  const [usesTargeting, setUsesTargeting] = React.useState(false);
   const [show, setShow] = React.useState(false);
   const { state } = useLocation();
 
@@ -104,12 +105,12 @@ export default function Play({ precon, name, roomID }) {
   return (
     <Container
       fluid
-      className="bg-dark d-flex flex-row h-100 w-100 p-2"
+      className="bg-dark d-flex flex-row h-100 w-100 p-1"
       style={{ overflow: "hidden" }}
     >
       <AttackModal show={show} handleClose={handleClose} selected={selected} />
       <div className="bg-dark d-flex flex-column w-25 h-100">
-        <div className="bg-light d-flex flex-column m-2 p-2 h-25 border border-secondary border-2 rounded">
+        <div className="bg-light d-flex flex-column m-1 p-1 h-25 border border-secondary border-2 rounded">
           <span>
             <strong>{yourName}</strong>
           </span>
@@ -118,7 +119,7 @@ export default function Play({ precon, name, roomID }) {
           <span>Cards in hand: {hand.length}</span>
           <span>Cards in discard: {discard.length}</span>
         </div>
-        <div className="bg-light d-flex flex-column m-2 p-2 h-25 border border-secondary border-2 rounded">
+        <div className="bg-light d-flex flex-column m-1 p-2 h-25 border border-secondary border-2 rounded">
           <span>
             <strong>{opponentName || "Waiting on opponent..."}</strong>
           </span>
@@ -127,11 +128,14 @@ export default function Play({ precon, name, roomID }) {
           <span>Cards in hand: {opponentHand.length}</span>
           <span>Cards in discard: {opponentDiscard.length}</span>
         </div>
-        <div className="bg-light d-flex flex-column m-2 p-2 h-50 border border-secondary border-2 rounded">
+        <div className="bg-light d-flex flex-column m-1 p-2 h-50 border border-secondary border-2 rounded">
           <InfoPanel
             selected={selected}
             setSelected={setSelected}
             selectedIndex={selectedIndex}
+            setSelectedIndex={setSelectedIndex}
+            usesTargeting={usesTargeting}
+            setUsesTargeting={setUsesTargeting}
             deck={deck}
             hand={hand}
             active={active}
@@ -144,26 +148,51 @@ export default function Play({ precon, name, roomID }) {
           />
         </div>
       </div>
-      <Container fluid className="bg-dark py-2 d-flex flex-column h-100 w-100">
-        <div className="bg-light d-flex flex-column p-2 justify-content-between h-100 w-100 border border-secondary border-3 rounded">
+      <Container
+        fluid
+        className="bg-dark py-1 d-flex flex-column h-100 w-100"
+        style={{ zIndex: 1 }}
+      >
+        <div className="bg-light p-2 d-flex flex-column justify-content-between h-100 w-100 border border-secondary border-3 rounded">
           <OpponentBench opponentBench={opponentBench} />
           <OpponentActive opponentActive={opponentActive} />
-          <Active active={active} setSelected={setSelected} setShow={setShow} />
-          <Bench bench={bench} setSelected={setSelected} />
-        </div>
-        <div className="d-flex flex-row mt-2 bg-primary border border-2 rounded h-25 w-100">
-          <Hand
+          <hr className="m-0" />
+          <Active
             hand={hand}
             active={active}
             setActive={setActive}
             bench={bench}
-            setBench={setBench}
             deck={deck}
             prizes={prizes}
             discard={discard}
+            selected={selected}
             setSelected={setSelected}
             setSelectedIndex={setSelectedIndex}
-            socket={socket}
+            setShow={setShow}
+            setUsesTargeting={setUsesTargeting}
+            socket
+          />
+          <Bench
+            hand={hand}
+            active={active}
+            bench={bench}
+            deck={deck}
+            prizes={prizes}
+            discard={discard}
+            setBench={setBench}
+            selected={selected}
+            setSelected={setSelected}
+            selectedIndex={selectedIndex}
+            setSelectedIndex={setSelectedIndex}
+            setUsesTargeting={setUsesTargeting}
+            socket
+          />
+        </div>
+        <div className="mt-2 bg-primary border border-2 rounded h-25 w-100">
+          <Hand
+            hand={hand}
+            setSelected={setSelected}
+            setSelectedIndex={setSelectedIndex}
           />
         </div>
       </Container>

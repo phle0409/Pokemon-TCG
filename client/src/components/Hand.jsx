@@ -2,21 +2,14 @@ import React from "react";
 
 export default function Hand({
   hand,
-  bench,
-  active,
-  setActive,
-  setBench,
-  deck,
-  prizes,
-  discard,
   setSelected,
   setSelectedIndex,
-  socket,
 }) {
   const handleClick = (e) => {
     const [name, set, zone, index] = e.target.id.split("-");
-    const selected = hand[index];
-    setSelected(selected);
+    const selectedCard = hand[index];
+    console.log(selectedCard);
+    setSelected(selectedCard);
     setSelectedIndex(index);
   };
 
@@ -26,7 +19,7 @@ export default function Hand({
         hand.map((card, index) => {
           return (
             <img
-              className="m-1 pkmn-card"
+              className="my-2 mx-1 pkmn-card hand-card"
               src={card.image}
               key={`hand-${index}`}
               id={`${card.name}-${card.set.name}-hand-${index}`}

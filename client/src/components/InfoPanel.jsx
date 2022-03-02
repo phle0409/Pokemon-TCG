@@ -5,6 +5,9 @@ export default function InfoPanel({
   selected,
   selectedIndex,
   setSelected,
+  setSelectedIndex,
+  usesTargeting,
+  setUsesTargeting,
   deck,
   hand,
   active,
@@ -16,7 +19,6 @@ export default function InfoPanel({
   socket,
 }) {
   const [action, setAction] = React.useState("");
-  const [targeted, setTargeted] = React.useState(false);
   const [infoText, setInfoText] = React.useState("");
 
   const handleClick = () => {
@@ -24,6 +26,7 @@ export default function InfoPanel({
       setActive(selected);
       hand.splice(selectedIndex, 1);
       setSelected(null);
+      setSelectedIndex(null);
       socket.emit("played-card", {
         deck,
         hand,
@@ -37,6 +40,7 @@ export default function InfoPanel({
       setBench(newBench);
       hand.splice(selectedIndex, 1);
       setSelected(null);
+      setSelectedIndex(null);
       socket.emit("played-card", {
         deck,
         hand,
@@ -54,69 +58,38 @@ export default function InfoPanel({
 
     if (
       supertype.includes("Pokémon") &&
-      subtypes.includes("Basic") &&
+      subtypes?.includes("Basic") &&
       !active
     ) {
       setInfoText(`Play ${name} to active?`);
-      setTargeted(false);
       setAction("toActive");
+      setUsesTargeting(false);
     } else if (
       supertype.includes("Pokémon") &&
-      subtypes.includes("Basic") &&
+      subtypes?.includes("Basic") &&
       bench.length < 5
     ) {
       setInfoText(`Play ${name} to bench?`);
-      setTargeted(false);
       setAction("toBench");
+      setUsesTargeting(false);
     } else if (
-      (supertype.includes("Pokémon") && subtypes.includes("Stage 1")) ||
-      (supertype.includes("Pokémon") && subtypes.includes("Stage 2"))
+      (supertype.includes("Pokémon") && subtypes?.includes("Stage 1")) ||
+      subtypes?.includes("Stage 2")
     ) {
       setInfoText(
         `Select a ${evolvesFrom} on your active or bench to evolve into ${name}`
       );
-      setTargeted(true);
-      setAction("evolve");
+      setUsesTargeting(true);
     } else if (supertype.includes("Energy")) {
       setInfoText(`Attach ${name} to a Pokémon on your active or bench`);
-      setTargeted(true);
+      setUsesTargeting(true);
     } else if (supertype.includes("Trainer")) {
       setInfoText(`Play ${name}?`);
-      setTargeted(false);
+      setUsesTargeting(false);
     }
   }, [selected]);
 
   if (!selected || selected === active) return <div></div>;
-
-  // if (
-  //     selectedPkmn.supertype.includes("Pokémon") &&
-  //     selectedPkmn.subtypes.includes("Basic")
-  //   ) {
-  //     hand.splice(index, 1);
-  //     let newBench = null;
-  //     if (!active) {
-  //       setActive(selectedPkmn);
-  //       socket.emit("played-card", {
-  //         deck,
-  //         hand,
-  //         active: selectedPkmn,
-  //         bench,
-  //         prizes,
-  //         discard,
-  //       });
-  //     } else if (bench.length < 5) {
-  //       let newBench = [...bench, selectedPkmn];
-  //       setBench(newBench);
-  //       socket.emit("played-card", {
-  //         deck,
-  //         hand,
-  //         active,
-  //         bench: newBench,
-  //         prizes,
-  //         discard,
-  //       });
-  //     }
-  //   }
 
   return (
     <div className="d-flex flex-column justify-content-center align-items-center h-100">
@@ -124,8 +97,15 @@ export default function InfoPanel({
         <strong>{infoText}</strong>
       </div>
       <ButtonGroup>
-        {!targeted ? <Button onClick={handleClick}>Confirm</Button> : ""}
-        <Button variant="secondary" onClick={() => setSelected(null)}>
+        {!usesTargeting ? <Button onClick={handleClick}>Confirm</Button> : ""}
+        <Button
+          variant="secondary"
+          onClick={() => {
+            setSelected(null);
+            setSelectedIndex(null);
+            setUsesTargeting(false);
+          }}
+        >
           Cancel
         </Button>
       </ButtonGroup>
