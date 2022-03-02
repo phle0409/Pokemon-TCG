@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Play from './Play.jsx';
 import HowToPlay from './HowToPlay.jsx';
 import PrePage from './PrePage';
+import RoomFull from './RoomFull.jsx';
 
 export default function Routing() {
   return (
@@ -11,6 +12,7 @@ export default function Routing() {
         <Route path="/" element={<PrePage />} />
         <Route path="/play" element={<Play />} />
         <Route path="/how-to-play" element={<HowToPlay />} />
+        <Route path="/room-full" element={<RoomFull />} />
       </Routes>
     </Router>
   );
