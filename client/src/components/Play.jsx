@@ -1,20 +1,20 @@
-import React from "react";
-import { useLocation } from "react-router-dom";
-import { io } from "socket.io-client";
-import { Container } from "react-bootstrap";
-import { fetchDeck } from "../utils/createDeck.js";
-import { decklist_brushfire } from "../utils/precons.js";
-import Hand from "./Hand.jsx";
-import Bench from "./Bench.jsx";
-import Active from "./Active.jsx";
-import OpponentActive from "./OpponentActive.jsx";
-import OpponentBench from "./OpponentBench.jsx";
-import InfoPanel from "./InfoPanel.jsx";
-import AttackModal from "./AttackModal.jsx";
+import React from 'react';
+import { useLocation } from 'react-router-dom';
+import { io } from 'socket.io-client';
+import { Container } from 'react-bootstrap';
+import { fetchDeck } from '../utils/createDeck.js';
+import { decklist_brushfire } from '../utils/precons.js';
+import Hand from './Hand.jsx';
+import Bench from './Bench.jsx';
+import Active from './Active.jsx';
+import OpponentActive from './OpponentActive.jsx';
+import OpponentBench from './OpponentBench.jsx';
+import InfoPanel from './InfoPanel.jsx';
+import AttackModal from './AttackModal.jsx';
 
-export default function Play({ precon, name, roomID }) {
+export default function Play() {
   const [socket, setSocket] = React.useState(null);
-  const [yourName, setYourName] = React.useState("You");
+  const [yourName, setYourName] = React.useState('You');
   const [deck, setDeck] = React.useState([]);
   const [hand, setHand] = React.useState([]);
   const [active, setActive] = React.useState(null);
@@ -48,17 +48,16 @@ export default function Play({ precon, name, roomID }) {
 
   React.useEffect(() => {
     if (!socket) return;
-    socket.on("connect", (id) => {
-      setYourName(socket.id.substring(0, 5));
-      socket.emit("player-joined", socket.id);
-    });
-    socket.on("player-name", (id) => {
-      setOpponentName(id.substring(0, 5));
-      socket.emit("other-player-name", socket.id);
-    });
-    socket.on("other-player-name", (id) => setOpponentName(id.substring(0, 5)));
 
-    socket.on("opponent-played-card", (board) => {
+    socket.on('userJoinRoom', (state.name, state.roomID));
+
+    socket.on('player-name', (id) => {
+      setOpponentName(id.substring(0, 5));
+      socket.emit('other-player-name', socket.id);
+    });
+    socket.on('other-player-name', (id) => setOpponentName(id.substring(0, 5)));
+
+    socket.on('opponent-played-card', (board) => {
       const { deck, hand, active, bench, prizes, discard } = board;
       setOpponentDeck(deck);
       setOpponentHand(hand);
@@ -68,7 +67,7 @@ export default function Play({ precon, name, roomID }) {
       setOpponentDiscard(discard);
     });
 
-    socket.on("player-left", (id) => {
+    socket.on('player-left', (id) => {
       setOpponentActive(null);
       setOpponentBench([]);
     });
@@ -84,8 +83,8 @@ export default function Play({ precon, name, roomID }) {
 
       for (const card of hand) {
         if (
-          card.supertype.includes("Pokémon") &&
-          card.subtypes.includes("Basic")
+          card.supertype.includes('Pokémon') &&
+          card.subtypes.includes('Basic')
         ) {
           openingHandBasic = true;
           break;
@@ -94,7 +93,7 @@ export default function Play({ precon, name, roomID }) {
 
       if (!openingHandBasic) {
         deck.putBack(hand);
-        console.log("Reshuffling...");
+        console.log('Reshuffling...');
       }
     }
     const prizes = deck.draw(6);
@@ -106,7 +105,7 @@ export default function Play({ precon, name, roomID }) {
     <Container
       fluid
       className="bg-dark d-flex flex-row h-100 w-100 p-1"
-      style={{ overflow: "hidden" }}
+      style={{ overflow: 'hidden' }}
     >
       <AttackModal show={show} handleClose={handleClose} selected={selected} />
       <div className="bg-dark d-flex flex-column w-25 h-100">
@@ -121,7 +120,7 @@ export default function Play({ precon, name, roomID }) {
         </div>
         <div className="bg-light d-flex flex-column m-1 p-2 h-25 border border-secondary border-2 rounded">
           <span>
-            <strong>{opponentName || "Waiting on opponent..."}</strong>
+            <strong>{opponentName || 'Waiting on opponent...'}</strong>
           </span>
           <span>Cards in deck: {opponentDeck.cards?.length}</span>
           <span>Prize cards: {opponentPrizes.length}</span>
