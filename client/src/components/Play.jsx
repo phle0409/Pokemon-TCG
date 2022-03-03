@@ -78,10 +78,10 @@ export default function Play() {
     //   setOpponentDiscard(discard);
     // });
 
-    // socket.on('player-left', (id) => {
-    //   setOpponentActive(null);
-    //   setOpponentBench([]);
-    // });
+    socket.on('player-left', ({ username, id }) => {
+      setOpponentActive(null);
+      setOpponentBench([]);
+    });
 
     socket.on('leaveRoom');
   }, [socket]);
