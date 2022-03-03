@@ -14,7 +14,8 @@ export default function Bench({
   selectedIndex,
   setSelectedIndex,
   setUsesTargeting,
-  socket
+  setToast,
+  socket,
 }) {
   const handleClick = (e) => {
     const [name, set, zone, index] = e.target.id.split("-");
@@ -26,6 +27,10 @@ export default function Bench({
       setUsesTargeting(false);
     } else {
       if (selected.supertype.includes("Energy")) {
+        setToast({
+          text: `Attached ${selected.name} to ${bench[index].name}`,
+          show: true,
+        });
         bench[index].effects.attachments.push(selected);
         bench[index].effects.energy.push(selected.name.replace(" Energy", ""));
         hand.splice(selectedIndex, 1);
@@ -44,6 +49,10 @@ export default function Bench({
           selected.subtypes?.includes("Stage 2")) &&
         selected.evolvesFrom === bench[index].name
       ) {
+        setToast({
+          text: `Evolved ${bench[index].name} to ${selected.name}`,
+          show: true,
+        });
         selected.effects.attachments = bench[index].effects.attachments;
         bench[index].effects.attachments = [];
         selected.effects.energy = bench[index].effects.energy;
@@ -73,7 +82,10 @@ export default function Bench({
       {bench.length > 0 ? (
         bench.map((card, index) => {
           return (
-            <div className="d-flex flex-row mx-2 border border rounded">
+            <div
+              className="d-flex flex-row mx-2 border border rounded"
+              style={{ width: "auto", height: "6.125rem" }}
+            >
               <img
                 className="pkmn-card table-card"
                 src={card.image}
@@ -81,10 +93,7 @@ export default function Bench({
                 id={`${card.name}-${card.set.name}-bench-${index}`}
                 onClick={handleClick}
               />
-              <div
-                className="d-flex flex-column"
-                style={{ width: "7rem" }}
-              >
+              <div className="d-flex flex-column" style={{ width: "7rem" }}>
                 <div className="d-flex align-items-center justify-content-center">{`${
                   card.hp - card.effects.damage
                 }/${card.hp} HP`}</div>

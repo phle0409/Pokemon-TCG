@@ -2,7 +2,14 @@ import React from "react";
 import { Button, Col, Container, Modal, Row } from "react-bootstrap";
 import EnergyCost from "./EnergyCost.jsx";
 
-export default function AttackModal({ show, handleClose, selected }) {
+export default function AttackModal({ show, handleClose, selected, setSelected, socket }) {
+  const attackButton = (event) => {
+    const [name, damage] = event.target.id.split("-");
+
+    socket.emit("attack", damage);
+    handleClose();
+  };
+
   if (!selected || selected.supertype !== "Pokémon")
     return (
       <Modal
@@ -52,7 +59,13 @@ export default function AttackModal({ show, handleClose, selected }) {
                   <span className="fw-bold d-block">{damage}</span>
                 </Col>
                 <Col xs={2}>
-                  <Button variant="success">Select</Button>
+                  <Button
+                    variant="success"
+                    id={`${name}-${damage}`}
+                    onClick={attackButton}
+                  >
+                    Select
+                  </Button>
                 </Col>
               </Row>
             );

@@ -1,5 +1,6 @@
 import React from "react";
 import { Button, ButtonGroup } from "react-bootstrap";
+import { isTargetedItem, itemMap } from "../utils/itemMap.js";
 
 export default function InfoPanel({
   selected,
@@ -10,6 +11,7 @@ export default function InfoPanel({
   setUsesTargeting,
   deck,
   hand,
+  setHand,
   active,
   setActive,
   bench,
@@ -25,8 +27,6 @@ export default function InfoPanel({
     if (action === "toActive") {
       setActive(selected);
       hand.splice(selectedIndex, 1);
-      setSelected(null);
-      setSelectedIndex(null);
       socket.emit("played-card", {
         deck,
         hand,
@@ -39,8 +39,6 @@ export default function InfoPanel({
       let newBench = [...bench, selected];
       setBench(newBench);
       hand.splice(selectedIndex, 1);
-      setSelected(null);
-      setSelectedIndex(null);
       socket.emit("played-card", {
         deck,
         hand,
@@ -50,6 +48,20 @@ export default function InfoPanel({
         discard,
       });
     }
+    else if(action === "item") {
+      itemMap(selected.name, deck, hand, setHand);
+      socket.emit("played-card", {
+        deck,
+        hand,
+        active,
+        bench,
+        prizes,
+        discard,
+      });
+    }
+
+    setSelected(null);
+    setSelectedIndex(null);
   };
 
   React.useEffect(() => {
@@ -84,8 +96,14 @@ export default function InfoPanel({
       setInfoText(`Attach ${name} to a Pokémon on your active or bench`);
       setUsesTargeting(true);
     } else if (supertype.includes("Trainer")) {
-      setInfoText(`Play ${name}?`);
-      setUsesTargeting(false);
+      if (isTargetedItem(name)) {
+        setInfoText(`Select a target for ${name}`);
+        setUsesTargeting(true);
+      } else {
+        setInfoText(`Play ${name}?`);
+        setAction("item");
+        setUsesTargeting(false);
+      }
     }
   }, [selected]);
 

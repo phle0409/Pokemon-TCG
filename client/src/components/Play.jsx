@@ -1,4 +1,5 @@
 import React from "react";
+import { ToastContainer } from "react-bootstrap";
 import { useLocation } from "react-router-dom";
 import { io } from "socket.io-client";
 import { Container } from "react-bootstrap";
@@ -11,6 +12,7 @@ import OpponentActive from "./OpponentActive.jsx";
 import OpponentBench from "./OpponentBench.jsx";
 import InfoPanel from "./InfoPanel.jsx";
 import AttackModal from "./AttackModal.jsx";
+import PkmnToast from "./PkmnToast.jsx";
 
 export default function Play({ precon, name, roomID }) {
   const [socket, setSocket] = React.useState(null);
@@ -31,13 +33,31 @@ export default function Play({ precon, name, roomID }) {
   const [selectedIndex, setSelectedIndex] = React.useState(null);
   const [selected, setSelected] = React.useState(null);
   const [usesTargeting, setUsesTargeting] = React.useState(false);
-  const [show, setShow] = React.useState(false);
+  const [showAttackModal, setShowAttackModal] = React.useState(false);
+  const [toast, setToast] = React.useState({
+    text: "",
+    show: false,
+  });
   const { state } = useLocation();
 
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
+  const handleCloseAttackModal = () => {
+    setShowAttackModal(false);
+    setSelected(null);
+  };
+
+  const handleShowAttackModal = () => setShowAttackModal(true);
+
+  const handleCloseToast = () => {
+    setToast({
+      show: false,
+    });
+  };
 
   React.useEffect(() => {
+    setToast({
+      text: "Shuffling deck...",
+      show: true,
+    });
     (async () => {
       const deck = await fetchDeck(decklist_brushfire);
       preGameSetup(deck);
@@ -55,6 +75,10 @@ export default function Play({ precon, name, roomID }) {
     socket.on("player-name", (id) => {
       setOpponentName(id.substring(0, 5));
       socket.emit("other-player-name", socket.id);
+      setToast({
+        text: "Player joined",
+        show: true,
+      });
     });
     socket.on("other-player-name", (id) => setOpponentName(id.substring(0, 5)));
 
@@ -66,6 +90,14 @@ export default function Play({ precon, name, roomID }) {
       setOpponentBench(bench);
       setOpponentPrizes(prizes);
       setOpponentDiscard(discard);
+    });
+
+    socket.on("opponent-attacked-me", (damage) => {
+      console.log(`opponent attacked for ${damage} damage`);
+      setToast({
+        text: `Opponent attacked for ${damage} damage`,
+        show: true,
+      });
     });
 
     socket.on("player-left", (id) => {
@@ -108,7 +140,13 @@ export default function Play({ precon, name, roomID }) {
       className="bg-dark d-flex flex-row h-100 w-100 p-1"
       style={{ overflow: "hidden" }}
     >
-      <AttackModal show={show} handleClose={handleClose} selected={selected} />
+      <AttackModal
+        show={showAttackModal}
+        handleClose={handleCloseAttackModal}
+        selected={selected}
+        setSelected={setSelected}
+        socket={socket}
+      />
       <div className="bg-dark d-flex flex-column w-25 h-100">
         <div className="bg-light d-flex flex-column m-1 p-1 h-25 border border-secondary border-2 rounded">
           <span>
@@ -138,6 +176,7 @@ export default function Play({ precon, name, roomID }) {
             setUsesTargeting={setUsesTargeting}
             deck={deck}
             hand={hand}
+            setHand={setHand}
             active={active}
             setActive={setActive}
             bench={bench}
@@ -153,6 +192,11 @@ export default function Play({ precon, name, roomID }) {
         className="bg-dark py-1 d-flex flex-column h-100 w-100"
         style={{ zIndex: 1 }}
       >
+        <PkmnToast
+          show={toast.show}
+          setShow={handleCloseToast}
+          text={toast.text}
+        />
         <div className="bg-light p-2 d-flex flex-column justify-content-between h-100 w-100 border border-secondary border-3 rounded">
           <OpponentBench opponentBench={opponentBench} />
           <OpponentActive opponentActive={opponentActive} />
@@ -168,9 +212,10 @@ export default function Play({ precon, name, roomID }) {
             selected={selected}
             setSelected={setSelected}
             setSelectedIndex={setSelectedIndex}
-            setShow={setShow}
+            setShow={setShowAttackModal}
             setUsesTargeting={setUsesTargeting}
-            socket
+            setToast={setToast}
+            socket={socket}
           />
           <Bench
             hand={hand}
@@ -185,7 +230,8 @@ export default function Play({ precon, name, roomID }) {
             selectedIndex={selectedIndex}
             setSelectedIndex={setSelectedIndex}
             setUsesTargeting={setUsesTargeting}
-            socket
+            setToast={setToast}
+            socket={socket}
           />
         </div>
         <div className="mt-2 bg-primary border border-2 rounded h-25 w-100">
