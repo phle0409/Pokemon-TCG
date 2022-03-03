@@ -1,7 +1,6 @@
 const users = [];
 
 const isRoomFull = (roomID) => {
-  console.log(users.filter((user) => user.roomID === roomID));
   return users.filter((user) => user.roomID === roomID).length >= 2;
 };
 
