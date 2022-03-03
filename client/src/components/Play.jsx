@@ -1,6 +1,5 @@
 import React from "react";
-import { ToastContainer } from "react-bootstrap";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
 import { Container } from "react-bootstrap";
 import { fetchDeck } from "../utils/createDeck.js";
@@ -14,9 +13,10 @@ import InfoPanel from "./InfoPanel.jsx";
 import AttackModal from "./AttackModal.jsx";
 import PkmnToast from "./PkmnToast.jsx";
 
-export default function Play({ precon, name, roomID }) {
+export default function Play() {
+  let navigate = useNavigate();
   const [socket, setSocket] = React.useState(null);
-  const [yourName, setYourName] = React.useState("You");
+  const [yourName, setYourName] = React.useState('You');
   const [deck, setDeck] = React.useState([]);
   const [hand, setHand] = React.useState([]);
   const [active, setActive] = React.useState(null);
@@ -68,42 +68,24 @@ export default function Play({ precon, name, roomID }) {
 
   React.useEffect(() => {
     if (!socket) return;
-    socket.on("connect", (id) => {
-      setYourName(socket.id.substring(0, 5));
-      socket.emit("player-joined", socket.id);
-    });
-    socket.on("player-name", (id) => {
-      setOpponentName(id.substring(0, 5));
-      socket.emit("other-player-name", socket.id);
-      setToast({
-        text: "Player joined",
-        show: true,
-      });
-    });
-    socket.on("other-player-name", (id) => setOpponentName(id.substring(0, 5)));
+    let username = state.name;
+    let roomID = state.roomID;
+    socket.emit('userJoinRoom', { username, roomID });
 
-    socket.on("opponent-played-card", (board) => {
-      const { deck, hand, active, bench, prizes, discard } = board;
-      setOpponentDeck(deck);
-      setOpponentHand(hand);
-      setOpponentActive(active);
-      setOpponentBench(bench);
-      setOpponentPrizes(prizes);
-      setOpponentDiscard(discard);
+    socket.on('message', (msg) => {
+      if (msg === 'full') {
+        navigate('/room-full');
+      } else {
+        console.log(msg);
+      }
     });
 
-    socket.on("opponent-attacked-me", (damage) => {
-      console.log(`opponent attacked for ${damage} damage`);
-      setToast({
-        text: `Opponent attacked for ${damage} damage`,
-        show: true,
-      });
-    });
-
-    socket.on("player-left", (id) => {
+    socket.on('player-left', ({ username, id }) => {
       setOpponentActive(null);
       setOpponentBench([]);
     });
+
+    socket.on('leaveRoom');
   }, [socket]);
 
   const preGameSetup = (deck) => {
@@ -116,8 +98,8 @@ export default function Play({ precon, name, roomID }) {
 
       for (const card of hand) {
         if (
-          card.supertype.includes("Pokémon") &&
-          card.subtypes.includes("Basic")
+          card.supertype.includes('Pokémon') &&
+          card.subtypes.includes('Basic')
         ) {
           openingHandBasic = true;
           break;
@@ -126,7 +108,7 @@ export default function Play({ precon, name, roomID }) {
 
       if (!openingHandBasic) {
         deck.putBack(hand);
-        console.log("Reshuffling...");
+        console.log('Reshuffling...');
       }
     }
     const prizes = deck.draw(6);
@@ -138,7 +120,7 @@ export default function Play({ precon, name, roomID }) {
     <Container
       fluid
       className="bg-dark d-flex flex-row h-100 w-100 p-1"
-      style={{ overflow: "hidden" }}
+      style={{ overflow: 'hidden' }}
     >
       <AttackModal
         show={showAttackModal}
@@ -159,7 +141,7 @@ export default function Play({ precon, name, roomID }) {
         </div>
         <div className="bg-light d-flex flex-column m-1 p-2 h-25 border border-secondary border-2 rounded">
           <span>
-            <strong>{opponentName || "Waiting on opponent..."}</strong>
+            <strong>{opponentName || 'Waiting on opponent...'}</strong>
           </span>
           <span>Cards in deck: {opponentDeck.cards?.length}</span>
           <span>Prize cards: {opponentPrizes.length}</span>
