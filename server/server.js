@@ -80,7 +80,7 @@ io.on('connection', (socket) => {
 
   socket.on('disconnect', () => {
     const user = userLeaveRoom(socket.id);
-    io.to(user.room).emit('leaveRoom', {
+    io.to(user.roomID).emit('player-left', {
       username: user.username,
       id: user.id,
     });
