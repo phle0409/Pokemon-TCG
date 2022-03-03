@@ -10,7 +10,7 @@ const PORT = process.env.PORT || 3000;
 const PKMN_API_KEY = process.env.PKMN_API_KEY;
 
 // user
-const { isRoomFull, userJoinRoom } = require('./users/users');
+const { isRoomFull, userJoinRoom, userLeaveRoom } = require('./users/users');
 
 app.use(cors());
 
@@ -60,7 +60,7 @@ io.on('connection', (socket) => {
   //   socket.broadcast.emit("opponent-played-card", board);
   // });
   socket.on('userJoinRoom', ({ username, roomID }) => {
-    if (isRoomFull()) {
+    if (isRoomFull(roomID)) {
       socket.emit('message', 'full');
     } else {
       const user = userJoinRoom(socket.id, username, roomID);
@@ -73,11 +73,10 @@ io.on('connection', (socket) => {
     }
   });
 
-  // socket.on('disconnect', () => {
-  //   console.log(`disconnected: player ${parseInt(player) + 1} ${socket.id}`);
-  //   players[player] = null;
-  //   socket.broadcast.emit('player-left', socket.id);
-  // });
+  socket.on('disconnect', () => {
+    const user = userLeaveRoom(socket.id);
+    io.to(user.room).emit('leaveRoom', `${user.username} left the room!`);
+  });
 });
 
 server.listen(PORT, () => {

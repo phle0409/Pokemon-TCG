@@ -1,18 +1,28 @@
 const users = [];
 
-const isRoomFull = () => {
-  return users.length >= 2;
+const isRoomFull = (roomID) => {
+  console.log(users.filter((user) => user.roomID === roomID));
+  return users.filter((user) => user.roomID === roomID).length >= 2;
 };
 
 const userJoinRoom = (id, username, roomID) => {
   const user = { id, username, roomID };
-  if (users.length <= 2) {
+  if (users.filter((user) => user.roomID === roomID).length < 2) {
     users.push(user);
   }
   return user;
 };
 
+const userLeaveRoom = (id) => {
+  const index = users.findIndex((user) => user.id === id);
+
+  if (index != -1) {
+    return users.splice(index, 1)[0];
+  }
+};
+
 module.exports = {
   isRoomFull,
   userJoinRoom,
+  userLeaveRoom,
 };
