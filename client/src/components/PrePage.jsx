@@ -59,7 +59,7 @@ const PrePage = () => {
       setIsMissing(false);
       console.log(selectedDeck);
       navigate('/play', {
-        state: { desklist: selectedDeck, name: username.value, roomID: room },
+        state: { decklist: selectedDeck, name: username.value, roomID: room },
       });
     }
   };

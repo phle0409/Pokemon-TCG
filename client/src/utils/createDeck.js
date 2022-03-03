@@ -1,5 +1,11 @@
 import PokemonCard from "./pokemonCard.js";
 import PokemonDeck from "./pokemonDeck.js";
+import {
+  decklist_brushfire,
+  decklist_blackout,
+  decklist_zap,
+  decklist_overgrowth,
+} from "./precons.js";
 
 const createDeck = (decklist, cardpool) => {
   let cards = [];
@@ -19,12 +25,29 @@ const createDeck = (decklist, cardpool) => {
 };
 
 export const fetchDeck = async (decklist) => {
+  let deck;
+
+  switch(decklist) {
+    case "brush":
+    deck = decklist_brushfire;
+    break;
+    case "black":
+    deck = decklist_blackout;
+    break;
+    case "overgrowth":
+    deck = decklist_overgrowth;
+    break;
+    default:
+    deck = decklist_zap;
+    break;
+  }
+
   const promise = await fetch("http://localhost:8080/cards")
     .then((res) => {
       return res.json();
     })
     .then((res) => {
-      return new PokemonDeck(createDeck(decklist, res.data));
+      return new PokemonDeck(createDeck(deck, res.data));
     })
     .catch((error) => {
       console.log(error);

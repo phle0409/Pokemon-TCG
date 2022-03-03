@@ -28,5 +28,5 @@ module.exports = {
   isRoomFull,
   userJoinRoom,
   userLeaveRoom,
-  getUserByID,
+  getUserByID
 };
