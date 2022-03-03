@@ -82,6 +82,8 @@ export default function Play() {
     //   setOpponentActive(null);
     //   setOpponentBench([]);
     // });
+
+    socket.on('leaveRoom');
   }, [socket]);
 
   const preGameSetup = (deck) => {

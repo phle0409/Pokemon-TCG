@@ -10,7 +10,12 @@ const PORT = process.env.PORT || 3000;
 const PKMN_API_KEY = process.env.PKMN_API_KEY;
 
 // user
-const { isRoomFull, userJoinRoom, userLeaveRoom } = require('./users/users');
+const {
+  isRoomFull,
+  userJoinRoom,
+  userLeaveRoom,
+  getUserByID,
+} = require('./users/users');
 
 app.use(cors());
 

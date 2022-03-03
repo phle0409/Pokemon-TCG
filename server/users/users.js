@@ -21,8 +21,13 @@ const userLeaveRoom = (id) => {
   }
 };
 
+const getUserByID = (id) => {
+  return users.find((user) => user.id === id);
+};
+
 module.exports = {
   isRoomFull,
   userJoinRoom,
   userLeaveRoom,
+  getUserByID,
 };
