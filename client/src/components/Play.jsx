@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
 import { Container } from "react-bootstrap";
 import { fetchDeck } from "../utils/createDeck.js";
-import { decklist_brushfire } from "../utils/precons.js";
 import Hand from "./Hand.jsx";
 import Bench from "./Bench.jsx";
 import Active from "./Active.jsx";
@@ -16,14 +15,20 @@ import PkmnToast from "./PkmnToast.jsx";
 export default function Play() {
   let navigate = useNavigate();
   const [socket, setSocket] = React.useState(null);
+  const [playerTurn, setPlayerTurn] = React.useState({
+    gameStarted: false,
+    playerTurn: ""
+  })
   const [yourName, setYourName] = React.useState("You");
+  const [opponentName, setOpponentName] = React.useState(
+    "Waiting on opponent..."
+  );
   const [deck, setDeck] = React.useState([]);
   const [hand, setHand] = React.useState([]);
   const [active, setActive] = React.useState(null);
   const [bench, setBench] = React.useState([]);
   const [prizes, setPrizes] = React.useState([]);
   const [discard, setDiscard] = React.useState([]);
-  const [opponentName, setOpponentName] = React.useState(null);
   const [opponentDeck, setOpponentDeck] = React.useState([]);
   const [opponentActive, setOpponentActive] = React.useState(null);
   const [opponentHand, setOpponentHand] = React.useState([]);
@@ -33,6 +38,7 @@ export default function Play() {
   const [selectedIndex, setSelectedIndex] = React.useState(null);
   const [selected, setSelected] = React.useState(null);
   const [damage, setDamage] = React.useState(0);
+  const [forcedAction, setForcedAction] = React.useState("");
   const [usesTargeting, setUsesTargeting] = React.useState(false);
   const [showAttackModal, setShowAttackModal] = React.useState(false);
   const [toast, setToast] = React.useState({
@@ -88,13 +94,29 @@ export default function Play() {
 
     socket.on("player-name", (oppname) => {
       setOpponentName(oppname);
+      setPlayerTurn({ gameStarted: true });
       socket.emit("other-player-name", username);
-      setToast({
-        text: "Player joined",
-        show: true,
+      socket.emit("played-card", {
+        deck,
+        hand,
+        active,
+        bench,
+        prizes,
+        discard,
       });
     });
-    socket.on("other-player-name", (oppname) => setOpponentName(oppname));
+    socket.on("other-player-name", (oppname) => {
+      setOpponentName(oppname);
+      setPlayerTurn({ gameStarted: true });
+      socket.emit("played-card", {
+        deck,
+        hand,
+        active,
+        bench,
+        prizes,
+        discard,
+      });
+    });
 
     socket.on("opponent-played-card", (board) => {
       const { deck, hand, active, bench, prizes, discard } = board;
@@ -106,35 +128,87 @@ export default function Play() {
       setOpponentDiscard(discard);
     });
 
-    socket.on("opponent-attacked", damage => {
+    socket.on("opponent-attacked", (damage) => {
       setDamage(damage);
-    })
+    });
+
+    socket.on("knockout", () => {
+      setHand([...hand, prizes.pop()]);
+      socket.emit("played-card", {
+        deck,
+        hand,
+        active,
+        bench,
+        prizes,
+        discard,
+      });
+    });
+
+    socket.on("toast", (message) => {
+      setToast({
+        text: message,
+        show: true,
+      });
+    });
 
     socket.on("player-left", ({ username, id }) => {
       setOpponentActive(null);
       setOpponentBench([]);
     });
-
-    socket.on("leaveRoom");
   }, [socket]);
 
   React.useEffect(() => {
-    if(damage === 0) return;
+    if (damage === 0) return;
 
     let newActive = active;
-    newActive.effects.damage += damage;
-    setActive(newActive);
-    socket.emit("played-card", {
-      deck,
-      hand,
-      active: newActive,
-      bench,
-      prizes,
-      discard,
-    });
+    newActive.effects.damage += parseInt(damage);
+
+    if (parseInt(newActive.effects.damage) >= parseInt(newActive.hp)) {
+      socket.emit("toast", `${yourName}'s ${newActive.name} was knocked out!`);
+      socket.emit("knockout");
+      setDiscard([...discard, newActive]);
+      newActive = null;
+      setActive(newActive);
+      socket.emit("played-card", {
+        deck,
+        hand,
+        active: newActive,
+        bench,
+        prizes,
+        discard,
+      });
+      if (bench.length > 0) setForcedAction("switch");
+      else
+        socket.emit(
+          "toast",
+          `${yourName} has no more benched Pokemon. ${opponentName} wins!`
+        );
+    } else {
+      setActive(newActive);
+      socket.emit("played-card", {
+        deck,
+        hand,
+        active: newActive,
+        bench,
+        prizes,
+        discard,
+      });
+    }
 
     setDamage(0);
-  }, [damage])
+  }, [damage]);
+
+  React.useEffect(() => {
+    if (playerTurn.gameStarted && deck.cards.length === 0)
+      socket.emit(
+        `${yourName} has no more cards in their deck. ${opponentName} wins!`
+      );
+
+    if (playerTurn.gameStarted && prizes.length === 0)
+      socket.emit(
+        `${yourName} has drawn all their prize cards. ${yourName} wins!`
+      );
+  }, [deck, prizes]);
 
   const preGameSetup = (deck) => {
     let openingHandBasic = false;
@@ -189,7 +263,7 @@ export default function Play() {
         </div>
         <div className="bg-light d-flex flex-column m-1 p-2 h-25 border border-secondary border-2 rounded">
           <span>
-            <strong>{opponentName || "Waiting on opponent..."}</strong>
+            <strong>{opponentName}</strong>
           </span>
           <span>Cards in deck: {opponentDeck.cards?.length}</span>
           <span>Prize cards: {opponentPrizes.length}</span>
@@ -213,6 +287,7 @@ export default function Play() {
             setBench={setBench}
             prizes={prizes}
             discard={discard}
+            yourName={yourName}
             socket={socket}
           />
         </div>
@@ -245,11 +320,15 @@ export default function Play() {
             setShow={setShowAttackModal}
             setUsesTargeting={setUsesTargeting}
             setToast={setToast}
+            forcedAction={forcedAction}
+            setForcedAction={setForcedAction}
+            yourName={yourName}
             socket={socket}
           />
           <Bench
             hand={hand}
             active={active}
+            setActive={setActive}
             bench={bench}
             deck={deck}
             prizes={prizes}
@@ -261,6 +340,9 @@ export default function Play() {
             setSelectedIndex={setSelectedIndex}
             setUsesTargeting={setUsesTargeting}
             setToast={setToast}
+            forcedAction={forcedAction}
+            setForcedAction={setForcedAction}
+            yourName={yourName}
             socket={socket}
           />
         </div>
@@ -269,6 +351,9 @@ export default function Play() {
             hand={hand}
             setSelected={setSelected}
             setSelectedIndex={setSelectedIndex}
+            forcedAction={forcedAction}
+            setForcedAction={setForcedAction}
+            setToast={setToast}
           />
         </div>
       </Container>

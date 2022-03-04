@@ -15,7 +15,7 @@ export default function Active({
   setSelectedIndex,
   setShow,
   setUsesTargeting,
-  setToast,
+  yourName,
   socket,
 }) {
   const handleClick = (e) => {
@@ -33,10 +33,7 @@ export default function Active({
       setSelected(null);
       setSelectedIndex(null);
       setUsesTargeting(false);
-      setToast({
-        text: `Attached ${selected.name} to ${active.name}`,
-        show: true,
-      });
+      socket.emit("toast", `${yourName} attached ${selected.name} to ${active.name}`);
       socket.emit("played-card", {
         deck,
         hand,
@@ -50,10 +47,7 @@ export default function Active({
       selected?.subtypes?.includes("Stage 2")
     ) {
       if (selected.evolvesFrom === active.name) {
-        setToast({
-          text: `Evolved ${active.name} to ${selected.name}`,
-          show: true,
-        });
+        socket.emit("toast", `${yourName} evolved ${active.name} into ${selected.name}!`);
         let newActive = selected;
         setActive(newActive);
         hand.splice(selectedIndex, 1);

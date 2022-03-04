@@ -15,6 +15,7 @@ html, body, #root {
 .pkmn-card:hover {
   cursor: pointer;
   transform: translateY(-6.125rem) scale(3);
+  z-index: 100;
 }
 
 .opp-pkmn-card {
@@ -27,6 +28,7 @@ html, body, #root {
 .opp-pkmn-card:hover {
   cursor: pointer;
   transform: translateY(6.125rem) scale(3);
+  z-index: 100;
 }
 
 .hand-card {

@@ -5,7 +5,6 @@ import EnergyCost from "./EnergyCost.jsx";
 export default function AttackModal({ show, handleClose, selected, setSelected, socket }) {
   const attackButton = (event) => {
     const [name, damage] = event.target.id.split("-");
-
     socket.emit("attack", damage);
     handleClose();
   };

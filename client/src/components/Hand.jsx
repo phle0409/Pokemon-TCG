@@ -4,8 +4,19 @@ export default function Hand({
   hand,
   setSelected,
   setSelectedIndex,
+  forcedAction,
+  setToast
 }) {
   const handleClick = (e) => {
+    if(forcedAction === "switch") {
+      setToast({
+        text: "You must selected a benched Pokemon to place into active",
+        show: true
+      })
+
+      return;
+    }
+
     const [name, set, zone, index] = e.target.id.split("-");
     const selectedCard = hand[index];
     console.log(selectedCard);

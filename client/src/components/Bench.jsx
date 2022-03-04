@@ -4,6 +4,7 @@ import EnergyCost from "./EnergyCost.jsx";
 export default function Bench({
   hand,
   active,
+  setActive,
   bench,
   deck,
   prizes,
@@ -14,11 +15,32 @@ export default function Bench({
   selectedIndex,
   setSelectedIndex,
   setUsesTargeting,
-  setToast,
+  forcedAction, 
+  setForcedAction,
   socket,
+  yourName
 }) {
   const handleClick = (e) => {
     const [name, set, zone, index] = e.target.id.split("-");
+
+    if(forcedAction === "switch") {
+      let newActive = bench[index];
+      setActive(newActive);
+      bench.splice(index, 1);
+      socket.emit("played-card", {
+        deck,
+        hand,
+        active: newActive,
+        bench,
+        prizes,
+        discard,
+      });
+      socket.emit("toast", `${yourName} sent out ${newActive.name}!`);
+
+      setForcedAction("");
+      return;
+    }
+
     if (!selected) {
       const selectedPkmn = bench[index];
       console.log(selectedPkmn);
@@ -27,10 +49,7 @@ export default function Bench({
       setUsesTargeting(false);
     } else {
       if (selected.supertype.includes("Energy")) {
-        setToast({
-          text: `Attached ${selected.name} to ${bench[index].name}`,
-          show: true,
-        });
+        socket.emit("toast", `${yourName} attached ${selected.name} to ${bench[index].name}`);
         bench[index].effects.attachments.push(selected);
         bench[index].effects.energy.push(selected.name.replace(" Energy", ""));
         hand.splice(selectedIndex, 1);
@@ -49,19 +68,17 @@ export default function Bench({
           selected.subtypes?.includes("Stage 2")) &&
         selected.evolvesFrom === bench[index].name
       ) {
-        setToast({
-          text: `Evolved ${bench[index].name} to ${selected.name}`,
-          show: true,
-        });
+        socket.emit("toast", `${yourName} evolved ${bench[index].name} into ${selected.name}!`);
         selected.effects.attachments = bench[index].effects.attachments;
         bench[index].effects.attachments = [];
         selected.effects.energy = bench[index].effects.energy;
         bench[index].effects.energy = [];
         selected.effects.attachments.push(bench[index]);
         hand.splice(selectedIndex, 1);
-        let newBench = bench.splice(index, 1);
-        let newerBench = [...newBench, selected];
-        setBench(newerBench);
+        bench.splice(index, 1);
+        bench.splice(index, 1);
+        let newBench = [...bench, selected];
+        setBench(newBench);
         setSelected(null);
         setSelectedIndex(null);
         setUsesTargeting(false);
@@ -69,7 +86,7 @@ export default function Bench({
           deck,
           hand,
           active,
-          bench: newerBench,
+          bench: newBench,
           prizes,
           discard,
         });

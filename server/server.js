@@ -61,22 +61,32 @@ io.on("connection", (socket) => {
         .emit("player-name", id);
     });
 
-    socket.on("other-player-name", (id) =>
+    socket.on("other-player-name", (id) => {
       socket.broadcast
         .to(getUserByID(socket.id).roomID)
-        .emit("other-player-name", id)
-    );
+        .emit("other-player-name", id);
+    });
 
     socket.on("played-card", (board) => {
       socket.broadcast
         .to(getUserByID(socket.id).roomID)
         .emit("opponent-played-card", board);
     });
-  });
 
-  socket.on("attack", attack => {
-    socket.broadcast.to(getUserByID(socket.id).roomID).emit("opponent-attacked", attack);
-  })
+    socket.on("toast", (message) => {
+      io.to(getUserByID(socket.id).roomID).emit("toast", message);
+    });
+
+    socket.on("attack", (attack) => {
+      socket.broadcast
+        .to(getUserByID(socket.id).roomID)
+        .emit("opponent-attacked", attack);
+    });
+
+    socket.on("knockout", () => {
+      socket.broadcast.to(getUserByID(socket.id).roomID).emit("knockout");
+    })
+  });
 
   socket.on("disconnect", () => {
     const user = userLeaveRoom(socket.id);

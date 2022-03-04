@@ -18,6 +18,7 @@ export default function InfoPanel({
   setBench,
   prizes,
   discard,
+  yourName,
   socket,
 }) {
   const [action, setAction] = React.useState("");
@@ -36,6 +37,7 @@ export default function InfoPanel({
         prizes,
         discard,
       });
+      socket.emit("toast", `${yourName} sent out ${newActive.name}!`);
     } else if (action === "toBench") {
       let newBench = [...bench, selected];
       setBench(newBench);
@@ -48,6 +50,7 @@ export default function InfoPanel({
         prizes,
         discard,
       });
+      socket.emit("toast", `${yourName} played ${selected.name} to bench`);
     }
     else if(action === "item") {
       itemMap(selected.name, deck, hand, setHand);
