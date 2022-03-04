@@ -32,6 +32,7 @@ export default function Play() {
   const [opponentDiscard, setOpponentDiscard] = React.useState([]);
   const [selectedIndex, setSelectedIndex] = React.useState(null);
   const [selected, setSelected] = React.useState(null);
+  const [damage, setDamage] = React.useState(0);
   const [usesTargeting, setUsesTargeting] = React.useState(false);
   const [showAttackModal, setShowAttackModal] = React.useState(false);
   const [toast, setToast] = React.useState({
@@ -105,11 +106,33 @@ export default function Play() {
       setOpponentDiscard(discard);
     });
 
+    socket.on('opponent-attacked', (damage) => {
+      setDamage(damage);
+    });
+
     socket.on('player-left', ({ username, id }) => {
       setOpponentActive(null);
       setOpponentBench([]);
     });
   }, [socket]);
+
+  React.useEffect(() => {
+    if (damage === 0) return;
+
+    let newActive = active;
+    newActive.effects.damage += damage;
+    setActive(newActive);
+    socket.emit('played-card', {
+      deck,
+      hand,
+      active: newActive,
+      bench,
+      prizes,
+      discard,
+    });
+
+    setDamage(0);
+  }, [damage]);
 
   const preGameSetup = (deck) => {
     let openingHandBasic = false;
