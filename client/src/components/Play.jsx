@@ -10,15 +10,16 @@ import OpponentActive from "./OpponentActive.jsx";
 import OpponentBench from "./OpponentBench.jsx";
 import InfoPanel from "./InfoPanel.jsx";
 import AttackModal from "./AttackModal.jsx";
+import ZoneModal from "./ZoneModal.jsx";
 import PkmnToast from "./PkmnToast.jsx";
 
 export default function Play() {
   let navigate = useNavigate();
   const [socket, setSocket] = React.useState(null);
-  const [playerTurn, setPlayerTurn] = React.useState({
+  const [gameStatus, setGameStatus] = React.useState({
     gameStarted: false,
-    playerTurn: ""
-  })
+    playerTurn: "",
+  });
   const [yourName, setYourName] = React.useState("You");
   const [opponentName, setOpponentName] = React.useState(
     "Waiting on opponent..."
@@ -41,6 +42,12 @@ export default function Play() {
   const [forcedAction, setForcedAction] = React.useState("");
   const [usesTargeting, setUsesTargeting] = React.useState(false);
   const [showAttackModal, setShowAttackModal] = React.useState(false);
+  const [zoneModal, setZoneModal] = React.useState({
+    cards: [],
+    zone: "",
+    show: false,
+    numTargets: 0,
+  });
   const [toast, setToast] = React.useState({
     text: "",
     show: false,
@@ -53,6 +60,8 @@ export default function Play() {
   };
 
   const handleShowAttackModal = () => setShowAttackModal(true);
+  const handleCloseZoneModal = () => setZoneModal({ show: false });
+  const handleShowZoneModal = () => setZoneModal({ show: true });
 
   const handleCloseToast = () => {
     setToast({
@@ -94,7 +103,6 @@ export default function Play() {
 
     socket.on("player-name", (oppname) => {
       setOpponentName(oppname);
-      setPlayerTurn({ gameStarted: true });
       socket.emit("other-player-name", username);
       socket.emit("played-card", {
         deck,
@@ -107,7 +115,6 @@ export default function Play() {
     });
     socket.on("other-player-name", (oppname) => {
       setOpponentName(oppname);
-      setPlayerTurn({ gameStarted: true });
       socket.emit("played-card", {
         deck,
         hand,
@@ -159,7 +166,6 @@ export default function Play() {
 
   React.useEffect(() => {
     if (damage === 0) return;
-
     let newActive = active;
     newActive.effects.damage += parseInt(damage);
 
@@ -199,12 +205,12 @@ export default function Play() {
   }, [damage]);
 
   React.useEffect(() => {
-    if (playerTurn.gameStarted && deck.cards.length === 0)
+    if (gameStatus.gameStarted && deck.cards.length === 0)
       socket.emit(
         `${yourName} has no more cards in their deck. ${opponentName} wins!`
       );
 
-    if (playerTurn.gameStarted && prizes.length === 0)
+    if (gameStatus.gameStarted && prizes.length === 0)
       socket.emit(
         `${yourName} has drawn all their prize cards. ${yourName} wins!`
       );
@@ -251,15 +257,40 @@ export default function Play() {
         setSelected={setSelected}
         socket={socket}
       />
+      <ZoneModal
+        show={zoneModal.show}
+        handleClose={handleCloseZoneModal}
+        numTargets={zoneModal.numTargets}
+        zone={zoneModal.zone}
+        cards={zoneModal.cards}
+      />
       <div className="bg-dark d-flex flex-column w-25 h-100">
-        <div className="bg-light d-flex flex-column m-1 p-1 h-25 border border-secondary border-2 rounded">
+        <div
+          className={`${
+            gameStatus.playerTurn === yourName
+              ? `border border-success`
+              : `border border-secondary`
+          }
+        bg-light d-flex flex-column m-1 p-1 h-25 border-2 rounded`}
+        >
           <span>
             <strong>{yourName}</strong>
           </span>
           <span>Cards in deck: {deck.cards?.length}</span>
           <span>Prize cards: {prizes.length}</span>
           <span>Cards in hand: {hand.length}</span>
-          <span>Cards in discard: {discard.length}</span>
+          <button
+            onClick={() => {
+              setZoneModal({
+                show: true,
+                zone: "Your discard pile",
+                numTargets: 0,
+                cards: discard,
+              });
+            }}
+          >
+            Cards in discard: {discard.length}
+          </button>
         </div>
         <div className="bg-light d-flex flex-column m-1 p-2 h-25 border border-secondary border-2 rounded">
           <span>
@@ -268,7 +299,18 @@ export default function Play() {
           <span>Cards in deck: {opponentDeck.cards?.length}</span>
           <span>Prize cards: {opponentPrizes.length}</span>
           <span>Cards in hand: {opponentHand.length}</span>
-          <span>Cards in discard: {opponentDiscard.length}</span>
+          <button
+            onClick={() =>
+              setZoneModal({
+                show: true,
+                zone: "Your opponent's discard pile",
+                numTargets: 0,
+                cards: opponentDiscard,
+              })
+            }
+          >
+            Cards in discard: {opponentDiscard.length}
+          </button>
         </div>
         <div className="bg-light d-flex flex-column m-1 p-2 h-50 border border-secondary border-2 rounded">
           <InfoPanel
@@ -302,7 +344,7 @@ export default function Play() {
           setShow={handleCloseToast}
           text={toast.text}
         />
-        <div className="bg-light p-2 d-flex flex-column justify-content-between h-100 w-100 border border-secondary border-3 rounded">
+        <div className="bg-light p-2 d-flex flex-column justify-content-between h-100 w-100 border border-secondary border-2 rounded">
           <OpponentBench opponentBench={opponentBench} />
           <OpponentActive opponentActive={opponentActive} />
           <hr className="m-0" />
