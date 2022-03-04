@@ -25,12 +25,13 @@ export default function InfoPanel({
 
   const handleClick = () => {
     if (action === "toActive") {
-      setActive(selected);
+      let newActive = selected;
+      setActive(newActive);
       hand.splice(selectedIndex, 1);
       socket.emit("played-card", {
         deck,
         hand,
-        active: selected,
+        active: newActive,
         bench,
         prizes,
         discard,

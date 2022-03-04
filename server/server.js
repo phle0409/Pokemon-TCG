@@ -77,7 +77,12 @@ io.on('connection', (socket) => {
     });
   });
 
-  socket.on('disconnect', () => {
+
+  socket.on("attack", attack => {
+    socket.broadcast.to(getUserByID(socket.id).roomID).emit("opponent-attacked", attack);
+  })
+
+  socket.on("disconnect", () => {
     const user = userLeaveRoom(socket.id);
     if (user) {
       io.to(user.roomID).emit('player-left', {
