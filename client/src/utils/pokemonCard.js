@@ -27,16 +27,16 @@ export default class PokemonCard {
     this.set = set;
     this.image = images.large || images.small;
     this.effects = {
-        attachments: [],
-        energy: [],
-        damage: 0,
-        statusConditions: {
-          poisoned: false,
-          asleep: false,
-          confused: false,
-          paralyzed: false,
-        },
-        misc: [],
-    }
+      attachments: [],
+      energy: [],
+      damage: 0,
+      statusConditions: {
+        poisoned: false,
+        asleep: false,
+        confused: false,
+        paralyzed: false,
+      },
+      misc: [],
+    };
   }
-} 
+}
