@@ -1,5 +1,6 @@
 import React from "react";
 import EnergyCost from "./EnergyCost";
+import Items from "./Items.jsx";
 
 export default function Active({
   hand,
@@ -21,7 +22,7 @@ export default function Active({
   socket,
 }) {
   const handleClick = (e) => {
-    const [name, set, zone, index] = e.target.split("-");
+    const [name, set, zone, index] = e.target.id.split("-");
 
     if(forcedAction === "switch") return;
 
@@ -114,6 +115,7 @@ export default function Active({
               active.hp - active.effects.damage
             }/${active.hp} HP`}</div>
             <EnergyCost energies={active.effects.energy} />
+            <Items items={active.effects.attachments} />
           </div>
         </div>
       ) : (
