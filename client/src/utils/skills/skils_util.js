@@ -6,7 +6,15 @@ const flipCoin = () => {
 
 const discard = (energies) => {
   const index = energies.findIndex((energy) => energy !== 'Colorless');
-  energies.splice(index, 1);
+  if (index !== -1) energies.splice(index, 1);
 };
 
-module.exports = { flipCoin, discard };
+const damageYourself = (damage, hp) => {
+  let result = hp - damage;
+  if (result < 0) {
+    result = 0;
+  }
+  return result;
+};
+
+module.exports = { flipCoin, discard, damageYourself };
