@@ -409,6 +409,7 @@ export default function Play() {
             setDiscard={setDiscard}
             selected={selected}
             setSelected={setSelected}
+            selectedIndex={selectedIndex}
             setSelectedIndex={setSelectedIndex}
             setShow={setShowAttackModal}
             setUsesTargeting={setUsesTargeting}
