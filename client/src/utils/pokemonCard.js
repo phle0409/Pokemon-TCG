@@ -35,6 +35,7 @@ export default class PokemonCard {
         asleep: false,
         confused: false,
         paralyzed: false,
+        immortal: false,
       },
       misc: [],
     };
