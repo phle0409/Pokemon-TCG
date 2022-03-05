@@ -4,7 +4,7 @@ import EnergyCost from "./EnergyCost.jsx";
 
 export default function AttackModal({ show, handleClose, selected, setSelected, socket }) {
   const attackButton = (event) => {
-    const [name, damage] = event.target.id.split("-");
+    const [name, damage, index] = event.target.id.split("-");
     socket.emit("attack", damage);
     handleClose();
   };
@@ -43,7 +43,7 @@ export default function AttackModal({ show, handleClose, selected, setSelected, 
       </Modal.Header>
       <Modal.Body>
         <Container className="px-3">
-          {selected.attacks.map((attack) => {
+          {selected.attacks.map((attack, index) => {
             const { name, cost, text, damage } = attack;
             return (
               <Row className="mt-2" key={name}>
@@ -60,7 +60,7 @@ export default function AttackModal({ show, handleClose, selected, setSelected, 
                 <Col xs={2}>
                   <Button
                     variant="success"
-                    id={`${name}-${damage}`}
+                    id={`${name}-${damage}-${index}`}
                     onClick={attackButton}
                   >
                     Select

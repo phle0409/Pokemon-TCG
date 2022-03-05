@@ -1,6 +1,6 @@
 import React from "react";
 import { Button, ButtonGroup } from "react-bootstrap";
-import { isTargetedItem, itemMap } from "../utils/itemMap.js";
+import { isTargetedItem, nonTargetedItems } from "../utils/itemMap.js";
 
 export default function InfoPanel({
   selected,
@@ -9,17 +9,25 @@ export default function InfoPanel({
   setSelectedIndex,
   usesTargeting,
   setUsesTargeting,
+  setForcedAction,
   deck,
+  setDeck,
   hand,
   setHand,
+  opponentDeck,
+  setOpponentDeck,
+  opponentHand,
+  setOpponentHand,
   active,
   setActive,
   bench,
   setBench,
   prizes,
   discard,
+  setDiscard,
   yourName,
   socket,
+  setZoneModal,
 }) {
   const [action, setAction] = React.useState("");
   const [infoText, setInfoText] = React.useState("");
@@ -51,16 +59,62 @@ export default function InfoPanel({
         discard,
       });
       socket.emit("toast", `${yourName} played ${selected.name} to bench`);
-    }
-    else if(action === "item") {
-      itemMap(selected.name, deck, hand, setHand);
+    } else if (action === "item") {
+      socket.emit("toast", `${yourName} played ${selected.name}`);
+      let newDiscard = [...discard, hand[selectedIndex]];
+      setDiscard(newDiscard);
+      hand.splice(selectedIndex, 1);
+      let newHand = hand;
+
+      if(selected.name === "Bill") {
+        let cards = deck.draw(2);
+        newHand = [...hand, ...cards];
+        setHand(newHand);
+      }
+      else if(selected.name === "Professor Oak") {
+        newDiscard = [...discard, ...hand];
+        setDiscard(newDiscard);
+        newHand = deck.draw(7);
+        setHand(newHand);
+      }
+      else if(selected.name === "Lass") {
+        setZoneModal({
+          show: true,
+          text: "Your opponent's hand",
+          numTargets: 0,
+          cards: opponentHand
+        })
+
+        let cards = [];
+        hand.forEach((card, i) => {
+          if(card.supertype === "Trainer") {
+            cards.push(card);
+            hand.splice(i, 1);
+          }
+        });
+
+        deck.putBack(cards);
+        deck.shuffle();
+
+        //TODO make it affect opponent
+      }
+      else if(selected.name === "Computer Search") {
+        setZoneModal({
+          show: true,
+          zone: "Select two cards from your hand to discard",
+          numTargets: 2,
+          cards: hand,
+          action: "discard then search deck"
+        })
+      }
+
       socket.emit("played-card", {
         deck,
-        hand,
+        hand: newHand,
         active,
         bench,
         prizes,
-        discard,
+        discard: newDiscard,
       });
     }
 
@@ -109,7 +163,7 @@ export default function InfoPanel({
         setUsesTargeting(false);
       }
     }
-  }, [selected]);
+  }, [selected, selectedIndex, setSelected, setSelectedIndex]);
 
   if (!selected || selected === active) return <div></div>;
 
@@ -126,6 +180,7 @@ export default function InfoPanel({
             setSelected(null);
             setSelectedIndex(null);
             setUsesTargeting(false);
+            setForcedAction("");
           }}
         >
           Cancel

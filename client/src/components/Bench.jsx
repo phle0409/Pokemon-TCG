@@ -1,42 +1,64 @@
 import React from "react";
 import EnergyCost from "./EnergyCost.jsx";
+import Items from "./Items.jsx";
+import { handToDiscard, benchToActive } from "../utils/changeZones.js";
 
 export default function Bench({
   hand,
+  setHand,
   active,
   setActive,
   bench,
   deck,
   prizes,
   discard,
+  setDiscard,
   setBench,
   selected,
   setSelected,
   selectedIndex,
   setSelectedIndex,
   setUsesTargeting,
-  forcedAction, 
+  forcedAction,
   setForcedAction,
   socket,
-  yourName
+  yourName,
 }) {
   const handleClick = (e) => {
     const [name, set, zone, index] = e.target.id.split("-");
 
-    if(forcedAction === "switch") {
-      let newActive = bench[index];
-      setActive(newActive);
-      bench.splice(index, 1);
-      socket.emit("played-card", {
-        deck,
-        hand,
-        active: newActive,
-        bench,
-        prizes,
-        discard,
-      });
-      socket.emit("toast", `${yourName} sent out ${newActive.name}!`);
+    if (forcedAction === "switch") {
+      benchToActive(bench, index, setBench, active, setActive);
+      // let newActive = bench[index];
+      // setActive(newActive);
+      // bench.splice(index, 1);
+      // let newBench;
+      // if (active) newBench = [...bench, active];
+      // else newBench = [...bench];
+      // setBench(newBench);
 
+      if (selected?.name === "Switch") {
+        handToDiscard([selectedIndex], hand, setHand, discard, setDiscard);
+        socket.emit("played-card", {
+          deck,
+          hand,
+          active,
+          bench,
+          prizes,
+          discard,
+        });
+      }
+
+      socket.emit(
+        "toast",
+        `${yourName} ${
+          selected?.name === "Switch" ? "used Switch and" : ""
+        } sent out ${active.name}!`
+      );
+
+      setSelected(null);
+      setSelectedIndex(null);
+      setUsesTargeting(false);
       setForcedAction("");
       return;
     }
@@ -49,7 +71,10 @@ export default function Bench({
       setUsesTargeting(false);
     } else {
       if (selected.supertype.includes("Energy")) {
-        socket.emit("toast", `${yourName} attached ${selected.name} to ${bench[index].name}`);
+        socket.emit(
+          "toast",
+          `${yourName} attached ${selected.name} to ${bench[index].name}`
+        );
         bench[index].effects.attachments.push(selected);
         bench[index].effects.energy.push(selected.name.replace(" Energy", ""));
         hand.splice(selectedIndex, 1);
@@ -68,7 +93,10 @@ export default function Bench({
           selected.subtypes?.includes("Stage 2")) &&
         selected.evolvesFrom === bench[index].name
       ) {
-        socket.emit("toast", `${yourName} evolved ${bench[index].name} into ${selected.name}!`);
+        socket.emit(
+          "toast",
+          `${yourName} evolved ${bench[index].name} into ${selected.name}!`
+        );
         selected.effects.attachments = bench[index].effects.attachments;
         bench[index].effects.attachments = [];
         selected.effects.energy = bench[index].effects.energy;
@@ -102,11 +130,11 @@ export default function Bench({
             <div
               className="d-flex flex-row mx-2 border border rounded"
               style={{ width: "auto", height: "6.125rem" }}
+              key={`bench-${index}`}
             >
               <img
                 className="pkmn-card table-card"
                 src={card.image}
-                key={`bench-${index}`}
                 id={`${card.name}-${card.set.name}-bench-${index}`}
                 onClick={handleClick}
               />
@@ -115,6 +143,7 @@ export default function Bench({
                   card.hp - card.effects.damage
                 }/${card.hp} HP`}</div>
                 <EnergyCost energies={card.effects.energy} />
+                <Items items={card.effects.attachments} />
               </div>
             </div>
           );

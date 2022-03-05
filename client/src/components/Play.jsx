@@ -38,6 +38,8 @@ export default function Play() {
   const [opponentDiscard, setOpponentDiscard] = React.useState([]);
   const [selectedIndex, setSelectedIndex] = React.useState(null);
   const [selected, setSelected] = React.useState(null);
+  const [multiSelect, setMultiSelect] = React.useState([]);
+  const [secondaryAction, setSecondaryAction] = React.useState("");
   const [damage, setDamage] = React.useState(0);
   const [forcedAction, setForcedAction] = React.useState("");
   const [usesTargeting, setUsesTargeting] = React.useState(false);
@@ -47,6 +49,7 @@ export default function Play() {
     zone: "",
     show: false,
     numTargets: 0,
+    action: null
   });
   const [toast, setToast] = React.useState({
     text: "",
@@ -200,7 +203,9 @@ export default function Play() {
     if (parseInt(newActive.effects.damage) >= parseInt(newActive.hp)) {
       socket.emit("toast", `${yourName}'s ${newActive.name} was knocked out!`);
       socket.emit("knockout");
-      setDiscard([...discard, newActive]);
+      let attachments = newActive.effects.attachments;
+      newActive.effects.attachments = [];
+      setDiscard([...discard, newActive, ...attachments]);
       newActive = null;
       setActive(newActive);
       socket.emit("played-card", {
@@ -243,6 +248,20 @@ export default function Play() {
         `${yourName} has drawn all their prize cards. ${yourName} wins!`
       );
   }, [deck, prizes]);
+
+  React.useEffect(() => {
+    if(secondaryAction === "") return;
+    else if(secondaryAction === "search deck") {
+      setZoneModal({
+        show: true,
+        zone: "Select 1 card from your deck to put into your hand",
+        numTargets: 1,
+        cards: deck.cards,
+        action: "search deck"
+      });
+    }
+    setSecondaryAction("");
+  }, [secondaryAction]);
 
   const preGameSetup = (deck) => {
     let openingHandBasic = false;
@@ -291,6 +310,16 @@ export default function Play() {
         numTargets={zoneModal.numTargets}
         zone={zoneModal.zone}
         cards={zoneModal.cards}
+        action={zoneModal.action}
+        multiSelect={multiSelect}
+        setMultiSelect={setMultiSelect}
+        setSecondaryAction={setSecondaryAction}
+        deck={deck}
+        setDeck={setDeck}
+        hand={hand}
+        setHand={setHand}
+        discard={discard}
+        setDiscard={setDiscard}
       />
       <div className="bg-dark d-flex flex-column w-25 h-100">
         <div
@@ -313,7 +342,7 @@ export default function Play() {
                 show: true,
                 zone: "Your discard pile",
                 numTargets: 0,
-                cards: discard,
+                cards: discard
               });
             }}
           >
@@ -421,13 +450,15 @@ export default function Play() {
           />
           <Bench
             hand={hand}
+            setHand={setHand}
             active={active}
             setActive={setActive}
             bench={bench}
+            setBench={setBench}
             deck={deck}
             prizes={prizes}
             discard={discard}
-            setBench={setBench}
+            setDiscard={setDiscard}
             selected={selected}
             setSelected={setSelected}
             selectedIndex={selectedIndex}

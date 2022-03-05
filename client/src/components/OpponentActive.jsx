@@ -1,5 +1,6 @@
 import React from "react";
 import EnergyCost from "./EnergyCost.jsx";
+import Items from "./Items.jsx";
 
 export default function OpponentActive({ opponentActive }) {
   return (
@@ -19,6 +20,7 @@ export default function OpponentActive({ opponentActive }) {
               opponentActive.hp
             } HP`}</div>
             <EnergyCost energies={opponentActive.effects.energy} />
+            <Items items={opponentActive.effects.attachments} />
           </div>
         </div>
       ) : (

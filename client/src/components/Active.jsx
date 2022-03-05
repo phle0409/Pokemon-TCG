@@ -28,19 +28,17 @@ export default function Active({
 
     if (!selected) {
       setSelected(active);
-      setSelectedIndex(index);
+      setSelectedIndex(null);
       setShow(true);
       setUsesTargeting(false);
       return;
     }
 
     if (selected?.supertype.includes("Energy")) {
+      active.effects.attachments.push(selected);
       active.effects.energy.push(selected.name.replace(" Energy", ""));
       let newActive = active;
       hand.splice(selectedIndex, 1);
-      setSelected(null);
-      setSelectedIndex(null);
-      setUsesTargeting(false);
       socket.emit("toast", `${yourName} attached ${selected.name} to ${active.name}`);
       socket.emit("played-card", {
         deck,
@@ -57,11 +55,13 @@ export default function Active({
       if (selected.evolvesFrom === active.name) {
         socket.emit("toast", `${yourName} evolved ${active.name} into ${selected.name}!`);
         let newActive = selected;
+        selected.effects.attachments = active.effects.attachments;
+        active.effects.attachments = [];
+        selected.effects.energy = active.effects.energy;
+        active.effects.energy = [];
+        selected.effects.attachments.push(active);
         setActive(newActive);
         hand.splice(selectedIndex, 1);
-        setSelected(null);
-        setSelectedIndex(null);
-        setUsesTargeting(false);
         socket.emit("played-card", {
           deck,
           hand,
@@ -72,7 +72,22 @@ export default function Active({
         });
       }
     } else if (selected?.supertype.includes("Trainer")) {
-      if(selected.name === "Potion") {
+      if(selected.name === "PlusPower" || selected.name === "Defender"){
+        socket.emit("toast", `${yourName} attached ${selected.name} to ${active.name}`);
+        let newActive = active;
+        newActive.effects.attachments.push(selected);
+        setActive(newActive);
+        hand.splice(selectedIndex, 1);
+        socket.emit("played-card", {
+          deck,
+          hand,
+          active: newActive,
+          bench,
+          prizes,
+          discard,
+        })
+      }
+      else if(selected.name === "Potion") {
         socket.emit("toast", `${yourName} used ${selected.name} on ${active.name}`);
         let newActive = active;
         let currentDamage = parseInt(active.effects.damage) - 20;
@@ -82,9 +97,6 @@ export default function Active({
         hand.splice(selectedIndex, 1);
         let newDiscard = [...discard, hand[selectedIndex]];
         setDiscard(newDiscard);
-        setSelected(null);
-        setSelectedIndex(null);
-        setUsesTargeting(false);
         socket.emit("played-card", {
           deck,
           hand,
@@ -92,8 +104,12 @@ export default function Active({
           bench,
           prizes,
           discard: newDiscard,
-        });
+        })
       }
+
+      setSelected(null);
+      setSelectedIndex(null);
+      setUsesTargeting(false);
     }
   };
 

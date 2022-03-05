@@ -5,6 +5,7 @@ export default function Hand({
   setSelected,
   setSelectedIndex,
   forcedAction,
+  setForcedAction,
   setToast
 }) {
   const handleClick = (e) => {
@@ -22,12 +23,16 @@ export default function Hand({
     console.log(selectedCard);
     setSelected(selectedCard);
     setSelectedIndex(index);
+
+    if(selectedCard.name === "Switch") {
+      setForcedAction("switch");
+    }
   };
 
   return (
     <div className="d-flex flex-row justify-content-center w-100">
-      {hand ? (
-        hand.map((card, index) => {
+      {hand.length > 0 ? (
+        hand?.map((card, index) => {
           return (
             <img
               className="my-2 mx-1 pkmn-card hand-card"
