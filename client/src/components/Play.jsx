@@ -87,17 +87,17 @@ export default function Play() {
     if (!socket) return;
     let username = state.name;
     let roomID = state.roomID;
+
     socket.on("connect", (id) => {
       setYourName(username);
       socket.emit("userJoinRoom", { username, roomID });
-      socket.emit("player-joined", username);
     });
 
     socket.on("message", (msg) => {
       if (msg === "full") {
         navigate("/room-full");
       } else {
-        console.log(msg);
+        socket.emit("player-joined", username);
       }
     });
 
@@ -140,12 +140,40 @@ export default function Play() {
     });
 
     socket.on("knockout", () => {
-      setHand([...hand, prizes.pop()]);
+      let newHand = [...hand, prizes.pop()];
+      setHand(newHand);
+      socket.emit("played-card", {
+        deck,
+        hand: newHand,
+        active,
+        bench,
+        prizes,
+        discard,
+      });
+    });
+
+    socket.on("reveal-hand", () => {
+      setZoneModal({
+        show: true,
+        text: "Your opponent's hand",
+        numTargets: 0,
+        zone: opponentHand,
+      });
+    });
+
+    socket.on("forced-retreat", (index) => {
+      let newActive = bench[index];
+      setActive(newActive);
+      bench.splice(index, 1);
+      let newBench;
+      if (active) newBench = [...bench, active];
+      else newBench = [...bench];
+      setBench(newBench);
       socket.emit("played-card", {
         deck,
         hand,
-        active,
-        bench,
+        active: newActive,
+        bench: newBench,
         prizes,
         discard,
       });
@@ -320,16 +348,23 @@ export default function Play() {
             setSelectedIndex={setSelectedIndex}
             usesTargeting={usesTargeting}
             setUsesTargeting={setUsesTargeting}
+            forcedAction={forcedAction}
+            setForcedAction={setForcedAction}
             deck={deck}
+            setDeck={setDeck}
             hand={hand}
             setHand={setHand}
+            opponentHand={opponentHand}
+            setOpponentHand={setOpponentHand}
             active={active}
             setActive={setActive}
             bench={bench}
             setBench={setBench}
             prizes={prizes}
             discard={discard}
+            setDiscard={setDiscard}
             yourName={yourName}
+            setZoneModal={setZoneModal}
             socket={socket}
           />
         </div>
@@ -345,7 +380,22 @@ export default function Play() {
           text={toast.text}
         />
         <div className="bg-light p-2 d-flex flex-column justify-content-between h-100 w-100 border border-secondary border-2 rounded">
-          <OpponentBench opponentBench={opponentBench} />
+          <OpponentBench
+            opponentBench={opponentBench}
+            selected={selected}
+            setSelected={setSelected}
+            selectedIndex={selectedIndex}
+            setSelectedIndex={setSelectedIndex}
+            deck={deck}
+            hand={hand}
+            setHand={setHand}
+            active={active}
+            discard={discard}
+            setDiscard={setDiscard}
+            prizes={prizes}
+            yourName={yourName}
+            socket={socket}
+          />
           <OpponentActive opponentActive={opponentActive} />
           <hr className="m-0" />
           <Active
@@ -356,6 +406,7 @@ export default function Play() {
             deck={deck}
             prizes={prizes}
             discard={discard}
+            setDiscard={setDiscard}
             selected={selected}
             setSelected={setSelected}
             setSelectedIndex={setSelectedIndex}

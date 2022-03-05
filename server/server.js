@@ -15,6 +15,8 @@ const {
   userJoinRoom,
   userLeaveRoom,
   getUserByID,
+  getAllUsersInRoomByID,
+  getAllUsersByRoom,
 } = require("./users/users");
 
 app.use(cors());
@@ -56,9 +58,10 @@ io.on("connection", (socket) => {
     }
 
     socket.on("player-joined", (id) => {
-      socket.broadcast
-        .to(getUserByID(socket.id).roomID)
-        .emit("player-name", id);
+      const user = getUserByID(socket.id);
+      if (user) {
+        socket.broadcast.to(user.roomID).emit("player-name", id);
+      }
     });
 
     socket.on("other-player-name", (id) => {
@@ -83,17 +86,27 @@ io.on("connection", (socket) => {
         .emit("opponent-attacked", attack);
     });
 
+    socket.on("reveal-hand", () => {
+      socket.broadcast.to(getUserByID(socket.id).roomID).emit("reveal-hand");
+    });
+
+    socket.on("forced-retreat", (index) => {
+      socket.broadcast.to(getUserByID(socket.id).roomID).emit("forced-retreat");
+    });
+
     socket.on("knockout", () => {
       socket.broadcast.to(getUserByID(socket.id).roomID).emit("knockout");
-    })
+    });
   });
 
   socket.on("disconnect", () => {
     const user = userLeaveRoom(socket.id);
-    io.to(user.roomID).emit("player-left", {
-      username: user.username,
-      id: user.id,
-    });
+    if (user) {
+      io.to(user.roomID).emit("player-left", {
+        username: user.username,
+        id: user.id,
+      });
+    }
   });
 });
 

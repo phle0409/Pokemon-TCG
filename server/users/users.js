@@ -1,7 +1,12 @@
 const users = [];
 
 const isRoomFull = (roomID) => {
-  return users.filter((user) => user.roomID === roomID).length >= 2;
+  const usersInRoom = users.filter((user) => user.roomID === roomID);
+  if (usersInRoom.length >= 2) {
+    return true;
+  } else {
+    return false;
+  }
 };
 
 const userJoinRoom = (id, username, roomID) => {
@@ -20,13 +25,27 @@ const userLeaveRoom = (id) => {
   }
 };
 
+const getAllUsersInRoomByID = (id) => {
+  const user = users.find((user) => user.id === id);
+  if (user) {
+    const room = user.roomID;
+    return users.find((user) => user.roomID === room);
+  }
+};
+
 const getUserByID = (id) => {
   return users.find((user) => user.id === id);
+};
+
+const getAllUsersByRoom = (roomID) => {
+  return users.find((user) => user.roomID === roomID);
 };
 
 module.exports = {
   isRoomFull,
   userJoinRoom,
   userLeaveRoom,
-  getUserByID
+  getUserByID,
+  getAllUsersInRoomByID,
+  getAllUsersByRoom,
 };

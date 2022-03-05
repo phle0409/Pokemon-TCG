@@ -9,18 +9,25 @@ export default function Active({
   deck,
   prizes,
   discard,
+  setDiscard,
   selected,
   setSelected,
   selectedIndex,
   setSelectedIndex,
+  forcedAction,
   setShow,
   setUsesTargeting,
   yourName,
   socket,
 }) {
   const handleClick = (e) => {
+    const [name, set, zone, index] = e.target.split("-");
+
+    if(forcedAction === "switch") return;
+
     if (!selected) {
       setSelected(active);
+      setSelectedIndex(index);
       setShow(true);
       setUsesTargeting(false);
       return;
@@ -64,7 +71,28 @@ export default function Active({
         });
       }
     } else if (selected?.supertype.includes("Trainer")) {
-      return;
+      if(selected.name === "Potion") {
+        socket.emit("toast", `${yourName} used ${selected.name} on ${active.name}`);
+        let newActive = active;
+        let currentDamage = parseInt(active.effects.damage) - 20;
+        if(currentDamage < 0) currentDamage = 0;
+        newActive.effects.damage = currentDamage;
+        setActive(newActive);
+        hand.splice(selectedIndex, 1);
+        let newDiscard = [...discard, hand[selectedIndex]];
+        setDiscard(newDiscard);
+        setSelected(null);
+        setSelectedIndex(null);
+        setUsesTargeting(false);
+        socket.emit("played-card", {
+          deck,
+          hand,
+          active: newActive,
+          bench,
+          prizes,
+          discard: newDiscard,
+        });
+      }
     }
   };
 
