@@ -1,15 +1,66 @@
-import React from "react";
-import { Button, Col, Container, Modal, Row } from "react-bootstrap";
-import EnergyCost from "./EnergyCost.jsx";
+import React from 'react';
+import { Button, Col, Container, Modal, Row } from 'react-bootstrap';
+import EnergyCost from './EnergyCost.jsx';
+import { skillCalculate } from '../utils/skills/skills';
 
-export default function AttackModal({ show, handleClose, selected, setSelected, socket }) {
+export default function AttackModal({
+  show,
+  handleClose,
+  selected,
+  setSelected,
+  socket,
+}) {
+  const canUseSkill = (costs, energies) => {
+    let colorless = 0;
+    let isEnoughEnergy = true;
+    let result = false;
+    for (let cost of costs) {
+      if (cost === 'Colorless') {
+        colorless++;
+      } else {
+        const index = energies.findIndex((energy) => energy === cost);
+        if (index === -1) {
+          isEnoughEnergy = false;
+          break;
+        } else {
+          energies.splice(index, 1);
+        }
+      }
+    }
+    if (isEnoughEnergy) {
+      if (colorless === 0) {
+        result = true;
+      } else if (colorless <= energies.length) {
+        energies.splice(0, colorless);
+        result = true;
+      }
+    }
+    return result;
+  };
+
   const attackButton = (event) => {
-    const [name, damage] = event.target.id.split("-");
-    socket.emit("attack", damage);
+    const [name, damage, cost] = event.target.id.split('#');
+
+    const costArray = cost.split(',');
+    const energyForCheckSkill = [...selected.effects.energy];
+    if (canUseSkill(costArray, energyForCheckSkill)) {
+      const [actualDamage, effectSkill] = skillCalculate(
+        name,
+        damage,
+        selected.effects.energy
+      );
+      console.log(actualDamage, effectSkill);
+      socket.emit('attack', { damage, effectSkill });
+    } else {
+      // Noti
+      // Doesn't enough energy cards
+      console.log('cannot use skill');
+    }
+
     handleClose();
   };
 
-  if (!selected || selected.supertype !== "Pokémon")
+  if (!selected || selected.supertype !== 'Pokémon')
     return (
       <Modal
         show={show}
@@ -60,7 +111,7 @@ export default function AttackModal({ show, handleClose, selected, setSelected, 
                 <Col xs={2}>
                   <Button
                     variant="success"
-                    id={`${name}-${damage}`}
+                    id={`${name}#${damage}#${cost}`}
                     onClick={attackButton}
                   >
                     Select

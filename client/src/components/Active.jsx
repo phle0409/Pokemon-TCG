@@ -1,6 +1,5 @@
-import React from "react";
-import EnergyCost from "./EnergyCost";
-import Items from "./Items.jsx";
+import React from 'react';
+import EnergyCost from './EnergyCost';
 
 export default function Active({
   hand,
@@ -22,9 +21,9 @@ export default function Active({
   socket,
 }) {
   const handleClick = (e) => {
-    const [name, set, zone, index] = e.target.id.split("-");
+    const [name, set, zone, index] = e.target.id.split('-');
 
-    if(forcedAction === "switch") return;
+    if (forcedAction === 'switch') return;
 
     if (!selected) {
       setSelected(active);
@@ -34,15 +33,18 @@ export default function Active({
       return;
     }
 
-    if (selected?.supertype.includes("Energy")) {
-      active.effects.energy.push(selected.name.replace(" Energy", ""));
+    if (selected?.supertype.includes('Energy')) {
+      active.effects.energy.push(selected.name.replace(' Energy', ''));
       let newActive = active;
       hand.splice(selectedIndex, 1);
       setSelected(null);
       setSelectedIndex(null);
       setUsesTargeting(false);
-      socket.emit("toast", `${yourName} attached ${selected.name} to ${active.name}`);
-      socket.emit("played-card", {
+      socket.emit(
+        'toast',
+        `${yourName} attached ${selected.name} to ${active.name}`
+      );
+      socket.emit('played-card', {
         deck,
         hand,
         active: newActive,
@@ -51,18 +53,21 @@ export default function Active({
         discard,
       });
     } else if (
-      selected?.subtypes?.includes("Stage 1") ||
-      selected?.subtypes?.includes("Stage 2")
+      selected?.subtypes?.includes('Stage 1') ||
+      selected?.subtypes?.includes('Stage 2')
     ) {
       if (selected.evolvesFrom === active.name) {
-        socket.emit("toast", `${yourName} evolved ${active.name} into ${selected.name}!`);
+        socket.emit(
+          'toast',
+          `${yourName} evolved ${active.name} into ${selected.name}!`
+        );
         let newActive = selected;
         setActive(newActive);
         hand.splice(selectedIndex, 1);
         setSelected(null);
         setSelectedIndex(null);
         setUsesTargeting(false);
-        socket.emit("played-card", {
+        socket.emit('played-card', {
           deck,
           hand,
           active: newActive,
@@ -71,12 +76,15 @@ export default function Active({
           discard,
         });
       }
-    } else if (selected?.supertype.includes("Trainer")) {
-      if(selected.name === "Potion") {
-        socket.emit("toast", `${yourName} used ${selected.name} on ${active.name}`);
+    } else if (selected?.supertype.includes('Trainer')) {
+      if (selected.name === 'Potion') {
+        socket.emit(
+          'toast',
+          `${yourName} used ${selected.name} on ${active.name}`
+        );
         let newActive = active;
         let currentDamage = parseInt(active.effects.damage) - 20;
-        if(currentDamage < 0) currentDamage = 0;
+        if (currentDamage < 0) currentDamage = 0;
         newActive.effects.damage = currentDamage;
         setActive(newActive);
         hand.splice(selectedIndex, 1);
@@ -85,7 +93,7 @@ export default function Active({
         setSelected(null);
         setSelectedIndex(null);
         setUsesTargeting(false);
-        socket.emit("played-card", {
+        socket.emit('played-card', {
           deck,
           hand,
           active: newActive,
@@ -102,7 +110,7 @@ export default function Active({
       {active ? (
         <div
           className="d-flex flex-row border rounded"
-          style={{ width: "auto", height: "6.125rem" }}
+          style={{ width: 'auto', height: '6.125rem' }}
         >
           <img
             className="pkmn-card table-card"
@@ -110,12 +118,11 @@ export default function Active({
             id={`${active.name}-${active.set.name}-active`}
             onClick={handleClick}
           />
-          <div className="d-flex flex-column" style={{ width: "7rem" }}>
+          <div className="d-flex flex-column" style={{ width: '7rem' }}>
             <div className="d-flex justify-content-center">{`${
               active.hp - active.effects.damage
             }/${active.hp} HP`}</div>
             <EnergyCost energies={active.effects.energy} />
-            <Items items={active.effects.attachments} />
           </div>
         </div>
       ) : (

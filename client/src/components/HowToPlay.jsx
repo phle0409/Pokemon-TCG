@@ -367,10 +367,17 @@ export default function HowToPlay() {
             <h3 className="fw-bold text-info ps-2">More Rules & Info</h3>
             <div className="ps-4">
               <p className="lead">
-                For more rules and information, you can check this link:
+                For more rules and information, you can check this link below:
               </p>
               <a href="https://www.pokemon.com/us/pokemon-tcg/">
                 https://www.pokemon.com/us/pokemon-tcg/
+              </a>
+
+              <p className="lead mt-3">
+                For the tutorial video, you can check this link below:
+              </p>
+              <a href="https://www.youtube.com/watch?v=tLIiyd1HL1s">
+                https://www.youtube.com/watch?v=tLIiyd1HL1s
               </a>
             </div>
           </section>
