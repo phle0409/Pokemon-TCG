@@ -1,16 +1,20 @@
 import { flipCoin, discard, damageYourself } from './skils_util';
 let effectSkill = null;
+let leakSplapDamage = 30;
 export const skillCalculate = (
   name,
   damage,
   energies,
   selected,
-  handleAttackChange
+  handleAttackChange,
+  handleHealChange
 ) => {
   switch (name) {
     /*****  decklist_brushfire skill *****/
     case 'Horn Hazzard':
       return FlipAttack(damage, energies);
+    case 'Lure':
+      return Lure(damage, energies);
     case 'Poison Sting':
       return FlipEffect(damage, energies, 'posion');
     case 'Confuse Ray':
@@ -32,12 +36,11 @@ export const skillCalculate = (
     case 'Bubblebeam':
       return FlipEffect(damage, energies, 'paralyzed');
     case 'Recover':
-      return Recover(damage, energies, selected);
+      return Recover(damage, energies, selected, handleHealChange);
     case 'Star Freeze':
       return FlipEffect(damage, energies, 'paralyzed');
     case 'Twineedle':
       return Flip2CoinsAttack(damage, energies);
-
     case 'Stiffen':
       return Stiffen(damage, energies);
 
@@ -51,11 +54,37 @@ export const skillCalculate = (
     case 'Meditate':
       return Meditate(30, energies);
     case `Hypnosis`:
-      return NormalEffect(damage, energies, 'asleep');
+      return SleepEffect(damage, energies, 'asleep');
+    case `Sleeping Gas`:
+      return SleepEffect(damage, energies, 'asleep');
     case `Dream Eater`:
       return DreamEater(damage, energies);
+    case `Destiny Bond`:
+      return DestinyBond(damage, energies);
+    case 'Psyshock':
+      return FlipEffect(damage, energies, 'paralyzed');
+    case 'Thunder Wave':
+      return FlipEffect(damage, energies, 'paralyzed');
+    case 'Thunder Jolt':
+      return ThunderJolt(damage, energies, handleAttackChange);
+    case 'Selfdestruct':
+      return Selfdestruct(damage, energies);
 
     /*****  decklist_blackout skill *****/
+    case 'Leek Slap':
+      return LeekSlap();
+    case 'Withdraw':
+      return Withdraw(selected);
+    case 'Bubble':
+      return FlipEffect(damage, energies, 'paralyzed');
+    case 'Harden':
+      return Stiffen(damage, energies);
+    case 'Sand-attack':
+      return SandAttack(damage, energies);
+    case 'Karate Chop':
+      return KarateChop(damage, energies, selected);
+    case 'Submission':
+      return Submission(damage, energies, handleAttackChange);
 
     /*****  Normal Default Attack skill *****/
     default:
@@ -68,6 +97,10 @@ const NormalAttack = (damage, energies) => {
 };
 
 /*****  decklist_brushfire skill *****/
+const Lure = (damage, energies) => {
+  // TODO: implement proper skill
+  return [30, null];
+};
 
 const TakeDown = (damage, energies, selected, handleAttackChange) => {
   handleAttackChange(30);
@@ -101,11 +134,10 @@ const FlipEffect = (damage, energies, effect) => {
 
 /*****  decklist_brushfire skill *****/
 
-const Recover = (damage, energies, selected) => {
-  // check update hp
+const Recover = (damage, energies, selected, handleHealChange) => {
   discard(energies);
-  // recovery
-  return [damage, null];
+  handleHealChange(60);
+  return [0, null];
 };
 
 const Flip2CoinsAttack = (damage, energies) => {
@@ -115,11 +147,9 @@ const Flip2CoinsAttack = (damage, energies) => {
 };
 
 const Stiffen = (damage, energies, selected) => {
-  // get current hp
   if (flipCoin()) {
     selected.effect.immortal = true;
   }
-
   return [0, null];
 };
 
@@ -141,5 +171,64 @@ const Meditate = (damage, energies) => {
 };
 
 const DreamEater = (damage, energies) => {
+  // TO DO : implement proper DreamEater skill
+  return [damage, null];
+};
+
+const SleepEffect = (damage, energies, effect) => {
+  return [0, effect];
+};
+
+const DestinyBond = (damage, energies, effect) => {
+  // TODO: implement proper skill
+
+  discard(energies);
+  return [30, effect];
+};
+
+const ThunderJolt = (damage, energies, handleAttackChange) => {
+  if (!flipCoin()) {
+    handleAttackChange(10);
+    damage = 0;
+  }
+  return [damage, null];
+};
+
+const Selfdestruct = (damage, energies) => {
+  // TODO: implement proper skill
+  return [30, null];
+};
+
+/*****  decklist_blackout skill *****/
+
+const LeekSlap = () => {
+  if (leakSplapDamage === 30) {
+    if (!flipCoin()) {
+      leakSplapDamage = 0;
+    }
+  }
+  return [leakSplapDamage, null];
+};
+
+const Withdraw = (selected) => {
+  if (flipCoin()) {
+    selected.effect.immortal = true;
+  }
+  return [0, null];
+};
+
+const SandAttack = (damage, energies) => {
+  // TODO: implement proper skill
+  return [damage, null];
+};
+
+const KarateChop = (damage, energies) => {
+  // TODO: implement proper skill
+  damage = 50 - Math.floor(Math.random() * 4) * 10;
+  return [damage, null];
+};
+
+const Submission = (damage, energies, handleAttackChange) => {
+  handleAttackChange(20);
   return [damage, null];
 };

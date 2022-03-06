@@ -10,6 +10,7 @@ export default function AttackModal({
   setSelected,
   socket,
   handleAttackChange,
+  handleHealChange,
 }) {
   const canUseSkill = (costs, energies) => {
     let colorless = 0;
@@ -49,7 +50,8 @@ export default function AttackModal({
         damage,
         selected.effects.energy,
         selected,
-        handleAttackChange
+        handleAttackChange,
+        handleHealChange
       );
       console.log(actualDamage, effectSkill);
 

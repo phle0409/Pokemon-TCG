@@ -39,7 +39,7 @@ export default function Play() {
   const [selectedIndex, setSelectedIndex] = React.useState(null);
   const [selected, setSelected] = React.useState(null);
   const [multiSelect, setMultiSelect] = React.useState([]);
-  const [secondaryAction, setSecondaryAction] = React.useState("");
+  const [secondaryAction, setSecondaryAction] = React.useState('');
   const [damage, setDamage] = React.useState(0);
   const [heal, setHeal] = React.useState(0);
   const [forcedAction, setForcedAction] = React.useState('');
@@ -50,7 +50,7 @@ export default function Play() {
     zone: '',
     show: false,
     numTargets: 0,
-    action: null
+    action: null,
   });
   const [toast, setToast] = React.useState({
     text: '',
@@ -237,12 +237,10 @@ export default function Play() {
   }, [damage]);
 
   React.useEffect(() => {
-    if(heal === 0) return;
+    if (heal === 0) return;
     let newActive = active;
-    if(newActive.effects.damage - heal < 0)
-      newActive.effects.damage = 0;
-    else
-      newActive.effects.damage -= heal;
+    if (newActive.effects.damage - heal < 0) newActive.effects.damage = 0;
+    else newActive.effects.damage -= heal;
     setActive(newActive);
     socket.emit('played-card', {
       deck,
@@ -259,6 +257,10 @@ export default function Play() {
     setDamage(damage);
   }
 
+  function handleHealChange(heal) {
+    setHeal(heal);
+  }
+
   React.useEffect(() => {
     if (gameStatus.gameStarted && deck.cards.length === 0)
       socket.emit(
@@ -272,17 +274,17 @@ export default function Play() {
   }, [deck, prizes]);
 
   React.useEffect(() => {
-    if(secondaryAction === "") return;
-    else if(secondaryAction === "search deck") {
+    if (secondaryAction === '') return;
+    else if (secondaryAction === 'search deck') {
       setZoneModal({
         show: true,
-        zone: "Select 1 card from your deck to put into your hand",
+        zone: 'Select 1 card from your deck to put into your hand',
         numTargets: 1,
         cards: deck.cards,
-        action: "search deck"
+        action: 'search deck',
       });
     }
-    setSecondaryAction("");
+    setSecondaryAction('');
   }, [secondaryAction]);
 
   const preGameSetup = (deck) => {
@@ -325,6 +327,7 @@ export default function Play() {
         selected={selected}
         setSelected={setSelected}
         handleAttackChange={handleAttackChange}
+        handleHealChange={handleHealChange}
         socket={socket}
       />
       <ZoneModal
@@ -365,7 +368,7 @@ export default function Play() {
                 show: true,
                 zone: 'Your discard pile',
                 numTargets: 0,
-                cards: discard
+                cards: discard,
               });
             }}
           >
