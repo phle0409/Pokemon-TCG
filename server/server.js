@@ -83,7 +83,7 @@ io.on('connection', (socket) => {
     socket.on('attack', ({ damage, effectSkill }) => {
       socket.broadcast
         .to(getUserByID(socket.id).roomID)
-        .emit('opponent-attacked', damage);
+        .emit('opponent-attacked', { damage, effectSkill });
     });
 
     socket.on('reveal-hand', () => {

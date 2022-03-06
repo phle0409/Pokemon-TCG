@@ -1,5 +1,6 @@
 import React from 'react';
 import { handToDiscard } from '../utils/changeZones';
+import EffectStatus from './EffectStatus';
 import EnergyCost from './EnergyCost';
 
 export default function Active({
@@ -107,7 +108,7 @@ export default function Active({
           bench,
           prizes,
           discard,
-        })
+        });
       }
 
       setSelected(null);
@@ -134,6 +135,7 @@ export default function Active({
               active.hp - active.effects.damage
             }/${active.hp} HP`}</div>
             <EnergyCost energies={active.effects.energy} />
+            <EffectStatus status={active.effects.statusConditions} />
           </div>
         </div>
       ) : (

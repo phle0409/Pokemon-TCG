@@ -42,6 +42,7 @@ export default function Play() {
   const [secondaryAction, setSecondaryAction] = React.useState('');
   const [damage, setDamage] = React.useState(0);
   const [heal, setHeal] = React.useState(0);
+  const [effect, setEffect] = React.useState('');
   const [forcedAction, setForcedAction] = React.useState('');
   const [usesTargeting, setUsesTargeting] = React.useState(false);
   const [showAttackModal, setShowAttackModal] = React.useState(false);
@@ -139,8 +140,13 @@ export default function Play() {
       setOpponentDiscard(discard);
     });
 
-    socket.on('opponent-attacked', (damage) => {
+    socket.on('opponent-attacked', ({ damage, effectSkill }) => {
+      console.log(`damage ${damage}, effect: ${effectSkill}`);
+      if (damage) damage = 0;
       setDamage(damage);
+      if (effectSkill) {
+        setEffect(effectSkill);
+      }
     });
 
     socket.on('knockout', () => {
@@ -199,6 +205,13 @@ export default function Play() {
   React.useEffect(() => {
     if (damage === 0) return;
     let newActive = active;
+    // Check if pokemon has immortal effect.
+    if (newActive.effects.statusConditions.immortal === true) {
+      newActive.effects.statusConditions.immortal = false;
+      setActive(newActive);
+      return;
+    }
+
     newActive.effects.damage += parseInt(damage);
 
     if (parseInt(newActive.effects.damage) >= parseInt(newActive.hp)) {
@@ -252,6 +265,30 @@ export default function Play() {
     });
     setHeal(0);
   }, [heal]);
+
+  React.useEffect(() => {
+    if (effect === '') return;
+    let newActive = active;
+    console.log('damage in effect', damage);
+    switch (effect) {
+      case 'posion':
+        newActive.effects.statusConditions.poisoned = true;
+        newActive.effects.statusConditions.posionedDamage = damage;
+        break;
+      case 'paralyzed':
+        newActive.effects.statusConditions.paralyzed = true;
+        newActive.effects.statusConditions.paralyzedDamage = damage;
+        break;
+      case 'confused':
+        newActive.effects.statusConditions.confused = true;
+        break;
+      default:
+        newActive.effects.statusConditions.asleep = true;
+    }
+    console.log(newActive);
+    setActive(newActive);
+    setEffect('');
+  }, [effect]);
 
   function handleAttackChange(damage) {
     setDamage(damage);

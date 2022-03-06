@@ -1,7 +1,8 @@
-import React from "react";
-import EnergyCost from "./EnergyCost.jsx";
-import Items from "./Items.jsx";
-import { handToDiscard, benchToActive } from "../utils/changeZones.js";
+import React from 'react';
+import EnergyCost from './EnergyCost.jsx';
+import Items from './Items.jsx';
+import { handToDiscard, benchToActive } from '../utils/changeZones.js';
+import EffectStatus from './EffectStatus';
 
 export default function Bench({
   hand,
@@ -25,9 +26,9 @@ export default function Bench({
   yourName,
 }) {
   const handleClick = (e) => {
-    const [name, set, zone, index] = e.target.id.split("-");
+    const [name, set, zone, index] = e.target.id.split('-');
 
-    if (forcedAction === "switch") {
+    if (forcedAction === 'switch') {
       benchToActive(bench, index, setBench, active, setActive);
       // let newActive = bench[index];
       // setActive(newActive);
@@ -37,9 +38,9 @@ export default function Bench({
       // else newBench = [...bench];
       // setBench(newBench);
 
-      if (selected?.name === "Switch") {
+      if (selected?.name === 'Switch') {
         handToDiscard([selectedIndex], hand, setHand, discard, setDiscard);
-        socket.emit("played-card", {
+        socket.emit('played-card', {
           deck,
           hand,
           active,
@@ -50,16 +51,16 @@ export default function Bench({
       }
 
       socket.emit(
-        "toast",
+        'toast',
         `${yourName} ${
-          selected?.name === "Switch" ? "used Switch and" : ""
+          selected?.name === 'Switch' ? 'used Switch and' : ''
         } sent out ${active.name}!`
       );
 
       setSelected(null);
       setSelectedIndex(null);
       setUsesTargeting(false);
-      setForcedAction("");
+      setForcedAction('');
       return;
     }
 
@@ -70,17 +71,17 @@ export default function Bench({
       setSelectedIndex(index);
       setUsesTargeting(false);
     } else {
-      if (selected.supertype.includes("Energy")) {
+      if (selected.supertype.includes('Energy')) {
         socket.emit(
-          "toast",
+          'toast',
           `${yourName} attached ${selected.name} to ${bench[index].name}`
         );
         bench[index].effects.attachments.push(selected);
-        bench[index].effects.energy.push(selected.name.replace(" Energy", ""));
+        bench[index].effects.energy.push(selected.name.replace(' Energy', ''));
         hand.splice(selectedIndex, 1);
         setSelected(null);
         setSelectedIndex(null);
-        socket.emit("played-card", {
+        socket.emit('played-card', {
           deck,
           hand,
           active,
@@ -89,12 +90,12 @@ export default function Bench({
           discard,
         });
       } else if (
-        (selected.subtypes?.includes("Stage 1") ||
-          selected.subtypes?.includes("Stage 2")) &&
+        (selected.subtypes?.includes('Stage 1') ||
+          selected.subtypes?.includes('Stage 2')) &&
         selected.evolvesFrom === bench[index].name
       ) {
         socket.emit(
-          "toast",
+          'toast',
           `${yourName} evolved ${bench[index].name} into ${selected.name}!`
         );
         selected.effects.attachments = bench[index].effects.attachments;
@@ -110,7 +111,7 @@ export default function Bench({
         setSelected(null);
         setSelectedIndex(null);
         setUsesTargeting(false);
-        socket.emit("played-card", {
+        socket.emit('played-card', {
           deck,
           hand,
           active,
@@ -129,7 +130,7 @@ export default function Bench({
           return (
             <div
               className="d-flex flex-row mx-2 border border rounded"
-              style={{ width: "auto", height: "6.125rem" }}
+              style={{ width: 'auto', height: '6.125rem' }}
               key={`bench-${index}`}
             >
               <img
@@ -138,12 +139,13 @@ export default function Bench({
                 id={`${card.name}-${card.set.name}-bench-${index}`}
                 onClick={handleClick}
               />
-              <div className="d-flex flex-column" style={{ width: "7rem" }}>
+              <div className="d-flex flex-column" style={{ width: '7rem' }}>
                 <div className="d-flex align-items-center justify-content-center">{`${
                   card.hp - card.effects.damage
                 }/${card.hp} HP`}</div>
                 <EnergyCost energies={card.effects.energy} />
                 <Items items={card.effects.attachments} />
+                <EffectStatus status={active.effects.statusConditions} />
               </div>
             </div>
           );

@@ -53,12 +53,9 @@ export default function AttackModal({
         handleAttackChange,
         handleHealChange
       );
-      console.log(actualDamage, effectSkill);
 
       socket.emit('attack', { damage, effectSkill });
     } else {
-      // Noti
-      // Doesn't enough energy cards
       console.log('cannot use skill');
     }
 
