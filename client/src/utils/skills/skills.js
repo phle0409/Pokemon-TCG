@@ -5,12 +5,15 @@ export const skillCalculate = (
   damage,
   energies,
   selected,
-  handleAttackChange
+  handleAttackChange,
+  handleHealChange
 ) => {
   switch (name) {
     /*****  decklist_brushfire skill *****/
     case 'Horn Hazzard':
       return FlipAttack(damage, energies);
+    case 'Lure':
+      return Lure(damage, energies);
     case 'Poison Sting':
       return FlipEffect(damage, energies, 'posion');
     case 'Confuse Ray':
@@ -32,7 +35,7 @@ export const skillCalculate = (
     case 'Bubblebeam':
       return FlipEffect(damage, energies, 'paralyzed');
     case 'Recover':
-      return Recover(damage, energies, selected);
+      return Recover(damage, energies, selected, handleHealChange);
     case 'Star Freeze':
       return FlipEffect(damage, energies, 'paralyzed');
     case 'Twineedle':
@@ -68,6 +71,10 @@ const NormalAttack = (damage, energies) => {
 };
 
 /*****  decklist_brushfire skill *****/
+const Lure = (damage, energies) => {
+  // TODO: implement proper skill
+  return [30, null];
+};
 
 const TakeDown = (damage, energies, selected, handleAttackChange) => {
   handleAttackChange(30);
@@ -101,11 +108,10 @@ const FlipEffect = (damage, energies, effect) => {
 
 /*****  decklist_brushfire skill *****/
 
-const Recover = (damage, energies, selected) => {
-  // check update hp
+const Recover = (damage, energies, selected, handleHealChange) => {
   discard(energies);
-  // recovery
-  return [damage, null];
+  handleHealChange(60);
+  return [0, null];
 };
 
 const Flip2CoinsAttack = (damage, energies) => {
@@ -115,11 +121,9 @@ const Flip2CoinsAttack = (damage, energies) => {
 };
 
 const Stiffen = (damage, energies, selected) => {
-  // get current hp
   if (flipCoin()) {
     selected.effect.immortal = true;
   }
-
   return [0, null];
 };
 
@@ -141,5 +145,6 @@ const Meditate = (damage, energies) => {
 };
 
 const DreamEater = (damage, energies) => {
+  // TO DO : implement proper DreamEater skill
   return [damage, null];
 };
