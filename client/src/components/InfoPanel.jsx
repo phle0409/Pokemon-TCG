@@ -1,6 +1,11 @@
 import React from "react";
 import { Button, ButtonGroup } from "react-bootstrap";
-import { isTargetedItem, nonTargetedItems } from "../utils/itemMap.js";
+import { isTargetedItem } from "../utils/itemMap.js";
+import {
+  handToActive,
+  handToBench,
+  handToDiscard,
+} from "../utils/changeZones.js";
 
 export default function InfoPanel({
   selected,
@@ -9,7 +14,7 @@ export default function InfoPanel({
   setSelectedIndex,
   usesTargeting,
   setUsesTargeting,
-  setForcedAction,
+  retreat,
   deck,
   setDeck,
   hand,
@@ -26,6 +31,7 @@ export default function InfoPanel({
   discard,
   setDiscard,
   yourName,
+  setToast,
   socket,
   setZoneModal,
 }) {
@@ -33,23 +39,37 @@ export default function InfoPanel({
   const [infoText, setInfoText] = React.useState("");
 
   const handleClick = () => {
+    setSelected(null);
+    setSelectedIndex(null);
+    setUsesTargeting(false);
+
     if (action === "toActive") {
-      let newActive = selected;
-      setActive(newActive);
-      hand.splice(selectedIndex, 1);
+      const [newActive, newHand] = handToActive(
+        hand,
+        selectedIndex,
+        setHand,
+        setActive
+      );
+
       socket.emit("played-card", {
         deck,
-        hand,
+        hand: newHand,
         active: newActive,
         bench,
         prizes,
         discard,
       });
+
       socket.emit("toast", `${yourName} sent out ${newActive.name}!`);
     } else if (action === "toBench") {
-      let newBench = [...bench, selected];
-      setBench(newBench);
-      hand.splice(selectedIndex, 1);
+      const [newHand, newBench] = handToBench(
+        hand,
+        selectedIndex,
+        setHand,
+        bench,
+        setBench
+      );
+
       socket.emit("played-card", {
         deck,
         hand,
@@ -58,74 +78,107 @@ export default function InfoPanel({
         prizes,
         discard,
       });
+
       socket.emit("toast", `${yourName} played ${selected.name} to bench`);
     } else if (action === "item") {
-      socket.emit("toast", `${yourName} played ${selected.name}`);
-      let newDiscard = [...discard, hand[selectedIndex]];
-      setDiscard(newDiscard);
-      hand.splice(selectedIndex, 1);
-      let newHand = hand;
+      let trainerPlayed = false;
 
-      if(selected.name === "Bill") {
+      if (selected.name === "Bill") {
         let cards = deck.draw(2);
-        newHand = [...hand, ...cards];
+        let newHand = [...hand, ...cards];
         setHand(newHand);
-      }
-      else if(selected.name === "Professor Oak") {
-        newDiscard = [...discard, ...hand];
+        trainerPlayed = true;
+      } else if (selected.name === "Professor Oak") {
+        let newDiscard = [...discard, ...hand];
         setDiscard(newDiscard);
-        newHand = deck.draw(7);
+        let newHand = deck.draw(7);
         setHand(newHand);
-      }
-      else if(selected.name === "Lass") {
-        setZoneModal({
-          show: true,
-          text: "Your opponent's hand",
-          numTargets: 0,
-          cards: opponentHand
-        })
+        trainerPlayed = true;
+      } else if (selected.name === "Lass") {
+        const [newHand, newDiscard] = handToDiscard(
+          [selectedIndex],
+          hand,
+          setHand,
+          discard,
+          setDiscard
+        );
 
-        let cards = [];
-        hand.forEach((card, i) => {
-          if(card.supertype === "Trainer") {
-            cards.push(card);
-            hand.splice(i, 1);
-          }
+        socket.emit("played-card", {
+          deck,
+          hand: newHand,
+          active,
+          bench,
+          discard: newDiscard,
+          prizes
         });
+        socket.emit("toast", `${yourName} played ${selected.name}`);
+        setTimeout(() => socket.emit("lass", hand), 2000);
+      } else if (selected.name === "Computer Search") {
+        if (hand.length < 2) {
+          setToast({
+            show: true,
+            text: "You need at least 2 cards in your hand to play Computer Search",
+          });
+        } else {
+          setZoneModal({
+            show: true,
+            zone: "Select two cards from your hand to discard",
+            numTargets: 2,
+            cards: hand,
+            action: "discard then search deck",
+          });
+          trainerPlayed = true;
+        }
+      } else if (selected.name === "Energy Retrieval") {
+        let energiesInDiscard = 0;
 
-        deck.putBack(cards);
-        deck.shuffle();
+        for (const card of discard) {
+          if (energiesInDiscard >= 2) break;
+          if (card.supertype.includes("Energy")) ++energiesInDiscard;
+        }
 
-        //TODO make it affect opponent
+        if (energiesInDiscard < 2) {
+          setToast({
+            show: true,
+            text: "You need at least 2 energies in your discard pile to play Energy Retrieval",
+          });
+        } else {
+          setZoneModal({
+            show: true,
+            zone: "Select 2 energy cards from discard",
+            numTargets: 2,
+            cards: discard,
+            action: "energy from discard to hand",
+          });
+          trainerPlayed = true;
+        }
       }
-      else if(selected.name === "Computer Search") {
-        setZoneModal({
-          show: true,
-          zone: "Select two cards from your hand to discard",
-          numTargets: 2,
-          cards: hand,
-          action: "discard then search deck"
-        })
-      }
 
-      socket.emit("played-card", {
-        deck,
-        hand: newHand,
-        active,
-        bench,
-        prizes,
-        discard: newDiscard,
-      });
+      if (trainerPlayed) {
+        const [newHand, newDiscard] = handToDiscard(
+          [selectedIndex],
+          hand,
+          setHand,
+          discard,
+          setDiscard
+        );
+
+        socket.emit("played-card", {
+          deck,
+          hand: newHand,
+          active,
+          bench,
+          prizes,
+          discard: newDiscard,
+        });
+      }
     }
-
-    setSelected(null);
-    setSelectedIndex(null);
   };
 
   React.useEffect(() => {
     if (!selected) return;
-    const { name, supertype, subtypes, evolvesFrom } = selected;
 
+    const { name, supertype, subtypes, evolvesFrom } = selected;
     if (
       supertype.includes("Pokémon") &&
       subtypes?.includes("Basic") &&
@@ -165,7 +218,7 @@ export default function InfoPanel({
     }
   }, [selected, selectedIndex, setSelected, setSelectedIndex]);
 
-  if (!selected || selected === active) return <div></div>;
+  if (!selected || (selected === active && !retreat)) return <div></div>;
 
   return (
     <div className="d-flex flex-column justify-content-center align-items-center h-100">
@@ -180,7 +233,6 @@ export default function InfoPanel({
             setSelected(null);
             setSelectedIndex(null);
             setUsesTargeting(false);
-            setForcedAction("");
           }}
         >
           Cancel

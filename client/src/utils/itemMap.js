@@ -7,7 +7,7 @@ export const isTargetedItem = (item) => {
     case "Defender":
       return true;
     case "Energy Removal":
-      return false;
+      return true;
     case "Energy Retrieval":
       return false;
     case "Gust of Wind":
@@ -21,7 +21,7 @@ export const isTargetedItem = (item) => {
     case "Professor Oak":
       return false;
     case "Super Potion":
-      return false;
+      return true;
     case "Switch":
       return true;
     default:

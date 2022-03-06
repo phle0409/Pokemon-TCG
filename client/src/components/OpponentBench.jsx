@@ -1,13 +1,16 @@
 import React from "react";
 import EnergyCost from "./EnergyCost.jsx";
 import Items from "./Items.jsx";
+import { handToDiscard } from "../utils/changeZones.js";
 
 export default function OpponentBench({
+  opponentActive,
   opponentBench,
   selected,
   setSelected,
   selectedIndex,
   setSelectedIndex,
+  setUsesTargeting,
   deck,
   active,
   hand,
@@ -17,30 +20,77 @@ export default function OpponentBench({
   setDiscard,
   prizes,
   yourName,
-  socket
+  setToast,
+  setZoneModal,
+  socket,
 }) {
   const handleClick = (e) => {
     const [name, set, zone, index] = e.target.id.split("-");
 
     if (selected.name === "Gust of Wind") {
-      socket.emit("toast", `${yourName} used ${selected.name} to bring in ${opponentBench[index].name}!`);
-      let newDiscard = [...discard, hand[selectedIndex]];
-      setDiscard(newDiscard);
-      hand.splice(selectedIndex, 1);
+      const [newHand, newDiscard] = handToDiscard(
+        [selectedIndex],
+        hand,
+        setHand,
+        discard,
+        setDiscard
+      );
+      socket.emit("forced-retreat", index);
+      socket.emit(
+        "toast",
+        `${yourName} used ${selected.name} on ${opponentBench[index].name}!`
+      );
       socket.emit("played-card", {
         deck,
-        hand,
+        hand: newHand,
         active,
         bench,
         discard: newDiscard,
-        prizes
-      })
+        prizes,
+      });
+    } else if (selected.name === "Energy Removal") {
+      if (opponentBench[index].effects.energy.length < 1) {
+        setToast({
+          show: true,
+          text: `${opponentBench[index].name} has no energy to discard`,
+        });
+        return;
+      }
 
-      setSelected(null);
-      setSelectedIndex(null);
+      const [newHand, newDiscard] = handToDiscard(
+        [selectedIndex],
+        hand,
+        setHand,
+        discard,
+        setDiscard
+      );
 
-      socket.emit("forced-retreat", index);
+      setZoneModal({
+        show: true,
+        zone: `Select an energy to discard from your opponent's ${opponentBench[index].name}`,
+        numTargets: 1,
+        cards: opponentBench[index].effects.attachments,
+        action: "make opponent discard energy from bench",
+        index: index,
+      });
+
+      socket.emit({
+        deck,
+        hand: newHand,
+        active,
+        bench,
+        discard: newDiscard,
+        prizes,
+      });
+
+      socket.emit(
+        `${yourName} used ${selected.name} on ${opponentBench[index].name}!`
+      );
     }
+
+    setSelected(null);
+    setSelectedIndex(null);
+    setUsesTargeting(false);
   };
 
   return (

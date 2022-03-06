@@ -24,7 +24,7 @@ export default class PokemonCard {
     this.attacks = attacks;
     this.weaknesses = weaknesses;
     this.retreatCost = retreatCost;
-    this.set = set;
+    this.set = set.name;
     this.image = images.large || images.small;
     this.effects = {
       attachments: [],

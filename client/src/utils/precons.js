@@ -34,7 +34,7 @@ export const decklist_overgrowth = [
   //{ name: "Super Potion", set: "Base", quantity: 2 },
   //{ name: "Switch", set: "Base", quantity: 2 },
   //{ name: "Gust of Wind", set: "Base", quantity: 2 },
-  { name: "Potion", set: "Base", quantity: 12 },
+  { name: "Energy Removal", set: "Base", quantity: 12 },
   { name: "Water Energy", set: "Base", quantity: 12 },
   { name: "Grass Energy", set: "Base", quantity: 16 },
 ];
