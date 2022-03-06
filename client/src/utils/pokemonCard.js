@@ -36,6 +36,8 @@ export default class PokemonCard {
         confused: false,
         paralyzed: false,
         immortal: false,
+        posionedDamage: 0,
+        paralyzedDamage: 0,
       },
       misc: [],
     };

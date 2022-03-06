@@ -1,12 +1,15 @@
+
 import React from "react";
 import EnergyCost from "./EnergyCost.jsx";
 import Items from "./Items.jsx";
+
 import {
   attachEnergyToBench,
   attachTrainerToBench,
   benchToActive,
   evolveBench,
   handToDiscard,
+
 } from "../utils/changeZones.js";
 
 export default function Bench({
@@ -34,6 +37,7 @@ export default function Bench({
   yourName,
 }) {
   const handleClick = (e) => {
+
     const [pokemonName, set, zone, index] = e.target.id.split("-");
 
     if (retreat) {
@@ -44,6 +48,7 @@ export default function Bench({
         active,
         setActive
       );
+
 
       socket.emit("played-card", {
         deck,
@@ -68,6 +73,7 @@ export default function Bench({
           setDiscard
         );
 
+
         socket.emit("played-card", {
           deck,
           hand: newHand,
@@ -79,8 +85,9 @@ export default function Bench({
       }
 
       socket.emit(
-        "toast",
+        'toast',
         `${yourName} ${
+
           selected?.name === "Switch" ? "used Switch and" : ""
         } sent out ${newActive.name}!`
       );
@@ -97,6 +104,7 @@ export default function Bench({
     }
 
     const { supertype, name, subtypes, evolvesFrom } = selected;
+
     if (supertype.includes("Energy")) {
       const [newHand, newBench] = attachEnergyToBench(
         hand,
@@ -107,6 +115,7 @@ export default function Bench({
         setBench
       );
       socket.emit(
+
         "toast",
         `${yourName} attached ${name} to ${newBench[index].name}`
       );
@@ -119,6 +128,7 @@ export default function Bench({
         prizes,
       });
     } else if (
+
       supertype.includes("Pokémon") &&
       evolvesFrom === bench[index].name
     ) {
@@ -131,6 +141,7 @@ export default function Bench({
         setBench
       );
       socket.emit(
+
         "toast",
         `${yourName} evolved ${newBench[index].name} into ${name}!`
       );
@@ -142,6 +153,7 @@ export default function Bench({
         discard,
         prizes,
       });
+
     } else if (supertype.includes("Trainer")) {
       if (name === "Potion") {
         const [newHand, newDiscard] = handToDiscard(
@@ -153,6 +165,7 @@ export default function Bench({
         );
         setHealBenched({ index: index, heal: 20 });
         socket.emit(
+
           "toast",
           `${yourName} used ${name} on ${bench[index].name}`
         );
@@ -172,16 +185,20 @@ export default function Bench({
           discard,
           setDiscard
         );
+
         socket.emit("toast", `${yourName} used ${name} on ${bench[index].name}`);
+
         setZoneModal({
           show: true,
           zone: `Choose an energy to discard from ${bench[index].name}`,
           numTargets: 1,
           cards: bench[index].effects.attachments,
+
           action: "discard energy from bench",
           index: index
         })
       } else if (name === "PlusPower" || name === "Defender") {
+
         const [newHand, newBench] = attachTrainerToBench(
           hand,
           selectedIndex,
@@ -191,6 +208,7 @@ export default function Bench({
           setBench
         );
         socket.emit(
+
           "toast",
           `${yourName} attached ${name} to ${newBench[index].name}`
         );
@@ -217,7 +235,7 @@ export default function Bench({
           return (
             <div
               className="d-flex flex-row mx-2 border border rounded"
-              style={{ width: "auto", height: "6.125rem" }}
+              style={{ width: 'auto', height: '6.125rem' }}
               key={`bench-${index}`}
             >
               <img
@@ -226,7 +244,7 @@ export default function Bench({
                 id={`${card.name}-${card.set.name}-bench-${index}`}
                 onClick={handleClick}
               />
-              <div className="d-flex flex-column" style={{ width: "7rem" }}>
+              <div className="d-flex flex-column" style={{ width: '7rem' }}>
                 <div className="d-flex align-items-center justify-content-center">{`${
                   card.hp - card.effects.damage
                 }/${card.hp} HP`}</div>

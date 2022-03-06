@@ -1,4 +1,7 @@
+
+
 import React from "react";
+
 import {
   attachEnergyToActive,
   attachTrainerToActive,
@@ -7,6 +10,7 @@ import {
 } from "../utils/changeZones.js";
 import EnergyCost from "./EnergyCost";
 import Items from "./Items.jsx";
+
 
 export default function Active({
   hand,
@@ -37,6 +41,7 @@ export default function Active({
     if (retreat) {
       setToast({
         show: true,
+
         text: "You must choose a benched Pokemon to place into active"
       })
       return;
@@ -51,7 +56,9 @@ export default function Active({
     }
 
     const { supertype, name, evolvesFrom } = selected;
+
     if (supertype.includes("Energy")) {
+
       const [newHand, newActive] = attachEnergyToActive(
         hand,
         selectedIndex,
@@ -59,7 +66,9 @@ export default function Active({
         active,
         setActive
       );
+
       socket.emit("toast", `${yourName} attached ${name} to ${active.name}`);
+
       socket.emit({
         deck,
         hand: newHand,
@@ -68,7 +77,9 @@ export default function Active({
         discard,
         prizes,
       });
+
     } else if (supertype.includes("Pokémon") && evolvesFrom === active.name) {
+
       const [newHand, newActive] = evolveActive(
         hand,
         selectedIndex,
@@ -76,7 +87,9 @@ export default function Active({
         active,
         setActive
       );
+
       socket.emit("toast", `${yourName} evolved ${active.name} into ${name}!`);
+
       socket.emit({
         deck,
         hand: newHand,
@@ -85,8 +98,10 @@ export default function Active({
         discard,
         prizes,
       });
+
     } else if (supertype.includes("Trainer")) {
       if (name === "Potion") {
+
         setHeal(20);
         const [newHand, newDiscard] = handToDiscard(
           [selectedIndex],
@@ -95,7 +110,9 @@ export default function Active({
           discard,
           setDiscard
         );
+
         socket.emit("toast", `${yourName} used ${name} on ${active.name}`);
+
         socket.emit({
           deck,
           hand: newHand,
@@ -104,11 +121,13 @@ export default function Active({
           discard: newDiscard,
           prizes,
         });
+
       } else if (name === "Super Potion") {
         if(active.effects.energy.length < 1) {
           setToast({
             show: true,
             text: `${active.name} does not have any attached energy`
+
           });
           return;
         }
@@ -121,7 +140,9 @@ export default function Active({
           discard,
           setDiscard
         );
+
         socket.emit("toast", `${yourName} used ${name} on ${active.name}`);
+
         socket.emit({
           deck,
           hand: newHand,
@@ -135,9 +156,11 @@ export default function Active({
           zone: `Choose an energy to discard from ${active.name}`,
           numTargets: 1,
           cards: active.effects.attachments,
+
           action: "discard energy from active",
         });
       } else if (name === "PlusPower" || name === "Defender") {
+
         const [newHand, newActive] = attachTrainerToActive(
           hand,
           selectedIndex,
@@ -145,7 +168,9 @@ export default function Active({
           active,
           setActive
         );
+
         socket.emit("toast", `${yourName} attached ${name} to ${active.name}`);
+
         socket.emit({
           deck,
           hand: newHand,
