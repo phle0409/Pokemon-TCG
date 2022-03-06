@@ -54,10 +54,17 @@ export const skillCalculate = (
     case 'Meditate':
       return Meditate(30, energies);
     case `Hypnosis`:
-      return NormalEffect(damage, energies, 'asleep');
+      return SleepEffect(damage, energies, 'asleep');
+    case `Sleeping Gas`:
+      return SleepEffect(damage, energies, 'asleep');
     case `Dream Eater`:
       return DreamEater(damage, energies);
-
+    case `Destiny Bond`:
+      return DestinyBond(damage, energies);
+    case 'Psyshock':
+      return FlipEffect(damage, energies, 'paralyzed');
+    case 'Thunder Jolt':
+      return ThunderJolt(damage, energies, handleAttackChange);
     /*****  decklist_blackout skill *****/
 
     /*****  Normal Default Attack skill *****/
@@ -146,5 +153,24 @@ const Meditate = (damage, energies) => {
 
 const DreamEater = (damage, energies) => {
   // TO DO : implement proper DreamEater skill
+  return [damage, null];
+};
+
+const SleepEffect = (damage, energies, effect) => {
+  return [0, effect];
+};
+
+const DestinyBond = (damage, energies, effect) => {
+  // TODO: implement proper skill
+
+  discard(energies);
+  return [30, effect];
+};
+
+const ThunderJolt = (damage, energies, handleAttackChange) => {
+  if (!flipCoin()) {
+    handleAttackChange(10);
+    damage = 0;
+  }
   return [damage, null];
 };
