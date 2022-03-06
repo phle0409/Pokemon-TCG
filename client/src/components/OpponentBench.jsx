@@ -1,7 +1,8 @@
-import React from "react";
-import EnergyCost from "./EnergyCost.jsx";
-import Items from "./Items.jsx";
-import { handToDiscard } from "../utils/changeZones.js";
+import React from 'react';
+import EffectStatus from './EffectStatus';
+import EnergyCost from './EnergyCost.jsx';
+import Items from './Items.jsx';
+import { handToDiscard } from '../utils/changeZones.js';
 
 export default function OpponentBench({
   opponentActive,
@@ -25,9 +26,9 @@ export default function OpponentBench({
   socket,
 }) {
   const handleClick = (e) => {
-    const [name, set, zone, index] = e.target.id.split("-");
+    const [name, set, zone, index] = e.target.id.split('-');
 
-    if (selected.name === "Gust of Wind") {
+    if (selected.name === 'Gust of Wind') {
       const [newHand, newDiscard] = handToDiscard(
         [selectedIndex],
         hand,
@@ -35,12 +36,12 @@ export default function OpponentBench({
         discard,
         setDiscard
       );
-      socket.emit("forced-retreat", index);
+      socket.emit('forced-retreat', index);
       socket.emit(
-        "toast",
+        'toast',
         `${yourName} used ${selected.name} on ${opponentBench[index].name}!`
       );
-      socket.emit("played-card", {
+      socket.emit('played-card', {
         deck,
         hand: newHand,
         active,
@@ -48,7 +49,7 @@ export default function OpponentBench({
         discard: newDiscard,
         prizes,
       });
-    } else if (selected.name === "Energy Removal") {
+    } else if (selected.name === 'Energy Removal') {
       if (opponentBench[index].effects.energy.length < 1) {
         setToast({
           show: true,
@@ -70,7 +71,7 @@ export default function OpponentBench({
         zone: `Select an energy to discard from your opponent's ${opponentBench[index].name}`,
         numTargets: 1,
         cards: opponentBench[index].effects.attachments,
-        action: "make opponent discard energy from bench",
+        action: 'make opponent discard energy from bench',
         index: index,
       });
 
@@ -108,12 +109,13 @@ export default function OpponentBench({
                 id={`${card.name}-${card.set.name}-opponentbench-${index}`}
                 onClick={handleClick}
               />
-              <div className="d-flex flex-column" style={{ width: "7rem" }}>
+              <div className="d-flex flex-column" style={{ width: '7rem' }}>
                 <div className="d-flex align-items-center justify-content-center">
                   {`${card.hp - card.effects.damage}/${card.hp} HP`}
                 </div>
                 <EnergyCost energies={card.effects.energy} />
                 <Items items={card.effects.attachments} />
+                <EffectStatus status={card.effects.statusConditions} />
               </div>
             </div>
           );

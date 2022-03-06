@@ -159,7 +159,7 @@ export default function Play() {
 
     socket.on('opponent-attacked', ({ damage, effectSkill }) => {
       console.log(`damage ${damage}, effect: ${effectSkill}`);
-      if (damage) damage = 0;
+      if (!damage) damage = 0;
 
       setDamage(damage);
 
@@ -296,6 +296,7 @@ export default function Play() {
       setActive(newActive);
       return;
     }
+
     newActive.effects.damage += parseInt(damage);
 
     if (parseInt(newActive.effects.damage) >= parseInt(newActive.hp)) {
