@@ -3,6 +3,12 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import { Container } from 'react-bootstrap';
 import { fetchDeck } from '../utils/createDeck.js';
+import {
+  activeToDiscard,
+  benchToActive,
+  discardEnergyFromActive,
+  discardEnergyFromBench,
+} from '../utils/changeZones.js';
 import Hand from './Hand.jsx';
 import Bench from './Bench.jsx';
 import Active from './Active.jsx';
@@ -43,7 +49,15 @@ export default function Play() {
   const [damage, setDamage] = React.useState(0);
   const [heal, setHeal] = React.useState(0);
   const [effect, setEffect] = React.useState('');
-  const [forcedAction, setForcedAction] = React.useState('');
+  const [damageBenched, setDamageBenched] = React.useState({
+    index: null,
+    damage: 0,
+  });
+  const [healBenched, setHealBenched] = React.useState({
+    index: null,
+    heal: 0,
+  });
+  const [retreat, setRetreat] = React.useState(false);
   const [usesTargeting, setUsesTargeting] = React.useState(false);
   const [showAttackModal, setShowAttackModal] = React.useState(false);
   const [zoneModal, setZoneModal] = React.useState({
@@ -52,6 +66,7 @@ export default function Play() {
     show: false,
     numTargets: 0,
     action: null,
+    index: null,
   });
   const [toast, setToast] = React.useState({
     text: '',
@@ -150,35 +165,60 @@ export default function Play() {
     });
 
     socket.on('knockout', () => {
-      let newHand = [...hand, prizes.pop()];
+      let newPrizes = prizes;
+      let prize = newPrizes.pop();
+      let newHand = [...hand, prize];
       setHand(newHand);
+      setPrizes(newPrizes);
       socket.emit('played-card', {
         deck,
         hand: newHand,
         active,
         bench,
-        prizes,
+        prizes: newPrizes,
         discard,
       });
     });
 
-    socket.on('reveal-hand', () => {
+    socket.on('lass', () => {
+      let trainers = [];
+      let indices = [];
+      hand.forEach((card, i) => {
+        if (card.supertype === 'Trainer') {
+          trainers.push(card);
+          indices.push(i);
+        }
+      });
+
+      let newHand = hand;
+      indices.sort().reverse();
+      for (let i = 0; i < indices.length; i++) {
+        newHand.splice(indices[i], 1);
+      }
+      setHand(newHand);
+      deck.putBack(trainers);
+      deck.shuffle();
+      //TODO it's not emitting the new board state
+      socket.emit('reveal-hand', hand);
+    });
+
+    socket.on('reveal-hand', (hand) => {
       setZoneModal({
         show: true,
-        text: "Your opponent's hand",
+        zone: "Your opponent's hand",
         numTargets: 0,
-        zone: opponentHand,
+        cards: hand,
       });
     });
 
     socket.on('forced-retreat', (index) => {
-      let newActive = bench[index];
-      setActive(newActive);
-      bench.splice(index, 1);
-      let newBench;
-      if (active) newBench = [...bench, active];
-      else newBench = [...bench];
-      setBench(newBench);
+      const [newActive, newBench] = benchToActive(
+        bench,
+        index,
+        setBench,
+        active,
+        setActive
+      );
       socket.emit('played-card', {
         deck,
         hand,
@@ -186,6 +226,43 @@ export default function Play() {
         bench: newBench,
         prizes,
         discard,
+      });
+    });
+
+    socket.on('forced-energy-discard-active', (multiSelect) => {
+      const [newActive, newDiscard] = discardEnergyFromActive(
+        multiSelect,
+        active,
+        setActive,
+        discard,
+        setDiscard
+      );
+      socket.emit({
+        deck,
+        hand,
+        active: newActive,
+        bench,
+        discard: newDiscard,
+        prizes,
+      });
+    });
+
+    socket.on('forced-energy-discard-bench', (multiSelect, benchIndex) => {
+      const [newBench, newDiscard] = discardEnergyFromBench(
+        multiSelect,
+        bench,
+        benchIndex,
+        setBench,
+        discard,
+        setDiscard
+      );
+      socket.emit({
+        deck,
+        hand,
+        active,
+        bench: newBench,
+        discard: newDiscard,
+        prizes,
       });
     });
 
@@ -211,29 +288,32 @@ export default function Play() {
       setActive(newActive);
       return;
     }
-
     newActive.effects.damage += parseInt(damage);
 
     if (parseInt(newActive.effects.damage) >= parseInt(newActive.hp)) {
-      socket.emit('toast', `${yourName}'s ${newActive.name} was knocked out!`);
+      socket.emit('toast', `${yourName}'s ${active.name} was knocked out!`);
       socket.emit('knockout');
-      setDiscard([...discard, newActive]);
-      newActive = null;
-      setActive(newActive);
+      const [newActive, newDiscard] = activeToDiscard(
+        active,
+        setActive,
+        discard,
+        setDiscard
+      );
+      if (bench.length > 0) setRetreat(true);
+      else
+        socket.emit(
+          'toast',
+          `${yourName} has no more benched Pokemon. ${opponentName} wins!`
+        );
+
       socket.emit('played-card', {
         deck,
         hand,
         active: newActive,
         bench,
         prizes,
-        discard,
+        discard: newDiscard,
       });
-      if (bench.length > 0) setForcedAction('switch');
-      else
-        socket.emit(
-          'toast',
-          `${yourName} has no more benched Pokemon. ${opponentName} wins!`
-        );
     } else {
       setActive(newActive);
       socket.emit('played-card', {
@@ -290,6 +370,26 @@ export default function Play() {
     setEffect('');
   }, [effect]);
 
+  React.useEffect(() => {
+    if (healBenched.heal === 0 || healBenched.index === null) return;
+    let benched = bench[healBenched.index];
+    if (benched.effects.damage - healBenched.heal < 0)
+      benched.effects.damage = 0;
+    else benched.effects.damage -= healBenched.heal;
+    let newBench = bench;
+    newBench.splice(healBenched.index, 1);
+    setBench([...newBench, benched]);
+    socket.emit('played-card', {
+      deck,
+      hand,
+      active,
+      bench: newBench,
+      prizes,
+      discard,
+    });
+    setHealBenched({ index: null, heal: 0 });
+  }, [healBenched]);
+
   function handleAttackChange(damage) {
     setDamage(damage);
   }
@@ -321,6 +421,7 @@ export default function Play() {
         action: 'search deck',
       });
     }
+
     setSecondaryAction('');
   }, [secondaryAction]);
 
@@ -364,6 +465,9 @@ export default function Play() {
         selected={selected}
         setSelected={setSelected}
         handleAttackChange={handleAttackChange}
+        setRetreat={setRetreat}
+        setSelectedIndex={setSelectedIndex}
+        setUsesTargeting={setUsesTargeting}
         handleHealChange={handleHealChange}
         socket={socket}
       />
@@ -374,6 +478,11 @@ export default function Play() {
         zone={zoneModal.zone}
         cards={zoneModal.cards}
         action={zoneModal.action}
+        index={zoneModal.index}
+        selectedIndex={selectedIndex}
+        setSelectedIndex={setSelectedIndex}
+        setSelected={setSelected}
+        setUsesTargeting={setUsesTargeting}
         multiSelect={multiSelect}
         setMultiSelect={setMultiSelect}
         setSecondaryAction={setSecondaryAction}
@@ -381,8 +490,14 @@ export default function Play() {
         setDeck={setDeck}
         hand={hand}
         setHand={setHand}
+        active={active}
+        setActive={setActive}
+        bench={bench}
+        setBench={setBench}
         discard={discard}
         setDiscard={setDiscard}
+        prizes={prizes}
+        socket={socket}
       />
       <div className="bg-dark d-flex flex-column w-25 h-100">
         <div
@@ -440,8 +555,8 @@ export default function Play() {
             setSelectedIndex={setSelectedIndex}
             usesTargeting={usesTargeting}
             setUsesTargeting={setUsesTargeting}
-            forcedAction={forcedAction}
-            setForcedAction={setForcedAction}
+            retreat={retreat}
+            setRetreat={setRetreat}
             deck={deck}
             setDeck={setDeck}
             hand={hand}
@@ -456,6 +571,7 @@ export default function Play() {
             discard={discard}
             setDiscard={setDiscard}
             yourName={yourName}
+            setToast={setToast}
             setZoneModal={setZoneModal}
             socket={socket}
           />
@@ -473,11 +589,13 @@ export default function Play() {
         />
         <div className="bg-light p-2 d-flex flex-column justify-content-between h-100 w-100 border border-secondary border-2 rounded">
           <OpponentBench
+            opponentActive={opponentActive}
             opponentBench={opponentBench}
             selected={selected}
             setSelected={setSelected}
             selectedIndex={selectedIndex}
             setSelectedIndex={setSelectedIndex}
+            setUsesTargeting={setUsesTargeting}
             deck={deck}
             hand={hand}
             setHand={setHand}
@@ -486,9 +604,30 @@ export default function Play() {
             setDiscard={setDiscard}
             prizes={prizes}
             yourName={yourName}
+            setToast={setToast}
+            setZoneModal={setZoneModal}
             socket={socket}
           />
-          <OpponentActive opponentActive={opponentActive} />
+          <OpponentActive
+            opponentActive={opponentActive}
+            deck={deck}
+            hand={hand}
+            setHand={setHand}
+            active={active}
+            bench={bench}
+            discard={discard}
+            setDiscard={setDiscard}
+            prizes={prizes}
+            selected={selected}
+            setSelected={setSelected}
+            selectedIndex={selectedIndex}
+            setSelectedIndex={setSelectedIndex}
+            setUsesTargeting={setUsesTargeting}
+            setZoneModal={setZoneModal}
+            setToast={setToast}
+            yourName={yourName}
+            socket={socket}
+          />
           <hr className="m-0" />
           <Active
             hand={hand}
@@ -507,10 +646,10 @@ export default function Play() {
             setShow={setShowAttackModal}
             setUsesTargeting={setUsesTargeting}
             setToast={setToast}
-            forcedAction={forcedAction}
-            setForcedAction={setForcedAction}
+            retreat={retreat}
             yourName={yourName}
             setHeal={setHeal}
+            setZoneModal={setZoneModal}
             socket={socket}
           />
           <Bench
@@ -529,10 +668,12 @@ export default function Play() {
             selectedIndex={selectedIndex}
             setSelectedIndex={setSelectedIndex}
             setUsesTargeting={setUsesTargeting}
+            setHealBenched={setHealBenched}
             setToast={setToast}
-            forcedAction={forcedAction}
-            setForcedAction={setForcedAction}
+            retreat={retreat}
+            setRetreat={setRetreat}
             yourName={yourName}
+            setZoneModal={setZoneModal}
             socket={socket}
           />
         </div>
@@ -542,8 +683,8 @@ export default function Play() {
             setHand={setHand}
             setSelected={setSelected}
             setSelectedIndex={setSelectedIndex}
-            forcedAction={forcedAction}
-            setForcedAction={setForcedAction}
+            retreat={retreat}
+            setRetreat={setRetreat}
             setToast={setToast}
           />
         </div>

@@ -1,8 +1,13 @@
 import React from 'react';
 import EnergyCost from './EnergyCost.jsx';
 import Items from './Items.jsx';
-import { handToDiscard, benchToActive } from '../utils/changeZones.js';
-import EffectStatus from './EffectStatus';
+import {
+  attachEnergyToBench,
+  attachTrainerToBench,
+  benchToActive,
+  evolveBench,
+  handToDiscard,
+} from '../utils/changeZones.js';
 
 export default function Bench({
   hand,
@@ -20,33 +25,56 @@ export default function Bench({
   selectedIndex,
   setSelectedIndex,
   setUsesTargeting,
-  forcedAction,
-  setForcedAction,
+  setHealBenched,
+  retreat,
+  setRetreat,
+  setZoneModal,
+  setToast,
   socket,
   yourName,
 }) {
   const handleClick = (e) => {
-    const [name, set, zone, index] = e.target.id.split('-');
+    const [pokemonName, set, zone, index] = e.target.id.split('-');
 
-    if (forcedAction === 'switch') {
-      benchToActive(bench, index, setBench, active, setActive);
-      // let newActive = bench[index];
-      // setActive(newActive);
-      // bench.splice(index, 1);
-      // let newBench;
-      // if (active) newBench = [...bench, active];
-      // else newBench = [...bench];
-      // setBench(newBench);
+    if (retreat) {
+      const [newActive, newBench] = benchToActive(
+        bench,
+        index,
+        setBench,
+        active,
+        setActive
+      );
+
+      socket.emit('played-card', {
+        deck,
+        hand,
+        active: newActive,
+        bench: newBench,
+        prizes,
+        discard,
+      });
+
+      setSelected(null);
+      setSelectedIndex(null);
+      setUsesTargeting(false);
+      setRetreat(false);
 
       if (selected?.name === 'Switch') {
-        handToDiscard([selectedIndex], hand, setHand, discard, setDiscard);
+        const [newHand, newDiscard] = handToDiscard(
+          [selectedIndex],
+          hand,
+          setHand,
+          discard,
+          setDiscard
+        );
+
         socket.emit('played-card', {
           deck,
-          hand,
+          hand: newHand,
           active,
           bench,
           prizes,
-          discard,
+          discard: newDiscard,
         });
       }
 
@@ -54,13 +82,8 @@ export default function Bench({
         'toast',
         `${yourName} ${
           selected?.name === 'Switch' ? 'used Switch and' : ''
-        } sent out ${active.name}!`
+        } sent out ${newActive.name}!`
       );
-
-      setSelected(null);
-      setSelectedIndex(null);
-      setUsesTargeting(false);
-      setForcedAction('');
       return;
     }
 
@@ -70,62 +93,129 @@ export default function Bench({
       setSelected(selectedPkmn);
       setSelectedIndex(index);
       setUsesTargeting(false);
-    } else {
-      if (selected.supertype.includes('Energy')) {
-        socket.emit(
-          'toast',
-          `${yourName} attached ${selected.name} to ${bench[index].name}`
-        );
-        bench[index].effects.attachments.push(selected);
-        bench[index].effects.energy.push(selected.name.replace(' Energy', ''));
-        hand.splice(selectedIndex, 1);
-        setSelected(null);
-        setSelectedIndex(null);
-        socket.emit('played-card', {
-          deck,
+      return;
+    }
+
+    const { supertype, name, subtypes, evolvesFrom } = selected;
+    if (supertype.includes('Energy')) {
+      const [newHand, newBench] = attachEnergyToBench(
+        hand,
+        selectedIndex,
+        setHand,
+        bench,
+        index,
+        setBench
+      );
+      socket.emit(
+        'toast',
+        `${yourName} attached ${name} to ${newBench[index].name}`
+      );
+      socket.emit('played-card', {
+        deck,
+        hand: newHand,
+        active,
+        bench: newBench,
+        discard,
+        prizes,
+      });
+    } else if (
+      supertype.includes('Pokémon') &&
+      evolvesFrom === bench[index].name
+    ) {
+      const [newHand, newBench] = evolveBench(
+        hand,
+        selectedIndex,
+        setHand,
+        bench,
+        index,
+        setBench
+      );
+      socket.emit(
+        'toast',
+        `${yourName} evolved ${newBench[index].name} into ${name}!`
+      );
+      socket.emit('played-card', {
+        deck,
+        hand: newHand,
+        active,
+        bench: newBench,
+        discard,
+        prizes,
+      });
+    } else if (supertype.includes('Trainer')) {
+      if (name === 'Potion') {
+        const [newHand, newDiscard] = handToDiscard(
+          [selectedIndex],
           hand,
-          active,
-          bench,
-          prizes,
+          setHand,
           discard,
-        });
-      } else if (
-        (selected.subtypes?.includes('Stage 1') ||
-          selected.subtypes?.includes('Stage 2')) &&
-        selected.evolvesFrom === bench[index].name
-      ) {
+          setDiscard
+        );
+        setHealBenched({ index: index, heal: 20 });
         socket.emit(
           'toast',
-          `${yourName} evolved ${bench[index].name} into ${selected.name}!`
+          `${yourName} used ${name} on ${bench[index].name}`
         );
-        selected.effects.attachments = bench[index].effects.attachments;
-        bench[index].effects.attachments = [];
-        selected.effects.energy = bench[index].effects.energy;
-        bench[index].effects.energy = [];
-        selected.effects.attachments.push(bench[index]);
-        hand.splice(selectedIndex, 1);
-        bench.splice(index, 1);
-        bench.splice(index, 1);
-        let newBench = [...bench, selected];
-        setBench(newBench);
-        setSelected(null);
-        setSelectedIndex(null);
-        setUsesTargeting(false);
+      } else if (name === 'Super Potion') {
+        if (bench[index].effects.energy.length < 1) {
+          setToast({
+            show: true,
+            text: `${bench[index].name} does not have any attached energy`,
+          });
+          return;
+        }
+        setHealBenched({ index: index, heal: 60 });
+        const [newHand, newDiscard] = handToDiscard(
+          [selectedIndex],
+          hand,
+          setHand,
+          discard,
+          setDiscard
+        );
+        socket.emit(
+          'toast',
+          `${yourName} used ${name} on ${bench[index].name}`
+        );
+        setZoneModal({
+          show: true,
+          zone: `Choose an energy to discard from ${bench[index].name}`,
+          numTargets: 1,
+          cards: bench[index].effects.attachments,
+          action: 'discard energy from bench',
+          index: index,
+        });
+      } else if (name === 'PlusPower' || name === 'Defender') {
+        const [newHand, newBench] = attachTrainerToBench(
+          hand,
+          selectedIndex,
+          setHand,
+          bench,
+          index,
+          setBench
+        );
+        socket.emit(
+          'toast',
+          `${yourName} attached ${name} to ${newBench[index].name}`
+        );
         socket.emit('played-card', {
           deck,
-          hand,
+          hand: newHand,
           active,
           bench: newBench,
-          prizes,
           discard,
+          prizes,
         });
       }
     }
+
+    setSelected(null);
+    setSelectedIndex(null);
+    setUsesTargeting(false);
   };
 
   return (
     <div className="d-flex flex-row justify-content-center">
-      {bench.length > 0 ? (
+      {bench?.length > 0 ? (
         bench.map((card, index) => {
           return (
             <div
@@ -145,7 +235,6 @@ export default function Bench({
                 }/${card.hp} HP`}</div>
                 <EnergyCost energies={card.effects.energy} />
                 <Items items={card.effects.attachments} />
-                <EffectStatus status={active.effects.statusConditions} />
               </div>
             </div>
           );

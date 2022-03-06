@@ -1,7 +1,12 @@
 import React from 'react';
-import { handToDiscard } from '../utils/changeZones';
-import EffectStatus from './EffectStatus';
+import {
+  attachEnergyToActive,
+  attachTrainerToActive,
+  evolveActive,
+  handToDiscard,
+} from '../utils/changeZones.js';
 import EnergyCost from './EnergyCost';
+import Items from './Items.jsx';
 
 export default function Active({
   hand,
@@ -17,17 +22,25 @@ export default function Active({
   setSelected,
   selectedIndex,
   setSelectedIndex,
-  forcedAction,
+  retreat,
   setShow,
   setUsesTargeting,
   yourName,
   setHeal,
+  setZoneModal,
+  setToast,
   socket,
 }) {
   const handleClick = (e) => {
-    const [name, set, zone, index] = e.target.id.split('-');
+    console.log(active);
 
-    if (forcedAction === 'switch') return;
+    if (retreat) {
+      setToast({
+        show: true,
+        text: 'You must choose a benched Pokemon to place into active',
+      });
+      return;
+    }
 
     if (!selected) {
       setSelected(active);
@@ -37,84 +50,116 @@ export default function Active({
       return;
     }
 
-    if (selected?.supertype.includes('Energy')) {
-      active.effects.energy.push(selected.name.replace(' Energy', ''));
-      let newActive = active;
-      hand.splice(selectedIndex, 1);
-      setSelected(null);
-      setSelectedIndex(null);
-      setUsesTargeting(false);
-      socket.emit(
-        'toast',
-        `${yourName} attached ${selected.name} to ${active.name}`
-      );
-      socket.emit('played-card', {
-        deck,
+    const { supertype, name, evolvesFrom } = selected;
+    if (supertype.includes('Energy')) {
+      const [newHand, newActive] = attachEnergyToActive(
         hand,
+        selectedIndex,
+        setHand,
+        active,
+        setActive
+      );
+      socket.emit('toast', `${yourName} attached ${name} to ${active.name}`);
+      socket.emit({
+        deck,
+        hand: newHand,
         active: newActive,
         bench,
-        prizes,
         discard,
+        prizes,
       });
-    } else if (
-      selected?.subtypes?.includes('Stage 1') ||
-      selected?.subtypes?.includes('Stage 2')
-    ) {
-      if (selected.evolvesFrom === active.name) {
-        socket.emit(
-          'toast',
-          `${yourName} evolved ${active.name} into ${selected.name}!`
-        );
-        let newActive = selected;
-        selected.effects.attachments = active.effects.attachments;
-        active.effects.attachments = [];
-        selected.effects.energy = active.effects.energy;
-        active.effects.energy = [];
-        selected.effects.attachments.push(active);
-        setActive(newActive);
-        hand.splice(selectedIndex, 1);
-        setSelected(null);
-        setSelectedIndex(null);
-        setUsesTargeting(false);
-        socket.emit('played-card', {
-          deck,
-          hand,
-          active: newActive,
-          bench,
-          prizes,
-          discard,
-        });
-      }
-    } else if (selected?.supertype.includes('Trainer')) {
-      if (selected.name === 'Potion') {
-        socket.emit(
-          'toast',
-          `${yourName} used ${selected.name} on ${active.name}`
-        );
+    } else if (supertype.includes('Pokémon') && evolvesFrom === active.name) {
+      const [newHand, newActive] = evolveActive(
+        hand,
+        selectedIndex,
+        setHand,
+        active,
+        setActive
+      );
+      socket.emit('toast', `${yourName} evolved ${active.name} into ${name}!`);
+      socket.emit({
+        deck,
+        hand: newHand,
+        active: newActive,
+        bench,
+        discard,
+        prizes,
+      });
+    } else if (supertype.includes('Trainer')) {
+      if (name === 'Potion') {
         setHeal(20);
-        handToDiscard([selectedIndex], hand, setHand, discard, setDiscard);
-        // let newActive = active;
-        // let currentDamage = parseInt(active.effects.damage) - 20;
-        // if (currentDamage < 0) currentDamage = 0;
-        // newActive.effects.damage = currentDamage;
-        // setActive(newActive);
-        // hand.splice(selectedIndex, 1);
-        // let newDiscard = [...discard, hand[selectedIndex]];
-        // setDiscard(newDiscard);
-        socket.emit('played-card', {
-          deck,
+        const [newHand, newDiscard] = handToDiscard(
+          [selectedIndex],
           hand,
+          setHand,
+          discard,
+          setDiscard
+        );
+        socket.emit('toast', `${yourName} used ${name} on ${active.name}`);
+        socket.emit({
+          deck,
+          hand: newHand,
           active,
           bench,
+          discard: newDiscard,
           prizes,
+        });
+      } else if (name === 'Super Potion') {
+        if (active.effects.energy.length < 1) {
+          setToast({
+            show: true,
+            text: `${active.name} does not have any attached energy`,
+          });
+          return;
+        }
+
+        setHeal(60);
+        const [newHand, newDiscard] = handToDiscard(
+          [selectedIndex],
+          hand,
+          setHand,
           discard,
+          setDiscard
+        );
+        socket.emit('toast', `${yourName} used ${name} on ${active.name}`);
+        socket.emit({
+          deck,
+          hand: newHand,
+          active,
+          bench,
+          discard: newDiscard,
+          prizes,
+        });
+        setZoneModal({
+          show: true,
+          zone: `Choose an energy to discard from ${active.name}`,
+          numTargets: 1,
+          cards: active.effects.attachments,
+          action: 'discard energy from active',
+        });
+      } else if (name === 'PlusPower' || name === 'Defender') {
+        const [newHand, newActive] = attachTrainerToActive(
+          hand,
+          selectedIndex,
+          setHand,
+          active,
+          setActive
+        );
+        socket.emit('toast', `${yourName} attached ${name} to ${active.name}`);
+        socket.emit({
+          deck,
+          hand: newHand,
+          active: newActive,
+          bench,
+          discard,
+          prizes,
         });
       }
-
-      setSelected(null);
-      setSelectedIndex(null);
-      setUsesTargeting(false);
     }
+
+    setSelected(null);
+    setSelectedIndex(null);
+    setUsesTargeting(false);
   };
 
   return (
@@ -135,7 +180,7 @@ export default function Active({
               active.hp - active.effects.damage
             }/${active.hp} HP`}</div>
             <EnergyCost energies={active.effects.energy} />
-            <EffectStatus status={active.effects.statusConditions} />
+            <Items items={active.effects.attachments} />
           </div>
         </div>
       ) : (
