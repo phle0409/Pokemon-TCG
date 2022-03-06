@@ -1,6 +1,12 @@
 import React from "react";
 import { Button, Modal } from "react-bootstrap";
-import { deckToHand, handToDiscard, discardToHand } from "../utils/changeZones";
+import {
+  deckToHand,
+  discardToHand,
+  discardEnergyFromActive,
+  discardEnergyFromBench,
+  handToDiscard,
+} from "../utils/changeZones";
 
 export default function ZoneModal({
   show,
@@ -9,6 +15,11 @@ export default function ZoneModal({
   numTargets,
   cards,
   action,
+  index,
+  selectedIndex,
+  setSelectedIndex,
+  setSelected,
+  setUsesTargeting,
   multiSelect,
   setMultiSelect,
   setSecondaryAction,
@@ -16,14 +27,28 @@ export default function ZoneModal({
   setDeck,
   hand,
   setHand,
+  active,
+  setActive,
+  bench,
+  setBench,
   discard,
   setDiscard,
+  prizes,
+  socket,
 }) {
+  const isValidTarget = (action, name) => {
+    if (action.includes("energy") && !name.includes("Energy")) return false;
+
+    return true;
+  };
+
   const handleClickCard = (e) => {
     const [name, set, zone, index] = e.target.id.split("-");
-    if (!action || multiSelect.includes(index)) return;
-
-    if (action === "energy retrieval" && !cards[index].name.includes("Energy"))
+    if (
+      !isValidTarget(action, cards[index].name) ||
+      !action ||
+      multiSelect.includes(index)
+    )
       return;
 
     document.getElementById(e.target.id).style = "border: 5px solid green";
@@ -35,18 +60,112 @@ export default function ZoneModal({
     if (multiSelect.length !== numTargets) return;
 
     if (action === "discard then search deck") {
-      handToDiscard(multiSelect, hand, setHand, discard, setDiscard);
+      const [newHand, newDiscard] = handToDiscard(
+        multiSelect,
+        hand,
+        setHand,
+        discard,
+        setDiscard
+      );
       setSecondaryAction("search deck");
+
+      socket.emit("played-card", {
+        deck,
+        hand: newHand,
+        active,
+        bench,
+        discard: newDiscard,
+        prizes,
+      });
     }
 
     if (action === "search deck") {
-      deckToHand(multiSelect, deck, setDeck, hand, setHand);
+      const [newDeck, newHand] = deckToHand(
+        multiSelect,
+        deck,
+        setDeck,
+        hand,
+        setHand
+      );
+
+      socket.emit("played-card", {
+        deck: newDeck,
+        hand: newHand,
+        active,
+        bench,
+        discard,
+        prizes,
+      });
     }
 
-    if (action === "energy retrieval") {
-      discardToHand(multiSelect, discard, setDiscard, hand, setHand);
+    if (action === "discard energy from active") {
+      const [newActive, newDiscard] = discardEnergyFromActive(
+        multiSelect,
+        active,
+        setActive,
+        discard,
+        setDiscard
+      );
+      socket.emit("played-card", {
+        deck,
+        hand,
+        active: newActive,
+        bench,
+        discard: newDiscard,
+        prizes,
+      });
     }
 
+    if (action === "discard energy from bench") {
+      const [newBench, newDiscard] = discardEnergyFromBench(
+        multiSelect,
+        bench,
+        index,
+        setBench,
+        discard,
+        setDiscard
+      );
+
+      socket.emit("played-card", {
+        deck,
+        hand,
+        active,
+        bench: newBench,
+        discard: newDiscard,
+        prizes,
+      });
+    }
+
+    if (action === "energy from discard to hand") {
+      const [newHand, newDiscard] = discardToHand(
+        multiSelect,
+        hand,
+        setHand,
+        discard,
+        setDiscard
+      );
+
+      socket.emit("played-card", {
+        deck,
+        hand: newHand,
+        active,
+        bench,
+        discard: newDiscard,
+        prizes,
+      });
+    }
+
+    if (action === "make opponent discard energy from active") {
+      socket.emit("forced-energy-discard-active", multiSelect);
+    }
+
+    if (action === "make opponent discard energy from bench") {
+      socket.emit("forced-energy-discard-bench", multiSelect, index);
+    }
+
+    setSelected(null);
+    setSelectedIndex(null);
+    setUsesTargeting(false);
     setMultiSelect([]);
 
     handleClose();

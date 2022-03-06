@@ -1,31 +1,33 @@
-import React from 'react';
+import React from "react";
 
 export default function Hand({
   hand,
   setHand,
   setSelected,
   setSelectedIndex,
+  retreat,
+  setRetreat,
   forcedAction,
   setForcedAction,
   setToast,
 }) {
   const handleClick = (e) => {
-    if (forcedAction === 'switch') {
+    if (retreat) {
       setToast({
-        text: 'You must selected a benched Pokemon to place into active',
+        text: "You must selected a benched Pokemon to place into active",
         show: true,
       });
 
       return;
     }
 
-    const [name, set, zone, index] = e.target.id.split('-');
+    const [name, set, zone, index] = e.target.id.split("-");
     const selectedCard = hand[index];
     setSelected(selectedCard);
     setSelectedIndex(index);
 
-    if(selectedCard.name === "Switch") {
-      setForcedAction("switch");
+    if (selectedCard.name === "Switch") {
+      setRetreat(true);
     }
   };
 

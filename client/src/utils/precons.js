@@ -20,6 +20,25 @@ export const decklist_brushfire = [
 ];
 
 export const decklist_overgrowth = [
+<<<<<<< HEAD
+  { name: "Gyarados", set: "Base", quantity: 1 },
+  { name: "Magikarp", set: "Base", quantity: 2 },
+  { name: "Starmie", set: "Base", quantity: 3 },
+  { name: "Staryu", set: "Base", quantity: 4 },
+  { name: "Beedrill", set: "Base", quantity: 1 },
+  { name: "Kakuna", set: "Base", quantity: 2 },
+  { name: "Ivysaur", set: "Base", quantity: 2 },
+  { name: "Weedle", set: "Base", quantity: 4 },
+  { name: "Bulbasaur", set: "Base", quantity: 4 },
+  { name: "Potion", set: "Base", quantity: 1 },
+  //{ name: "Bill", set: "Base", quantity: 2 },
+  //{ name: "Super Potion", set: "Base", quantity: 2 },
+  //{ name: "Switch", set: "Base", quantity: 2 },
+  //{ name: "Gust of Wind", set: "Base", quantity: 2 },
+  { name: "Energy Removal", set: "Base", quantity: 12 },
+  { name: "Water Energy", set: "Base", quantity: 12 },
+  { name: "Grass Energy", set: "Base", quantity: 16 },
+=======
   { name: 'Gyarados', set: 'Base', quantity: 1 },
   { name: 'Magikarp', set: 'Base', quantity: 2 },
   { name: 'Starmie', set: 'Base', quantity: 3 },
@@ -37,6 +56,7 @@ export const decklist_overgrowth = [
   { name: 'Potion', set: 'Base', quantity: 12 },
   { name: 'Water Energy', set: 'Base', quantity: 12 },
   { name: 'Grass Energy', set: 'Base', quantity: 16 },
+>>>>>>> 748ff0728d55d876a8d048de738604417ef7db46
 ];
 
 export const decklist_zap = [

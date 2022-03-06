@@ -1,34 +1,37 @@
-import React from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { io } from 'socket.io-client';
-import { Container } from 'react-bootstrap';
-import { fetchDeck } from '../utils/createDeck.js';
+
+import React from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { io } from "socket.io-client";
+import { Container } from "react-bootstrap";
+import { fetchDeck } from "../utils/createDeck.js";
 import {
   activeToDiscard,
   benchToActive,
   discardEnergyFromActive,
   discardEnergyFromBench,
-} from '../utils/changeZones.js';
-import Hand from './Hand.jsx';
-import Bench from './Bench.jsx';
-import Active from './Active.jsx';
-import OpponentActive from './OpponentActive.jsx';
-import OpponentBench from './OpponentBench.jsx';
-import InfoPanel from './InfoPanel.jsx';
-import AttackModal from './AttackModal.jsx';
-import ZoneModal from './ZoneModal.jsx';
-import PkmnToast from './PkmnToast.jsx';
+
+} from "../utils/changeZones.js";
+import Hand from "./Hand.jsx";
+import Bench from "./Bench.jsx";
+import Active from "./Active.jsx";
+import OpponentActive from "./OpponentActive.jsx";
+import OpponentBench from "./OpponentBench.jsx";
+import InfoPanel from "./InfoPanel.jsx";
+import AttackModal from "./AttackModal.jsx";
+import ZoneModal from "./ZoneModal.jsx";
+import PkmnToast from "./PkmnToast.jsx";
+
 
 export default function Play() {
   let navigate = useNavigate();
   const [socket, setSocket] = React.useState(null);
   const [gameStatus, setGameStatus] = React.useState({
     gameStarted: false,
-    playerTurn: '',
+    playerTurn: "",
   });
-  const [yourName, setYourName] = React.useState('You');
+  const [yourName, setYourName] = React.useState("You");
   const [opponentName, setOpponentName] = React.useState(
-    'Waiting on opponent...'
+    "Waiting on opponent..."
   );
   const [deck, setDeck] = React.useState([]);
   const [hand, setHand] = React.useState([]);
@@ -48,7 +51,9 @@ export default function Play() {
   const [secondaryAction, setSecondaryAction] = React.useState('');
   const [damage, setDamage] = React.useState(0);
   const [heal, setHeal] = React.useState(0);
+
   const [effect, setEffect] = React.useState('');
+
   const [damageBenched, setDamageBenched] = React.useState({
     index: null,
     damage: 0,
@@ -62,14 +67,14 @@ export default function Play() {
   const [showAttackModal, setShowAttackModal] = React.useState(false);
   const [zoneModal, setZoneModal] = React.useState({
     cards: [],
-    zone: '',
+    zone: "",
     show: false,
     numTargets: 0,
     action: null,
     index: null,
   });
   const [toast, setToast] = React.useState({
-    text: '',
+    text: "",
     show: false,
   });
   const { state } = useLocation();
@@ -92,7 +97,7 @@ export default function Play() {
   React.useEffect(() => {
     let decklist = state.decklist;
     setToast({
-      text: 'Shuffling deck...',
+      text: "Shuffling deck...",
       show: true,
     });
     (async () => {
@@ -108,23 +113,23 @@ export default function Play() {
     let username = state.name;
     let roomID = state.roomID;
 
-    socket.on('connect', (id) => {
+    socket.on("connect", (id) => {
       setYourName(username);
-      socket.emit('userJoinRoom', { username, roomID });
+      socket.emit("userJoinRoom", { username, roomID });
     });
 
-    socket.on('message', (msg) => {
-      if (msg === 'full') {
-        navigate('/room-full');
+    socket.on("message", (msg) => {
+      if (msg === "full") {
+        navigate("/room-full");
       } else {
-        socket.emit('player-joined', username);
+        socket.emit("player-joined", username);
       }
     });
 
-    socket.on('player-name', (oppname) => {
+    socket.on("player-name", (oppname) => {
       setOpponentName(oppname);
-      socket.emit('other-player-name', username);
-      socket.emit('played-card', {
+      socket.emit("other-player-name", username);
+      socket.emit("played-card", {
         deck,
         hand,
         active,
@@ -133,9 +138,9 @@ export default function Play() {
         discard,
       });
     });
-    socket.on('other-player-name', (oppname) => {
+    socket.on("other-player-name", (oppname) => {
       setOpponentName(oppname);
-      socket.emit('played-card', {
+      socket.emit("played-card", {
         deck,
         hand,
         active,
@@ -145,7 +150,7 @@ export default function Play() {
       });
     });
 
-    socket.on('opponent-played-card', (board) => {
+    socket.on("opponent-played-card", (board) => {
       const { deck, hand, active, bench, prizes, discard } = board;
       setOpponentDeck(deck);
       setOpponentHand(hand);
@@ -155,22 +160,27 @@ export default function Play() {
       setOpponentDiscard(discard);
     });
 
+
     socket.on('opponent-attacked', ({ damage, effectSkill }) => {
       console.log(`damage ${damage}, effect: ${effectSkill}`);
       if (damage) damage = 0;
+
       setDamage(damage);
       if (effectSkill) {
         setEffect(effectSkill);
       }
     });
 
-    socket.on('knockout', () => {
+
+    socket.on("knockout", () => {
+
       let newPrizes = prizes;
       let prize = newPrizes.pop();
       let newHand = [...hand, prize];
       setHand(newHand);
       setPrizes(newPrizes);
-      socket.emit('played-card', {
+
+      socket.emit("played-card", {
         deck,
         hand: newHand,
         active,
@@ -180,11 +190,13 @@ export default function Play() {
       });
     });
 
-    socket.on('lass', () => {
+
+    socket.on("lass", () => {
       let trainers = [];
       let indices = [];
       hand.forEach((card, i) => {
-        if (card.supertype === 'Trainer') {
+        if (card.supertype === "Trainer") {
+
           trainers.push(card);
           indices.push(i);
         }
@@ -199,10 +211,11 @@ export default function Play() {
       deck.putBack(trainers);
       deck.shuffle();
       //TODO it's not emitting the new board state
-      socket.emit('reveal-hand', hand);
+
+      socket.emit("reveal-hand", hand);
     });
 
-    socket.on('reveal-hand', (hand) => {
+    socket.on("reveal-hand", (hand) => {
       setZoneModal({
         show: true,
         zone: "Your opponent's hand",
@@ -211,7 +224,9 @@ export default function Play() {
       });
     });
 
-    socket.on('forced-retreat', (index) => {
+
+    socket.on("forced-retreat", (index) => {
+
       const [newActive, newBench] = benchToActive(
         bench,
         index,
@@ -219,7 +234,9 @@ export default function Play() {
         active,
         setActive
       );
-      socket.emit('played-card', {
+
+      socket.emit("played-card", {
+
         deck,
         hand,
         active: newActive,
@@ -229,7 +246,8 @@ export default function Play() {
       });
     });
 
-    socket.on('forced-energy-discard-active', (multiSelect) => {
+
+    socket.on("forced-energy-discard-active", (multiSelect) => {
       const [newActive, newDiscard] = discardEnergyFromActive(
         multiSelect,
         active,
@@ -247,7 +265,8 @@ export default function Play() {
       });
     });
 
-    socket.on('forced-energy-discard-bench', (multiSelect, benchIndex) => {
+
+    socket.on("forced-energy-discard-bench", (multiSelect, benchIndex) => {
       const [newBench, newDiscard] = discardEnergyFromBench(
         multiSelect,
         bench,
@@ -266,14 +285,15 @@ export default function Play() {
       });
     });
 
-    socket.on('toast', (message) => {
+
+    socket.on("toast", (message) => {
       setToast({
         text: message,
         show: true,
       });
     });
 
-    socket.on('player-left', ({ username, id }) => {
+    socket.on("player-left", ({ username, id }) => {
       setOpponentActive(null);
       setOpponentBench([]);
     });
@@ -291,8 +311,9 @@ export default function Play() {
     newActive.effects.damage += parseInt(damage);
 
     if (parseInt(newActive.effects.damage) >= parseInt(newActive.hp)) {
-      socket.emit('toast', `${yourName}'s ${active.name} was knocked out!`);
-      socket.emit('knockout');
+
+      socket.emit("toast", `${yourName}'s ${active.name} was knocked out!`);
+      socket.emit("knockout");
       const [newActive, newDiscard] = activeToDiscard(
         active,
         setActive,
@@ -302,11 +323,12 @@ export default function Play() {
       if (bench.length > 0) setRetreat(true);
       else
         socket.emit(
-          'toast',
+
+          "toast",
           `${yourName} has no more benched Pokemon. ${opponentName} wins!`
         );
 
-      socket.emit('played-card', {
+      socket.emit("played-card", {
         deck,
         hand,
         active: newActive,
@@ -316,7 +338,7 @@ export default function Play() {
       });
     } else {
       setActive(newActive);
-      socket.emit('played-card', {
+      socket.emit("played-card", {
         deck,
         hand,
         active: newActive,
@@ -335,7 +357,7 @@ export default function Play() {
     if (newActive.effects.damage - heal < 0) newActive.effects.damage = 0;
     else newActive.effects.damage -= heal;
     setActive(newActive);
-    socket.emit('played-card', {
+    socket.emit("played-card", {
       deck,
       hand,
       active: newActive,
@@ -347,6 +369,7 @@ export default function Play() {
   }, [heal]);
 
   React.useEffect(() => {
+
     if (effect === '') return;
     let newActive = active;
     console.log('damage in effect', damage);
@@ -379,7 +402,8 @@ export default function Play() {
     let newBench = bench;
     newBench.splice(healBenched.index, 1);
     setBench([...newBench, benched]);
-    socket.emit('played-card', {
+
+    socket.emit("played-card", {
       deck,
       hand,
       active,
@@ -411,18 +435,19 @@ export default function Play() {
   }, [deck, prizes]);
 
   React.useEffect(() => {
-    if (secondaryAction === '') return;
-    else if (secondaryAction === 'search deck') {
+    if (secondaryAction === "") return;
+    else if (secondaryAction === "search deck") {
       setZoneModal({
         show: true,
         zone: 'Select 1 card from your deck to put into your hand',
         numTargets: 1,
         cards: deck.cards,
-        action: 'search deck',
+        action: "search deck",
       });
     }
 
-    setSecondaryAction('');
+
+    setSecondaryAction("");
   }, [secondaryAction]);
 
   const preGameSetup = (deck) => {
@@ -435,8 +460,8 @@ export default function Play() {
 
       for (const card of hand) {
         if (
-          card.supertype.includes('Pokémon') &&
-          card.subtypes.includes('Basic')
+          card.supertype.includes("Pokémon") &&
+          card.subtypes.includes("Basic")
         ) {
           openingHandBasic = true;
           break;
@@ -445,7 +470,7 @@ export default function Play() {
 
       if (!openingHandBasic) {
         deck.putBack(hand);
-        console.log('Reshuffling...');
+        console.log("Reshuffling...");
       }
     }
     const prizes = deck.draw(6);
@@ -457,7 +482,7 @@ export default function Play() {
     <Container
       fluid
       className="bg-dark d-flex flex-row h-100 w-100 p-1"
-      style={{ overflow: 'hidden' }}
+      style={{ overflow: "hidden" }}
     >
       <AttackModal
         show={showAttackModal}
@@ -518,7 +543,7 @@ export default function Play() {
             onClick={() => {
               setZoneModal({
                 show: true,
-                zone: 'Your discard pile',
+                zone: "Your discard pile",
                 numTargets: 0,
                 cards: discard,
               });

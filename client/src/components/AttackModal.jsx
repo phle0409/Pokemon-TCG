@@ -7,10 +7,16 @@ export default function AttackModal({
   show,
   handleClose,
   selected,
-  setSelected,
   socket,
   handleAttackChange,
+<<<<<<< HEAD
+  setRetreat,
+  setSelected,
+  setSelectedIndex,
+  setUsesTargeting
+=======
   handleHealChange,
+>>>>>>> 748ff0728d55d876a8d048de738604417ef7db46
 }) {
   const canUseSkill = (costs, energies) => {
     let colorless = 0;
@@ -42,6 +48,8 @@ export default function AttackModal({
 
   const attackButton = (event) => {
     const [name, damage, cost] = event.target.id.split('#');
+    socket.emit("attack", damage);
+    return;
     const costArray = cost.split(',');
     const energyForCheckSkill = [...selected.effects.energy];
     if (canUseSkill(costArray, energyForCheckSkill)) {
@@ -60,6 +68,15 @@ export default function AttackModal({
     }
 
     handleClose();
+  };
+
+  const retreatButton = () => {
+    //TODO force discard energy
+    setRetreat(true);
+    handleClose();
+    setSelected(null);
+    setSelectedIndex(null);
+    setUsesTargeting(false);
   };
 
   if (!selected || selected.supertype !== 'Pokémon')
@@ -133,7 +150,7 @@ export default function AttackModal({
               </span>
             </Col>
             <Col xs={2}>
-              <Button variant="warning">Select</Button>
+              <Button variant="warning" onClick={retreatButton}>Select</Button>
             </Col>
           </Row>
         </Container>
