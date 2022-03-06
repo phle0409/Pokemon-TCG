@@ -4,11 +4,16 @@ import { Container } from 'react-bootstrap';
 const EffectStatus = ({ status }) => {
   const [skillStatus, setSkillStatus] = React.useState('');
 
-  console.log(status);
+  let result = '';
+  if (status.poisoned) result += ' poisoned';
+  if (status.asleep) result += ' asleep';
+  if (status.confused) result += ' confused';
+  if (status.paralyzed) result += ' paralyzed';
+  if (status.immortal) result += ' immortal';
 
   return (
     <Container className="center">
-      <p className="text-danger text-center">effect</p>
+      {result !== '' && <p className="text-danger">{skillStatus}</p>}
     </Container>
   );
 };

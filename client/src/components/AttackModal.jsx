@@ -9,14 +9,11 @@ export default function AttackModal({
   selected,
   socket,
   handleAttackChange,
-<<<<<<< HEAD
   setRetreat,
   setSelected,
   setSelectedIndex,
-  setUsesTargeting
-=======
+  setUsesTargeting,
   handleHealChange,
->>>>>>> 748ff0728d55d876a8d048de738604417ef7db46
 }) {
   const canUseSkill = (costs, energies) => {
     let colorless = 0;
@@ -48,7 +45,7 @@ export default function AttackModal({
 
   const attackButton = (event) => {
     const [name, damage, cost] = event.target.id.split('#');
-    socket.emit("attack", damage);
+    socket.emit('attack', damage);
     return;
     const costArray = cost.split(',');
     const energyForCheckSkill = [...selected.effects.energy];
@@ -150,7 +147,9 @@ export default function AttackModal({
               </span>
             </Col>
             <Col xs={2}>
-              <Button variant="warning" onClick={retreatButton}>Select</Button>
+              <Button variant="warning" onClick={retreatButton}>
+                Select
+              </Button>
             </Col>
           </Row>
         </Container>
