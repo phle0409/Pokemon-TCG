@@ -1,7 +1,7 @@
-import React from 'react';
-import { Button, Col, Container, Modal, Row } from 'react-bootstrap';
-import EnergyCost from './EnergyCost.jsx';
-import { skillCalculate } from '../utils/skills/skills';
+import React from "react";
+import { Button, Col, Container, Modal, Row } from "react-bootstrap";
+import EnergyCost from "./EnergyCost.jsx";
+import { skillCalculate } from "../utils/skills/skills";
 
 export default function AttackModal({
   show,
@@ -9,21 +9,18 @@ export default function AttackModal({
   selected,
   socket,
   handleAttackChange,
-<<<<<<< HEAD
   setRetreat,
   setSelected,
   setSelectedIndex,
-  setUsesTargeting
-=======
+  setUsesTargeting,
   handleHealChange,
->>>>>>> 748ff0728d55d876a8d048de738604417ef7db46
 }) {
   const canUseSkill = (costs, energies) => {
     let colorless = 0;
     let isEnoughEnergy = true;
     let result = false;
     for (let cost of costs) {
-      if (cost === 'Colorless') {
+      if (cost === "Colorless") {
         colorless++;
       } else {
         const index = energies.findIndex((energy) => energy === cost);
@@ -47,10 +44,8 @@ export default function AttackModal({
   };
 
   const attackButton = (event) => {
-    const [name, damage, cost] = event.target.id.split('#');
-    socket.emit("attack", damage);
-    return;
-    const costArray = cost.split(',');
+    const [name, damage, cost] = event.target.id.split("#");
+    const costArray = cost.split(",");
     const energyForCheckSkill = [...selected.effects.energy];
     if (canUseSkill(costArray, energyForCheckSkill)) {
       const [actualDamage, effectSkill] = skillCalculate(
@@ -63,11 +58,11 @@ export default function AttackModal({
       );
       console.log(actualDamage, effectSkill);
 
-      socket.emit('attack', { damage, effectSkill });
+      socket.emit("attack", { damage, effectSkill });
     } else {
       // Noti
       // Doesn't enough energy cards
-      console.log('cannot use skill');
+      console.log("cannot use skill");
     }
 
     handleClose();
@@ -75,6 +70,26 @@ export default function AttackModal({
 
   const retreatButton = () => {
     //TODO force discard energy
+
+    /*
+      const { retreatCost, effects } = selected;
+
+      if(effects.energy.length < retreatCost.length) {
+        setToast({
+          show: true, 
+          text: "You do not have enough energy to retreat"
+        })
+        return;
+      }
+
+      setZoneModal({
+        show: true,
+        zone: `Choose ${retreatCost.length} energy to discard`
+        numTargets: retreatCost.length,
+        cards: effects.attachments
+        action: "discard energy from active"
+      })
+    */
     setRetreat(true);
     handleClose();
     setSelected(null);
@@ -82,7 +97,7 @@ export default function AttackModal({
     setUsesTargeting(false);
   };
 
-  if (!selected || selected.supertype !== 'Pokémon')
+  if (!selected || selected.supertype !== "Pokémon")
     return (
       <Modal
         show={show}
@@ -153,7 +168,9 @@ export default function AttackModal({
               </span>
             </Col>
             <Col xs={2}>
-              <Button variant="warning" onClick={retreatButton}>Select</Button>
+              <Button variant="warning" onClick={retreatButton}>
+                Select
+              </Button>
             </Col>
           </Row>
         </Container>

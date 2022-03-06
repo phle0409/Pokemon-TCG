@@ -417,6 +417,8 @@ export default function Play() {
     setDeck(deck);
   };
 
+  // TODO add a useEffect to socket.emit whenever the board state changes
+
   return (
     <Container
       fluid
