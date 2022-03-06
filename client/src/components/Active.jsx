@@ -132,7 +132,7 @@ export default function Active({
           return;
         }
 
-        setHeal(60);
+        setHeal(80);
         const [newHand, newDiscard] = handToDiscard(
           [selectedIndex],
           hand,

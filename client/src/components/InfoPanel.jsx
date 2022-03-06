@@ -220,6 +220,8 @@ export default function InfoPanel({
 
   if (!selected || (selected === active && !retreat)) return <div></div>;
 
+  //TODO add infoText when forced to retreat
+
   return (
     <div className="d-flex flex-column justify-content-center align-items-center h-100">
       <div className="mb-4 text-center">

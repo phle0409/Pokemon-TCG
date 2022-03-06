@@ -45,8 +45,6 @@ export default function AttackModal({
 
   const attackButton = (event) => {
     const [name, damage, cost] = event.target.id.split('#');
-    socket.emit('attack', damage);
-    return;
     const costArray = cost.split(',');
     const energyForCheckSkill = [...selected.effects.energy];
     if (canUseSkill(costArray, energyForCheckSkill)) {
@@ -69,6 +67,26 @@ export default function AttackModal({
 
   const retreatButton = () => {
     //TODO force discard energy
+
+    /*
+      const { retreatCost, effects } = selected;
+
+      if(effects.energy.length < retreatCost.length) {
+        setToast({
+          show: true, 
+          text: "You do not have enough energy to retreat"
+        })
+        return;
+      }
+
+      setZoneModal({
+        show: true,
+        zone: `Choose ${retreatCost.length} energy to discard`
+        numTargets: retreatCost.length,
+        cards: effects.attachments
+        action: "discard energy from active"
+      })
+    */
     setRetreat(true);
     handleClose();
     setSelected(null);

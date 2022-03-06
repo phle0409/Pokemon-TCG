@@ -177,8 +177,7 @@ export default function Bench({
           })
           return;
         }
-        setHealBenched({ index: index, heal: 60})
-
+        setHealBenched({ index: index, heal: 80})
         const [newHand, newDiscard] = handToDiscard(
           [selectedIndex],
           hand,
