@@ -45,7 +45,7 @@ export default function Play() {
   const [selectedIndex, setSelectedIndex] = React.useState(null);
   const [selected, setSelected] = React.useState(null);
   const [multiSelect, setMultiSelect] = React.useState([]);
-  const [secondaryAction, setSecondaryAction] = React.useState("");
+  const [secondaryAction, setSecondaryAction] = React.useState('');
   const [damage, setDamage] = React.useState(0);
   const [heal, setHeal] = React.useState(0);
   const [damageBenched, setDamageBenched] = React.useState({
@@ -358,6 +358,10 @@ export default function Play() {
     setDamage(damage);
   }
 
+  function handleHealChange(heal) {
+    setHeal(heal);
+  }
+
   React.useEffect(() => {
     if (gameStatus.gameStarted && deck.cards.length === 0)
       socket.emit(
@@ -375,7 +379,7 @@ export default function Play() {
     else if (secondaryAction === "search deck") {
       setZoneModal({
         show: true,
-        zone: "Select 1 card from your deck to put into your hand",
+        zone: 'Select 1 card from your deck to put into your hand',
         numTargets: 1,
         cards: deck.cards,
         action: "search deck",
@@ -429,6 +433,7 @@ export default function Play() {
         setSelected={setSelected}
         setSelectedIndex={setSelectedIndex}
         setUsesTargeting={setUsesTargeting}
+        handleHealChange={handleHealChange}
         socket={socket}
       />
       <ZoneModal
