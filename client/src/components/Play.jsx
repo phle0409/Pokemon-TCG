@@ -724,6 +724,7 @@ export default function Play() {
             setHand={setHand}
             setSelected={setSelected}
             setSelectedIndex={setSelectedIndex}
+            selectedIndex={selectedIndex}
             retreat={retreat}
             setRetreat={setRetreat}
             setToast={setToast}

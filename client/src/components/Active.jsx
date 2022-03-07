@@ -36,8 +36,6 @@ export default function Active({
   socket,
 }) {
   const handleClick = (e) => {
-    console.log(active);
-
     if (retreat) {
       setToast({
         show: true,

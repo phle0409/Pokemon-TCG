@@ -160,7 +160,7 @@ export const attachEnergyToActive = (
   let newHand = hand;
   newActive.effects.attachments.push(hand[handIndex]);
   newActive.effects.energy.push(hand[handIndex].name.replace(" Energy", ""));
-  newHand.splice(hand[handIndex], 1);
+  newHand.splice(handIndex, 1);
   setHand(newHand);
   setActive(newActive);
   return [newHand, newActive];

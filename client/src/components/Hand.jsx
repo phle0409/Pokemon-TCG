@@ -5,6 +5,7 @@ export default function Hand({
   setHand,
   setSelected,
   setSelectedIndex,
+  selectedIndex,
   retreat,
   setRetreat,
   setToast,
@@ -21,8 +22,8 @@ export default function Hand({
 
     const [name, set, zone, index] = e.target.id.split("-");
     const selectedCard = hand[index];
-    setSelected(selectedCard);
     setSelectedIndex(index);
+    setSelected(selectedCard);
 
     if (selectedCard.name === "Switch") {
       setRetreat(true);
