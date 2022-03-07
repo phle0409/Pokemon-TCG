@@ -527,6 +527,7 @@ export default function Play() {
         setEffect={setEffect}
         socket={socket}
         setToast={setToast}
+        setZoneModal={setZoneModal}
       />
       <ZoneModal
         show={zoneModal.show}

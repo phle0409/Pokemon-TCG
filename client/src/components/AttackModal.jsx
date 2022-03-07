@@ -16,6 +16,7 @@ export default function AttackModal({
   setHeal,
   setToast,
   setEffect,
+  setZoneModal,
 }) {
   const canUseSkill = (costs, energies) => {
     let colorless = 0;
@@ -53,11 +54,11 @@ export default function AttackModal({
       const [actualDamage, effectSkill] = skillCalculate(
         name,
         damage,
-        selected.effects.energy,
         selected,
         setDamage,
         setHeal,
-        setEffect
+        setEffect,
+        setZoneModal
       );
       setToast({ show: true, text: `Success use skill ${name}` });
       console.log(actualDamage, effectSkill);
