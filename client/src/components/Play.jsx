@@ -161,15 +161,14 @@ export default function Play() {
       setOpponentDiscard(discard);
     });
 
-    socket.on("opponent-attacked", ({ damage, effectSkill }) => {
+    socket.on("opponent-attacked", ({ actualDamage, effectSkill }) => {
+      console.log(`opponent damage ${actualDamage} effect ${effectSkill}`);
+      if (!actualDamage) actualDamage = 0;
 
-      if (!damage) damage = 0;
-
-      setDamage(damage);
+      setDamage(actualDamage);
       if (effectSkill) {
         setEffect(effectSkill);
       }
-
     });
 
     socket.on("knockout", () => {
@@ -222,7 +221,6 @@ export default function Play() {
     });
 
     socket.on("forced-retreat", (index) => {
-
       setForcedAction({
         action: "forced-retreat",
         targetIndex: index,
@@ -260,7 +258,6 @@ export default function Play() {
   React.useEffect(() => {
     if (forcedAction.action === "") return;
     else if (forcedAction.action === "forced-retreat") {
-
       const [newActive, newBench] = benchToActive(
         bench,
         forcedAction.targetIndex,
@@ -277,9 +274,7 @@ export default function Play() {
         prizes,
         discard,
       });
-
     } else if (forcedAction.action === "forced-energy-discard-active") {
-      
       const [newActive, newDiscard] = discardEnergyFromActive(
         forcedAction.indices,
         active,
@@ -295,9 +290,7 @@ export default function Play() {
         discard: newDiscard,
         prizes,
       });
-
     } else if (forcedAction.action === "forced-energy-discard-bench") {
-
       const [newBench, newDiscard] = discardEnergyFromBench(
         forcedAction.indices,
         bench,
@@ -320,7 +313,6 @@ export default function Play() {
       targetIndex: null,
       indices: [],
     });
-
   }, [forcedAction.action]);
 
   React.useEffect(() => {
@@ -330,9 +322,17 @@ export default function Play() {
     if (newActive.effects.statusConditions.immortal === true) {
       newActive.effects.statusConditions.immortal = false;
       setActive(newActive);
+      socket.emit("played-card", {
+        deck,
+        hand,
+        active: newActive,
+        bench,
+        prizes,
+        discard,
+      });
+      setDamage(0);
       return;
     }
-
     newActive.effects.damage += parseInt(damage);
 
     if (parseInt(newActive.effects.damage) >= parseInt(newActive.hp)) {
@@ -410,6 +410,9 @@ export default function Play() {
         break;
       case "confused":
         newActive.effects.statusConditions.confused = true;
+        break;
+      case "immortal":
+        newActive.effects.statusConditions.immortal = true;
         break;
       default:
         newActive.effects.statusConditions.asleep = true;
@@ -521,6 +524,7 @@ export default function Play() {
         setSelectedIndex={setSelectedIndex}
         setUsesTargeting={setUsesTargeting}
         setHeal={setHeal}
+        setEffect={setEffect}
         socket={socket}
         setToast={setToast}
       />
@@ -671,7 +675,6 @@ export default function Play() {
             discard={discard}
             setDiscard={setDiscard}
             prizes={prizes}
-            opponentActive={opponentActive}
             selected={selected}
             setSelected={setSelected}
             selectedIndex={selectedIndex}

@@ -3,20 +3,22 @@ import { Container } from "react-bootstrap";
 
 const EffectStatus = ({ status }) => {
   let result = [];
-  if (status.poisoned) result.push("poisoned");
-  if (status.asleep) result.push("asleep");
-  if (status.confused) result.push("confused");
-  if (status.paralyzed) result.push("paralyzed");
-  if (status.immortal) result.push("immortal");
+  if (status.poisoned) result.push("PO");
+  if (status.asleep) result.push("AS");
+  if (status.confused) result.push("CO");
+  if (status.paralyzed) result.push("PA");
+  if (status.immortal) result.push("IM");
   let totalEffect = "";
   result.forEach((effect) => (totalEffect += effect + " "));
   return (
-    <div className="text-center">
+    <div>
       {(status.poisoned ||
         status.asleep ||
         status.confused ||
         status.paralyzed ||
-        status.immortal) && <p className="text-danger">{totalEffect} </p>}
+        status.immortal) && (
+        <p className="text-danger h7 ps-1">{totalEffect} </p>
+      )}
     </div>
   );
 };
