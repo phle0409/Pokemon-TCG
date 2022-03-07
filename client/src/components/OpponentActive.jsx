@@ -1,3 +1,4 @@
+import EffectStatus from "./EffectStatus";
 import React from "react";
 import EnergyCost from "./EnergyCost.jsx";
 import Items from "./Items.jsx";
@@ -58,8 +59,8 @@ export default function OpponentActive({
         active,
         bench,
         discard: newDiscard,
-        prizes
-      })
+        prizes,
+      });
 
       setSelected(null);
       setSelectedIndex(null);
@@ -89,6 +90,7 @@ export default function OpponentActive({
             } HP`}</div>
             <EnergyCost energies={opponentActive.effects.energy} />
             <Items items={opponentActive.effects.attachments} />
+            <EffectStatus status={opponentActive.effects.statusConditions} />
           </div>
         </div>
       ) : (

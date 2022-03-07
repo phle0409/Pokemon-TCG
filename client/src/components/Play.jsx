@@ -47,7 +47,9 @@ export default function Play() {
   const [secondaryAction, setSecondaryAction] = React.useState("");
   const [damage, setDamage] = React.useState(0);
   const [heal, setHeal] = React.useState(0);
+
   const [effect, setEffect] = React.useState("");
+
   const [damageBenched, setDamageBenched] = React.useState({
     index: null,
     damage: 0,
@@ -160,15 +162,14 @@ export default function Play() {
     });
 
     socket.on("opponent-attacked", ({ damage, effectSkill }) => {
-      console.log(`damage ${damage}, effect: ${effectSkill}`);
-      if (damage) damage = 0;
+
+      if (!damage) damage = 0;
 
       setDamage(damage);
+      if (effectSkill) {
+        setEffect(effectSkill);
+      }
 
-      // Testing
-      // if (effectSkill) {
-      setEffect("asleep");
-      // }
     });
 
     socket.on("knockout", () => {
@@ -221,6 +222,7 @@ export default function Play() {
     });
 
     socket.on("forced-retreat", (index) => {
+
       setForcedAction({
         action: "forced-retreat",
         targetIndex: index,
@@ -258,6 +260,7 @@ export default function Play() {
   React.useEffect(() => {
     if (forcedAction.action === "") return;
     else if (forcedAction.action === "forced-retreat") {
+
       const [newActive, newBench] = benchToActive(
         bench,
         forcedAction.targetIndex,
@@ -274,7 +277,9 @@ export default function Play() {
         prizes,
         discard,
       });
+
     } else if (forcedAction.action === "forced-energy-discard-active") {
+      
       const [newActive, newDiscard] = discardEnergyFromActive(
         forcedAction.indices,
         active,
@@ -290,7 +295,9 @@ export default function Play() {
         discard: newDiscard,
         prizes,
       });
+
     } else if (forcedAction.action === "forced-energy-discard-bench") {
+
       const [newBench, newDiscard] = discardEnergyFromBench(
         forcedAction.indices,
         bench,
@@ -313,6 +320,7 @@ export default function Play() {
       targetIndex: null,
       indices: [],
     });
+
   }, [forcedAction.action]);
 
   React.useEffect(() => {
@@ -324,6 +332,7 @@ export default function Play() {
       setActive(newActive);
       return;
     }
+
     newActive.effects.damage += parseInt(damage);
 
     if (parseInt(newActive.effects.damage) >= parseInt(newActive.hp)) {
@@ -385,15 +394,19 @@ export default function Play() {
   React.useEffect(() => {
     if (effect === "") return;
     let newActive = active;
-    console.log("damage in effect", damage);
+
+    let damageEffect = damage;
+    if (!damageEffect) damageEffect = 0;
+    console.log(effect);
+
     switch (effect) {
       case "posion":
         newActive.effects.statusConditions.poisoned = true;
-        newActive.effects.statusConditions.posionedDamage = damage;
+        newActive.effects.statusConditions.posionedDamage = damageEffect;
         break;
       case "paralyzed":
         newActive.effects.statusConditions.paralyzed = true;
-        newActive.effects.statusConditions.paralyzedDamage = damage;
+        newActive.effects.statusConditions.paralyzedDamage = damageEffect;
         break;
       case "confused":
         newActive.effects.statusConditions.confused = true;
@@ -403,6 +416,16 @@ export default function Play() {
     }
 
     setActive(newActive);
+
+    socket.emit("played-card", {
+      deck,
+      hand,
+      active: newActive,
+      bench,
+      prizes,
+      discard,
+    });
+
     setEffect("");
   }, [effect]);
 
@@ -426,14 +449,6 @@ export default function Play() {
     });
     setHealBenched({ index: null, heal: 0 });
   }, [healBenched]);
-
-  function handleAttackChange(damage) {
-    setDamage(damage);
-  }
-
-  function handleHealChange(heal) {
-    setHeal(heal);
-  }
 
   React.useEffect(() => {
     if (gameStatus.gameStarted && deck.cards.length === 0)
@@ -501,12 +516,13 @@ export default function Play() {
         handleClose={handleCloseAttackModal}
         selected={selected}
         setSelected={setSelected}
-        handleAttackChange={handleAttackChange}
+        setDamage={setDamage}
         setRetreat={setRetreat}
         setSelectedIndex={setSelectedIndex}
         setUsesTargeting={setUsesTargeting}
-        handleHealChange={handleHealChange}
+        setHeal={setHeal}
         socket={socket}
+        setToast={setToast}
       />
       <ZoneModal
         show={zoneModal.show}

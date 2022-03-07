@@ -1,4 +1,5 @@
 import React from "react";
+import EffectStatus from "./EffectStatus";
 import EnergyCost from "./EnergyCost.jsx";
 import Items from "./Items.jsx";
 
@@ -45,6 +46,22 @@ export default function Bench({
         active,
         setActive
       );
+
+
+      socket.emit("played-card", {
+        deck,
+        hand,
+        active: newActive,
+        bench: newBench,
+        prizes,
+        discard,
+      });
+
+      setSelected(null);
+      setSelectedIndex(null);
+      setUsesTargeting(false);
+      setRetreat(false);
+
 
       if (selected?.name === "Switch") {
         const [newHand, newDiscard] = handToDiscard(
@@ -136,6 +153,12 @@ export default function Bench({
         index,
         setBench
       );
+      
+      socket.emit(
+        "toast",
+        `${yourName} evolved ${newBench[index].name} into ${name}!`
+      );
+
       socket.emit("played-card", {
         deck,
         hand: newHand,
@@ -240,6 +263,7 @@ export default function Bench({
                 }/${card.hp} HP`}</div>
                 <EnergyCost energies={card.effects.energy} />
                 <Items items={card.effects.attachments} />
+                <EffectStatus status={card.effects.statusConditions} />
               </div>
             </div>
           );
