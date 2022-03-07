@@ -58,12 +58,11 @@ export const benchToActive = (
   setActive
 ) => {
   let newActive = bench[benchIndex];
-  setActive(newActive);
   let newBench = bench;
   newBench.splice(benchIndex, 1);
-  if (active) newBench = [...bench, active];
-  else newBench = [...bench];
+  newBench = [...newBench, active];
   setBench(newBench);
+  setActive(newActive);
   return [newActive, newBench];
 };
 

@@ -34,6 +34,7 @@ export default function ZoneModal({
   discard,
   setDiscard,
   prizes,
+  opponentActive,
   socket,
 }) {
   const isValidTarget = (action, name) => {

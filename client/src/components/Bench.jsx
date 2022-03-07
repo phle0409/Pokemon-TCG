@@ -46,20 +46,6 @@ export default function Bench({
         setActive
       );
 
-      socket.emit("played-card", {
-        deck,
-        hand,
-        active: newActive,
-        bench: newBench,
-        prizes,
-        discard,
-      });
-
-      setSelected(null);
-      setSelectedIndex(null);
-      setUsesTargeting(false);
-      setRetreat(false);
-
       if (selected?.name === "Switch") {
         const [newHand, newDiscard] = handToDiscard(
           [selectedIndex],
@@ -79,13 +65,26 @@ export default function Bench({
         });
       }
 
+      socket.emit("played-card", {
+        deck,
+        hand,
+        active: newActive,
+        bench: newBench,
+        prizes,
+        discard,
+      });
+
       socket.emit(
         "toast",
         `${yourName} ${
           selected?.name === "Switch" ? "used Switch and" : ""
         } sent out ${newActive.name}!`
       );
-      return;
+
+      setSelected(null);
+      setSelectedIndex(null);
+      setUsesTargeting(false);
+      setRetreat(false);
     }
 
     if (!selected) {
@@ -124,6 +123,11 @@ export default function Bench({
       supertype.includes("Pokémon") &&
       evolvesFrom === bench[index].name
     ) {
+      socket.emit(
+        "toast",
+        `${yourName} evolved ${bench[index].name} into ${name}!`
+      );
+
       const [newHand, newBench] = evolveBench(
         hand,
         selectedIndex,
@@ -131,10 +135,6 @@ export default function Bench({
         bench,
         index,
         setBench
-      );
-      socket.emit(
-        "toast",
-        `${yourName} evolved ${newBench[index].name} into ${name}!`
       );
       socket.emit("played-card", {
         deck,

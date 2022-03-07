@@ -28,17 +28,19 @@ export default function OpponentBench({
     const [name, set, zone, index] = e.target.id.split("-");
 
     if (selected.name === "Gust of Wind") {
+      socket.emit("forced-retreat", index);
+
+      socket.emit(
+        "toast",
+        `${yourName} used ${selected.name} on ${opponentBench[index].name}!`
+      );
+
       const [newHand, newDiscard] = handToDiscard(
         [selectedIndex],
         hand,
         setHand,
         discard,
         setDiscard
-      );
-      socket.emit("forced-retreat", index);
-      socket.emit(
-        "toast",
-        `${yourName} used ${selected.name} on ${opponentBench[index].name}!`
       );
       socket.emit("played-card", {
         deck,
@@ -56,6 +58,10 @@ export default function OpponentBench({
         });
         return;
       }
+
+      socket.emit(
+        `${yourName} used ${selected.name} on ${opponentBench[index].name}!`
+      );
 
       const [newHand, newDiscard] = handToDiscard(
         [selectedIndex],
@@ -82,10 +88,6 @@ export default function OpponentBench({
         discard: newDiscard,
         prizes,
       });
-
-      socket.emit(
-        `${yourName} used ${selected.name} on ${opponentBench[index].name}!`
-      );
     }
 
     setSelected(null);

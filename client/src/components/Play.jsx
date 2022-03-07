@@ -20,7 +20,6 @@ import ZoneModal from "./ZoneModal.jsx";
 import PkmnToast from "./PkmnToast.jsx";
 
 export default function Play() {
-  let navigate = useNavigate();
   const [socket, setSocket] = React.useState(null);
   const [gameStatus, setGameStatus] = React.useState({
     gameStarted: false,
@@ -48,9 +47,7 @@ export default function Play() {
   const [secondaryAction, setSecondaryAction] = React.useState("");
   const [damage, setDamage] = React.useState(0);
   const [heal, setHeal] = React.useState(0);
-
   const [effect, setEffect] = React.useState("");
-
   const [damageBenched, setDamageBenched] = React.useState({
     index: null,
     damage: 0,
@@ -60,6 +57,11 @@ export default function Play() {
     heal: 0,
   });
   const [retreat, setRetreat] = React.useState(false);
+  const [forcedAction, setForcedAction] = React.useState({
+    action: "",
+    targetIndex: null,
+    targetIndices: [],
+  });
   const [usesTargeting, setUsesTargeting] = React.useState(false);
   const [showAttackModal, setShowAttackModal] = React.useState(false);
   const [zoneModal, setZoneModal] = React.useState({
@@ -74,6 +76,7 @@ export default function Play() {
     text: "",
     show: false,
   });
+  let navigate = useNavigate();
   const { state } = useLocation();
 
   const handleCloseAttackModal = () => {
@@ -83,7 +86,6 @@ export default function Play() {
 
   const handleShowAttackModal = () => setShowAttackModal(true);
   const handleCloseZoneModal = () => setZoneModal({ show: false });
-  const handleShowZoneModal = () => setZoneModal({ show: true });
 
   const handleCloseToast = () => {
     setToast({
@@ -219,58 +221,24 @@ export default function Play() {
     });
 
     socket.on("forced-retreat", (index) => {
-      const [newActive, newBench] = benchToActive(
-        bench,
-        index,
-        setBench,
-        active,
-        setActive
-      );
-
-      socket.emit("played-card", {
-        deck,
-        hand,
-        active: newActive,
-        bench: newBench,
-        prizes,
-        discard,
+      setForcedAction({
+        action: "forced-retreat",
+        targetIndex: index,
       });
     });
 
     socket.on("forced-energy-discard-active", (multiSelect) => {
-      const [newActive, newDiscard] = discardEnergyFromActive(
-        multiSelect,
-        active,
-        setActive,
-        discard,
-        setDiscard
-      );
-      socket.emit({
-        deck,
-        hand,
-        active: newActive,
-        bench,
-        discard: newDiscard,
-        prizes,
+      setForcedAction({
+        action: "forced-energy-discard-active",
+        indices: multiSelect,
       });
     });
 
     socket.on("forced-energy-discard-bench", (multiSelect, benchIndex) => {
-      const [newBench, newDiscard] = discardEnergyFromBench(
-        multiSelect,
-        bench,
-        benchIndex,
-        setBench,
-        discard,
-        setDiscard
-      );
-      socket.emit({
-        deck,
-        hand,
-        active,
-        bench: newBench,
-        discard: newDiscard,
-        prizes,
+      setForcedAction({
+        action: "forced-energy-discard-bench",
+        targetIndex: benchIndex,
+        indices: multiSelect,
       });
     });
 
@@ -286,6 +254,66 @@ export default function Play() {
       setOpponentBench([]);
     });
   }, [socket]);
+
+  React.useEffect(() => {
+    if (forcedAction.action === "") return;
+    else if (forcedAction.action === "forced-retreat") {
+      const [newActive, newBench] = benchToActive(
+        bench,
+        forcedAction.targetIndex,
+        setBench,
+        active,
+        setActive
+      );
+
+      socket.emit("played-card", {
+        deck,
+        hand,
+        active: newActive,
+        bench: newBench,
+        prizes,
+        discard,
+      });
+    } else if (forcedAction.action === "forced-energy-discard-active") {
+      const [newActive, newDiscard] = discardEnergyFromActive(
+        forcedAction.indices,
+        active,
+        setActive,
+        discard,
+        setDiscard
+      );
+      socket.emit({
+        deck,
+        hand,
+        active: newActive,
+        bench,
+        discard: newDiscard,
+        prizes,
+      });
+    } else if (forcedAction.action === "forced-energy-discard-bench") {
+      const [newBench, newDiscard] = discardEnergyFromBench(
+        forcedAction.indices,
+        bench,
+        forcedAction.targetIndex,
+        setBench,
+        discard,
+        setDiscard
+      );
+      socket.emit({
+        deck,
+        hand,
+        active,
+        bench: newBench,
+        discard: newDiscard,
+        prizes,
+      });
+    }
+    setForcedAction({
+      action: "",
+      targetIndex: null,
+      indices: [],
+    });
+  }, [forcedAction.action]);
 
   React.useEffect(() => {
     if (damage === 0) return;
@@ -627,6 +655,7 @@ export default function Play() {
             discard={discard}
             setDiscard={setDiscard}
             prizes={prizes}
+            opponentActive={opponentActive}
             selected={selected}
             setSelected={setSelected}
             selectedIndex={selectedIndex}

@@ -19,10 +19,6 @@ export default function InfoPanel({
   setDeck,
   hand,
   setHand,
-  opponentDeck,
-  setOpponentDeck,
-  opponentHand,
-  setOpponentHand,
   active,
   setActive,
   bench,
@@ -39,10 +35,6 @@ export default function InfoPanel({
   const [infoText, setInfoText] = React.useState("");
 
   const handleClick = () => {
-    setSelected(null);
-    setSelectedIndex(null);
-    setUsesTargeting(false);
-
     if (action === "toActive") {
       const [newActive, newHand] = handToActive(
         hand,
@@ -89,11 +81,9 @@ export default function InfoPanel({
         setHand(newHand);
         trainerPlayed = true;
       } else if (selected.name === "Professor Oak") {
-        let newDiscard = [...discard, ...hand];
-        setDiscard(newDiscard);
+        setDiscard([...discard, ...hand]);
         let newHand = deck.draw(7);
         setHand(newHand);
-        trainerPlayed = true;
       } else if (selected.name === "Lass") {
         const [newHand, newDiscard] = handToDiscard(
           [selectedIndex],
@@ -109,7 +99,7 @@ export default function InfoPanel({
           active,
           bench,
           discard: newDiscard,
-          prizes
+          prizes,
         });
         socket.emit("toast", `${yourName} played ${selected.name}`);
         setTimeout(() => socket.emit("lass", hand), 2000);
@@ -173,6 +163,10 @@ export default function InfoPanel({
         });
       }
     }
+
+    setSelected(null);
+    setSelectedIndex(null);
+    setUsesTargeting(false); 
   };
 
   React.useEffect(() => {
