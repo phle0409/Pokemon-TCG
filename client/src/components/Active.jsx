@@ -1,13 +1,13 @@
-import React from 'react';
-import EffectStatus from './EffectStatus';
+import React from "react";
+import EffectStatus from "./EffectStatus";
 import {
   attachEnergyToActive,
   attachTrainerToActive,
   evolveActive,
   handToDiscard,
-} from '../utils/changeZones.js';
-import EnergyCost from './EnergyCost';
-import Items from './Items.jsx';
+} from "../utils/changeZones.js";
+import EnergyCost from "./EnergyCost";
+import Items from "./Items.jsx";
 
 export default function Active({
   hand,
@@ -37,7 +37,7 @@ export default function Active({
       setToast({
         show: true,
 
-        text: 'You must choose a benched Pokemon to place into active',
+        text: "You must choose a benched Pokemon to place into active",
       });
       return;
     }
@@ -52,7 +52,7 @@ export default function Active({
 
     const { supertype, name, evolvesFrom } = selected;
 
-    if (supertype.includes('Energy')) {
+    if (supertype.includes("Energy")) {
       const [newHand, newActive] = attachEnergyToActive(
         hand,
         selectedIndex,
@@ -61,7 +61,7 @@ export default function Active({
         setActive
       );
 
-      socket.emit('toast', `${yourName} attached ${name} to ${active.name}`);
+      socket.emit("toast", `${yourName} attached ${name} to ${active.name}`);
 
       socket.emit({
         deck,
@@ -71,7 +71,7 @@ export default function Active({
         discard,
         prizes,
       });
-    } else if (supertype.includes('Pokémon') && evolvesFrom === active.name) {
+    } else if (supertype.includes("Pokémon") && evolvesFrom === active.name) {
       const [newHand, newActive] = evolveActive(
         hand,
         selectedIndex,
@@ -80,7 +80,7 @@ export default function Active({
         setActive
       );
 
-      socket.emit('toast', `${yourName} evolved ${active.name} into ${name}!`);
+      socket.emit("toast", `${yourName} evolved ${active.name} into ${name}!`);
 
       socket.emit({
         deck,
@@ -90,8 +90,8 @@ export default function Active({
         discard,
         prizes,
       });
-    } else if (supertype.includes('Trainer')) {
-      if (name === 'Potion') {
+    } else if (supertype.includes("Trainer")) {
+      if (name === "Potion") {
         setHeal(20);
         const [newHand, newDiscard] = handToDiscard(
           [selectedIndex],
@@ -101,7 +101,7 @@ export default function Active({
           setDiscard
         );
 
-        socket.emit('toast', `${yourName} used ${name} on ${active.name}`);
+        socket.emit("toast", `${yourName} used ${name} on ${active.name}`);
 
         socket.emit({
           deck,
@@ -111,7 +111,7 @@ export default function Active({
           discard: newDiscard,
           prizes,
         });
-      } else if (name === 'Super Potion') {
+      } else if (name === "Super Potion") {
         if (active.effects.energy.length < 1) {
           setToast({
             show: true,
@@ -129,7 +129,7 @@ export default function Active({
           setDiscard
         );
 
-        socket.emit('toast', `${yourName} used ${name} on ${active.name}`);
+        socket.emit("toast", `${yourName} used ${name} on ${active.name}`);
 
         socket.emit({
           deck,
@@ -145,9 +145,9 @@ export default function Active({
           numTargets: 1,
           cards: active.effects.attachments,
 
-          action: 'discard energy from active',
+          action: "discard energy from active",
         });
-      } else if (name === 'PlusPower' || name === 'Defender') {
+      } else if (name === "PlusPower" || name === "Defender") {
         const [newHand, newActive] = attachTrainerToActive(
           hand,
           selectedIndex,
@@ -156,7 +156,7 @@ export default function Active({
           setActive
         );
 
-        socket.emit('toast', `${yourName} attached ${name} to ${active.name}`);
+        socket.emit("toast", `${yourName} attached ${name} to ${active.name}`);
 
         socket.emit({
           deck,
@@ -179,7 +179,7 @@ export default function Active({
       {active ? (
         <div
           className="d-flex flex-row border rounded"
-          style={{ width: 'auto', height: '6.125rem' }}
+          style={{ width: "auto", height: "6.125rem" }}
         >
           <img
             className="pkmn-card table-card"
@@ -187,7 +187,7 @@ export default function Active({
             id={`${active.name}-${active.set.name}-active`}
             onClick={handleClick}
           />
-          <div className="d-flex flex-column" style={{ width: '7rem' }}>
+          <div className="d-flex flex-column" style={{ width: "7rem" }}>
             <div className="d-flex justify-content-center">{`${
               active.hp - active.effects.damage
             }/${active.hp} HP`}</div>

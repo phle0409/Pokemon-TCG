@@ -6,8 +6,8 @@ export const skillCalculate = (
   damage,
   energies,
   selected,
-  handleAttackChange,
-  handleHealChange
+  setDamage,
+  setHeal
 ) => {
   switch (name) {
     /*****  decklist_brushfire skill *****/
@@ -28,7 +28,7 @@ export const skillCalculate = (
     case 'Flamethrower':
       return NormalDiscardOne(damage, energies);
     case 'Take Down':
-      return TakeDown(damage, energies, selected, handleAttackChange);
+      return TakeDown(damage, energies, selected, setDamage);
     case `Poisonpowder`:
       return NormalEffect(damage, energies, 'posion');
 
@@ -36,7 +36,7 @@ export const skillCalculate = (
     case 'Bubblebeam':
       return FlipEffect(damage, energies, 'paralyzed');
     case 'Recover':
-      return Recover(damage, energies, selected, handleHealChange);
+      return Recover(damage, energies, selected, setHeal);
     case 'Star Freeze':
       return FlipEffect(damage, energies, 'paralyzed');
     case 'Twineedle':
@@ -66,7 +66,7 @@ export const skillCalculate = (
     case 'Thunder Wave':
       return FlipEffect(damage, energies, 'paralyzed');
     case 'Thunder Jolt':
-      return ThunderJolt(damage, energies, handleAttackChange);
+      return ThunderJolt(damage, energies, setDamage);
     case 'Selfdestruct':
       return Selfdestruct(damage, energies);
 
@@ -84,7 +84,7 @@ export const skillCalculate = (
     case 'Karate Chop':
       return KarateChop(damage, energies, selected);
     case 'Submission':
-      return Submission(damage, energies, handleAttackChange);
+      return Submission(damage, energies, setDamage);
 
     /*****  Normal Default Attack skill *****/
     default:
@@ -102,8 +102,8 @@ const Lure = (damage, energies) => {
   return [30, null];
 };
 
-const TakeDown = (damage, energies, selected, handleAttackChange) => {
-  handleAttackChange(30);
+const TakeDown = (damage, energies, selected, setDamage) => {
+  setDamage(30);
   return [damage, null, selected.hp];
 };
 
@@ -134,9 +134,9 @@ const FlipEffect = (damage, energies, effect) => {
 
 /*****  decklist_brushfire skill *****/
 
-const Recover = (damage, energies, selected, handleHealChange) => {
+const Recover = (damage, energies, selected, setHeal) => {
   discard(energies);
-  handleHealChange(60);
+  setHeal(60);
   return [0, null];
 };
 
@@ -186,9 +186,9 @@ const DestinyBond = (damage, energies, effect) => {
   return [30, effect];
 };
 
-const ThunderJolt = (damage, energies, handleAttackChange) => {
+const ThunderJolt = (damage, energies, setDamage) => {
   if (!flipCoin()) {
-    handleAttackChange(10);
+    setDamage(10);
     damage = 0;
   }
   return [damage, null];
@@ -228,7 +228,7 @@ const KarateChop = (damage, energies) => {
   return [damage, null];
 };
 
-const Submission = (damage, energies, handleAttackChange) => {
-  handleAttackChange(20);
+const Submission = (damage, energies, setDamage) => {
+  setDamage(20);
   return [damage, null];
 };
