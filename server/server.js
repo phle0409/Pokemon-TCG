@@ -80,12 +80,11 @@ io.on("connection", (socket) => {
       io.to(getUserByID(socket.id).roomID).emit("toast", message);
     });
 
-    socket.on("attack", ({ damage, effectSkill }) => {
+    socket.on("attack", ({ actualDamage, effectSkill }) => {
       socket.broadcast
         .to(getUserByID(socket.id).roomID)
 
-        .emit('opponent-attacked', { damage, effectSkill });
-
+        .emit("opponent-attacked", { actualDamage, effectSkill });
     });
 
     socket.on("lass", () => {

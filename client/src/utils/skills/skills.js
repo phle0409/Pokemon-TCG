@@ -1,4 +1,4 @@
-import { flipCoin, discard, damageYourself } from './skils_util';
+import { flipCoin, discard, damageYourself } from "./skils_util";
 let effectSkill = null;
 let leakSplapDamage = 30;
 export const skillCalculate = (
@@ -7,83 +7,84 @@ export const skillCalculate = (
   energies,
   selected,
   setDamage,
-  setHeal
+  setHeal,
+  setEffect
 ) => {
   switch (name) {
     /*****  decklist_brushfire skill *****/
-    case 'Horn Hazzard':
+    case "Horn Hazzard":
       return FlipAttack(damage, energies);
-    case 'Lure':
+    case "Lure":
       return Lure(damage, energies);
-    case 'Poison Sting':
-      return FlipEffect(damage, energies, 'posion');
-    case 'Confuse Ray':
-      return FlipEffect(damage, energies, 'confused');
-    case 'Blind':
-      return FlipEffect(damage, energies, 'paralyzed');
-    case 'Ember':
+    case "Poison Sting":
+      return FlipEffect(damage, energies, "posion");
+    case "Confuse Ray":
+      return FlipEffect(damage, energies, "confused");
+    case "Blind":
+      return FlipEffect(damage, energies, "paralyzed");
+    case "Ember":
       return NormalDiscardOne(damage, energies);
-    case 'Fire Blast':
+    case "Fire Blast":
       return NormalDiscardOne(damage, energies);
-    case 'Flamethrower':
+    case "Flamethrower":
       return NormalDiscardOne(damage, energies);
-    case 'Take Down':
+    case "Take Down":
       return TakeDown(damage, energies, selected, setDamage);
     case `Poisonpowder`:
-      return NormalEffect(damage, energies, 'posion');
+      return NormalEffect(damage, energies, "posion");
 
     /*****  decklist_overgrowth skill *****/
-    case 'Bubblebeam':
-      return FlipEffect(damage, energies, 'paralyzed');
-    case 'Recover':
+    case "Bubblebeam":
+      return FlipEffect(damage, energies, "paralyzed");
+    case "Recover":
       return Recover(damage, energies, selected, setHeal);
-    case 'Star Freeze':
-      return FlipEffect(damage, energies, 'paralyzed');
-    case 'Twineedle':
+    case "Star Freeze":
+      return FlipEffect(damage, energies, "paralyzed");
+    case "Twineedle":
       return Flip2CoinsAttack(damage, energies);
-    case 'Stiffen':
+    case "Stiffen":
       return Stiffen(damage, energies);
 
     /*****  decklist_zap skill *****/
-    case 'Psychic':
+    case "Psychic":
       return Psychic(damage, energies);
-    case 'Barrier':
-      return Barrier(damage, energies);
-    case 'Doubleslap':
+    case "Barrier":
+      return Barrier(damage, energies, setEffect);
+    case "Doubleslap":
       return Flip2CoinsAttack(damage, energies);
-    case 'Meditate':
+    case "Meditate":
       return Meditate(30, energies);
     case `Hypnosis`:
-      return SleepEffect(damage, energies, 'asleep');
+      return SleepEffect(damage, energies, "asleep");
     case `Sleeping Gas`:
-      return SleepEffect(damage, energies, 'asleep');
+      return SleepEffect(damage, energies, "asleep");
     case `Dream Eater`:
       return DreamEater(damage, energies);
     case `Destiny Bond`:
       return DestinyBond(damage, energies);
-    case 'Psyshock':
-      return FlipEffect(damage, energies, 'paralyzed');
-    case 'Thunder Wave':
-      return FlipEffect(damage, energies, 'paralyzed');
-    case 'Thunder Jolt':
+    case "Psyshock":
+      return FlipEffect(damage, energies, "paralyzed");
+    case "Thunder Wave":
+      return FlipEffect(damage, energies, "paralyzed");
+    case "Thunder Jolt":
       return ThunderJolt(damage, energies, setDamage);
-    case 'Selfdestruct':
+    case "Selfdestruct":
       return Selfdestruct(damage, energies);
 
     /*****  decklist_blackout skill *****/
-    case 'Leek Slap':
+    case "Leek Slap":
       return LeekSlap();
-    case 'Withdraw':
+    case "Withdraw":
       return Withdraw(selected);
-    case 'Bubble':
-      return FlipEffect(damage, energies, 'paralyzed');
-    case 'Harden':
+    case "Bubble":
+      return FlipEffect(damage, energies, "paralyzed");
+    case "Harden":
       return Stiffen(damage, energies);
-    case 'Sand-attack':
+    case "Sand-attack":
       return SandAttack(damage, energies);
-    case 'Karate Chop':
+    case "Karate Chop":
       return KarateChop(damage, energies, selected);
-    case 'Submission':
+    case "Submission":
       return Submission(damage, energies, setDamage);
 
     /*****  Normal Default Attack skill *****/
@@ -146,9 +147,9 @@ const Flip2CoinsAttack = (damage, energies) => {
   return [damage, null];
 };
 
-const Stiffen = (damage, energies, selected) => {
+const Stiffen = (damage, energies, setEffect) => {
   if (flipCoin()) {
-    selected.effect.immortal = true;
+    setEffect("immortal");
   }
   return [0, null];
 };
@@ -159,10 +160,10 @@ const Psychic = (damage, energies) => {
   return [damage, null];
 };
 
-const Barrier = (damage, energies, selected) => {
-  const index = energies.findIndex((energy) => energy === 'Psychic');
+const Barrier = (damage, energies, setEffect) => {
+  const index = energies.findIndex((energy) => energy === "Psychic");
   if (index !== -1) energies.splice(index, 1);
-  selected.effect.immortal = true;
+  setEffect("immortal");
   return [damage, null];
 };
 
@@ -210,9 +211,9 @@ const LeekSlap = () => {
   return [leakSplapDamage, null];
 };
 
-const Withdraw = (selected) => {
+const Withdraw = (setEffect) => {
   if (flipCoin()) {
-    selected.effect.immortal = true;
+    setEffect("immortal");
   }
   return [0, null];
 };

@@ -40,13 +40,13 @@ export const decklist_overgrowth = [
 ];
 
 export const decklist_zap = [
-  // { name: 'Mewtwo', set: 'Base', quantity: 1 },
+  { name: "Mewtwo", set: "Base", quantity: 1 },
   // { name: 'Kadabra', set: 'Base', quantity: 1 },
-  { name: "Jynx", set: "Base", quantity: 2 },
-  { name: "Haunter", set: "Base", quantity: 2 },
+  // { name: "Jynx", set: "Base", quantity: 2 },
+  // { name: "Haunter", set: "Base", quantity: 2 },
   { name: "Gastly", set: "Base", quantity: 3 },
-  // { name: 'Drowzee', set: 'Base', quantity: 2 },
-  // { name: 'Abra', set: 'Base', quantity: 3 },
+  // { name: "Drowzee", set: "Base", quantity: 2 },
+  // { name: "Abra", set: "Base", quantity: 3 },
   // { name: 'Pikachu', set: 'Base', quantity: 4 },
   // { name: 'Magnemite', set: 'Base', quantity: 3 },
   // { name: 'Computer Search', set: 'Base', quantity: 1 },
@@ -57,7 +57,7 @@ export const decklist_zap = [
   // { name: 'Potion', set: 'Base', quantity: 1 },
   // { name: 'Gust of Wind', set: 'Base', quantity: 2 },
   // { name: 'Bill', set: 'Base', quantity: 2 },
-  // { name: 'Lightning Energy', set: 'Base', quantity: 12 },
+  // { name: "Lightning Energy", set: "Base", quantity: 12 },
   { name: "Psychic Energy", set: "Base", quantity: 16 },
 ];
 
