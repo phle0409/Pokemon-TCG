@@ -2,7 +2,9 @@
   box-sizing: border-box;
 }
 
-html, body, #root {
+html,
+body,
+#root {
   height: 100vh;
 }
 
@@ -15,6 +17,7 @@ html, body, #root {
 .pkmn-card:hover {
   cursor: pointer;
   transform: translateY(-6.125rem) scale(3);
+  z-index: 100;
 }
 
 .opp-pkmn-card {
@@ -27,6 +30,7 @@ html, body, #root {
 .opp-pkmn-card:hover {
   cursor: pointer;
   transform: translateY(6.125rem) scale(3);
+  z-index: 100;
 }
 
 .hand-card {
@@ -41,6 +45,10 @@ html, body, #root {
   animation: gelatine 0.5s ease 2;
 }
 
+.item {
+  animation: gelatine 0.5s ease 2;
+}
+
 @keyframes bounce-in-right {
   0% {
     opacity: 0;
@@ -50,8 +58,12 @@ html, body, #root {
     opacity: 1;
     transform: translateX(-30px);
   }
-  80% { transform: translateX(10px); }
-  100% { transform: translateX(0); }
+  80% {
+    transform: translateX(10px);
+  }
+  100% {
+    transform: translateX(0);
+  }
 }
 
 @keyframes fade-in-down {
@@ -66,13 +78,17 @@ html, body, #root {
 }
 
 @keyframes gelatine {
-  from, to { transform: scale(1, 1); }
-  25% { transform: scale(0.9, 1.1); }
-  50% { transform: scale(1.1, 0.9); }
-  75% { transform: scale(0.95, 1.05); }
-}
-
-@keyframes grow {
-  from { transform: scale(0); }
-  to { transform: scale(1); }
+  from,
+  to {
+    transform: scale(1, 1);
+  }
+  25% {
+    transform: scale(0.9, 1.1);
+  }
+  50% {
+    transform: scale(1.1, 0.9);
+  }
+  75% {
+    transform: scale(0.95, 1.05);
+  }
 }

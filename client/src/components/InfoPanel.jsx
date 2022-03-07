@@ -1,6 +1,11 @@
 import React from "react";
 import { Button, ButtonGroup } from "react-bootstrap";
-import { isTargetedItem, itemMap } from "../utils/itemMap.js";
+import { isTargetedItem } from "../utils/itemMap.js";
+import {
+  handToActive,
+  handToBench,
+  handToDiscard,
+} from "../utils/changeZones.js";
 
 export default function InfoPanel({
   selected,
@@ -9,7 +14,9 @@ export default function InfoPanel({
   setSelectedIndex,
   usesTargeting,
   setUsesTargeting,
+  retreat,
   deck,
+  setDeck,
   hand,
   setHand,
   active,
@@ -18,57 +25,154 @@ export default function InfoPanel({
   setBench,
   prizes,
   discard,
+  setDiscard,
+  yourName,
+  setToast,
   socket,
+  setZoneModal,
 }) {
   const [action, setAction] = React.useState("");
   const [infoText, setInfoText] = React.useState("");
 
   const handleClick = () => {
     if (action === "toActive") {
-      let newActive = selected;
-      setActive(newActive);
-      hand.splice(selectedIndex, 1);
+      const [newActive, newHand] = handToActive(
+        hand,
+        selectedIndex,
+        setHand,
+        setActive
+      );
+
       socket.emit("played-card", {
         deck,
-        hand,
+        hand: newHand,
         active: newActive,
         bench,
         prizes,
         discard,
       });
+
+      socket.emit("toast", `${yourName} sent out ${newActive.name}!`);
     } else if (action === "toBench") {
-      let newBench = [...bench, selected];
-      setBench(newBench);
-      hand.splice(selectedIndex, 1);
+      const [newHand, newBench] = handToBench(
+        hand,
+        selectedIndex,
+        setHand,
+        bench,
+        setBench
+      );
+
       socket.emit("played-card", {
         deck,
-        hand,
+        hand: newHand,
         active,
         bench: newBench,
         prizes,
         discard,
       });
-    }
-    else if(action === "item") {
-      itemMap(selected.name, deck, hand, setHand);
-      socket.emit("played-card", {
-        deck,
-        hand,
-        active,
-        bench,
-        prizes,
-        discard,
-      });
+
+      socket.emit("toast", `${yourName} played ${selected.name} to bench`);
+    } else if (action === "item") {
+      let trainerPlayed = false;
+
+      if (selected.name === "Bill") {
+        let cards = deck.draw(2);
+        let newHand = [...hand, ...cards];
+        setHand(newHand);
+        trainerPlayed = true;
+      } else if (selected.name === "Professor Oak") {
+        setDiscard([...discard, ...hand]);
+        let newHand = deck.draw(7);
+        setHand(newHand);
+      } else if (selected.name === "Lass") {
+        const [newHand, newDiscard] = handToDiscard(
+          [selectedIndex],
+          hand,
+          setHand,
+          discard,
+          setDiscard
+        );
+
+        socket.emit("played-card", {
+          deck,
+          hand: newHand,
+          active,
+          bench,
+          discard: newDiscard,
+          prizes,
+        });
+        socket.emit("toast", `${yourName} played ${selected.name}`);
+        setTimeout(() => socket.emit("lass", hand), 2000);
+      } else if (selected.name === "Computer Search") {
+        if (hand.length < 2) {
+          setToast({
+            show: true,
+            text: "You need at least 2 cards in your hand to play Computer Search",
+          });
+        } else {
+          setZoneModal({
+            show: true,
+            zone: "Select two cards from your hand to discard",
+            numTargets: 2,
+            cards: hand,
+            action: "discard then search deck",
+          });
+          trainerPlayed = true;
+        }
+      } else if (selected.name === "Energy Retrieval") {
+        let energiesInDiscard = 0;
+
+        for (const card of discard) {
+          if (energiesInDiscard >= 2) break;
+          if (card.supertype.includes("Energy")) ++energiesInDiscard;
+        }
+
+        if (energiesInDiscard < 2) {
+          setToast({
+            show: true,
+            text: "You need at least 2 energies in your discard pile to play Energy Retrieval",
+          });
+        } else {
+          setZoneModal({
+            show: true,
+            zone: "Select 2 energy cards from discard",
+            numTargets: 2,
+            cards: discard,
+            action: "energy from discard to hand",
+          });
+          trainerPlayed = true;
+        }
+      }
+
+      if (trainerPlayed) {
+        const [newHand, newDiscard] = handToDiscard(
+          [selectedIndex],
+          hand,
+          setHand,
+          discard,
+          setDiscard
+        );
+
+        socket.emit("played-card", {
+          deck,
+          hand: newHand,
+          active,
+          bench,
+          prizes,
+          discard: newDiscard,
+        });
+      }
     }
 
     setSelected(null);
     setSelectedIndex(null);
+    setUsesTargeting(false); 
   };
 
   React.useEffect(() => {
     if (!selected) return;
-    const { name, supertype, subtypes, evolvesFrom } = selected;
 
+    const { name, supertype, subtypes, evolvesFrom } = selected;
     if (
       supertype.includes("Pokémon") &&
       subtypes?.includes("Basic") &&
@@ -106,9 +210,11 @@ export default function InfoPanel({
         setUsesTargeting(false);
       }
     }
-  }, [selected]);
+  }, [selected, selectedIndex, setSelected, setSelectedIndex]);
 
-  if (!selected || selected === active) return <div></div>;
+  if (!selected || (selected === active && !retreat)) return <div></div>;
+
+  //TODO add infoText when forced to retreat
 
   return (
     <div className="d-flex flex-column justify-content-center align-items-center h-100">

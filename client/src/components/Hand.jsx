@@ -2,21 +2,38 @@ import React from "react";
 
 export default function Hand({
   hand,
+  setHand,
   setSelected,
   setSelectedIndex,
+  selectedIndex,
+  retreat,
+  setRetreat,
+  setToast,
 }) {
   const handleClick = (e) => {
+    if (retreat) {
+      setToast({
+        text: "You must selected a benched Pokemon to place into active",
+        show: true,
+      });
+
+      return;
+    }
+
     const [name, set, zone, index] = e.target.id.split("-");
     const selectedCard = hand[index];
-    console.log(selectedCard);
-    setSelected(selectedCard);
     setSelectedIndex(index);
+    setSelected(selectedCard);
+
+    if (selectedCard.name === "Switch") {
+      setRetreat(true);
+    }
   };
 
   return (
     <div className="d-flex flex-row justify-content-center w-100">
-      {hand ? (
-        hand.map((card, index) => {
+      {hand.length > 0 ? (
+        hand?.map((card, index) => {
           return (
             <img
               className="my-2 mx-1 pkmn-card hand-card"
