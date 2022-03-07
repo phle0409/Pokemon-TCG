@@ -72,7 +72,7 @@ export default function InfoPanel({
 
       socket.emit("played-card", {
         deck,
-        hand,
+        hand: newHand,
         active,
         bench: newBench,
         prizes,

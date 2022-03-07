@@ -236,7 +236,6 @@ export default function Play() {
       );
 
       socket.emit("played-card", {
-
         deck,
         hand,
         active: newActive,
@@ -478,8 +477,6 @@ export default function Play() {
     setDeck(deck);
   };
 
-  // TODO add a useEffect to socket.emit whenever the board state changes
-
   return (
     <Container
       fluid
@@ -657,15 +654,18 @@ export default function Play() {
           />
           <hr className="m-0" />
           <Active
+            deck={deck}
+            setDeck={setDeck}
             hand={hand}
             setHand={setHand}
             active={active}
             setActive={setActive}
             bench={bench}
-            deck={deck}
-            prizes={prizes}
+            setBench={setBench}
             discard={discard}
             setDiscard={setDiscard}
+            prizes={prizes}
+            setPrizes={setPrizes}
             selected={selected}
             setSelected={setSelected}
             selectedIndex={selectedIndex}

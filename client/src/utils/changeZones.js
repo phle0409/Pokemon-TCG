@@ -138,7 +138,6 @@ export const discardEnergyFromBench = (
     benched.effects.energy.splice(indices[i], 1);
   }
 
-  
   let newBench = bench;
   bench.splice(benchIndex, 1);
   newBench = [...bench, benched];
@@ -147,7 +146,7 @@ export const discardEnergyFromBench = (
 
   setBench(newBench);
   setDiscard(newDiscard);
-  
+
   return [newBench, newDiscard];
 };
 
@@ -159,12 +158,12 @@ export const attachEnergyToActive = (
   setActive
 ) => {
   let newActive = active;
+  let newHand = hand;
   newActive.effects.attachments.push(hand[handIndex]);
   newActive.effects.energy.push(hand[handIndex].name.replace(" Energy", ""));
-  let newHand = hand;
   newHand.splice(hand[handIndex], 1);
-  setActive(newActive);
   setHand(newHand);
+  setActive(newActive);
   return [newHand, newActive];
 };
 
