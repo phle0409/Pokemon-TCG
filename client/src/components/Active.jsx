@@ -1,5 +1,5 @@
 import React from "react";
-
+import EffectStatus from "./EffectStatus";
 import {
   attachEnergyToActive,
   attachTrainerToActive,
@@ -36,8 +36,6 @@ export default function Active({
   socket,
 }) {
   const handleClick = (e) => {
-    console.log(active);
-
     if (retreat) {
       setToast({
         show: true,
@@ -220,6 +218,7 @@ export default function Active({
             }/${active.hp} HP`}</div>
             <EnergyCost energies={active.effects.energy} />
             <Items items={active.effects.attachments} />
+            <EffectStatus status={active.effects.statusConditions} />
           </div>
         </div>
       ) : (

@@ -1,4 +1,5 @@
 import React from "react";
+import EffectStatus from "./EffectStatus";
 import EnergyCost from "./EnergyCost.jsx";
 import Items from "./Items.jsx";
 import { handToDiscard } from "../utils/changeZones.js";
@@ -116,6 +117,7 @@ export default function OpponentBench({
                 </div>
                 <EnergyCost energies={card.effects.energy} />
                 <Items items={card.effects.attachments} />
+                <EffectStatus status={card.effects.statusConditions} />
               </div>
             </div>
           );

@@ -1,26 +1,27 @@
-import React from 'react';
-import { Button, Col, Container, Modal, Row } from 'react-bootstrap';
-import EnergyCost from './EnergyCost.jsx';
-import { skillCalculate } from '../utils/skills/skills';
+import React from "react";
+import { Button, Col, Container, Modal, Row } from "react-bootstrap";
+import EnergyCost from "./EnergyCost.jsx";
+import { skillCalculate } from "../utils/skills/skills";
 
 export default function AttackModal({
   show,
   handleClose,
   selected,
   socket,
-  handleAttackChange,
+  setDamage,
   setRetreat,
   setSelected,
   setSelectedIndex,
   setUsesTargeting,
-  handleHealChange,
+  setHeal,
+  setToast,
 }) {
   const canUseSkill = (costs, energies) => {
     let colorless = 0;
     let isEnoughEnergy = true;
     let result = false;
     for (let cost of costs) {
-      if (cost === 'Colorless') {
+      if (cost === "Colorless") {
         colorless++;
       } else {
         const index = energies.findIndex((energy) => energy === cost);
@@ -44,8 +45,8 @@ export default function AttackModal({
   };
 
   const attackButton = (event) => {
-    const [name, damage, cost] = event.target.id.split('#');
-    const costArray = cost.split(',');
+    const [name, damage, cost] = event.target.id.split("#");
+    const costArray = cost.split(",");
     const energyForCheckSkill = [...selected.effects.energy];
     if (canUseSkill(costArray, energyForCheckSkill)) {
       const [actualDamage, effectSkill] = skillCalculate(
@@ -53,13 +54,13 @@ export default function AttackModal({
         damage,
         selected.effects.energy,
         selected,
-        handleAttackChange,
-        handleHealChange
+        setDamage,
+        setHeal
       );
-
-      socket.emit('attack', { damage, effectSkill });
+      setToast({ show: true, text: `Success use skill ${name}` });
+      socket.emit("attack", { damage, effectSkill });
     } else {
-      console.log('cannot use skill');
+      setToast({ show: true, text: `Cannot use skill ${name}` });
     }
 
     handleClose();
@@ -94,7 +95,7 @@ export default function AttackModal({
     setUsesTargeting(false);
   };
 
-  if (!selected || selected.supertype !== 'Pokémon')
+  if (!selected || selected.supertype !== "Pokémon")
     return (
       <Modal
         show={show}

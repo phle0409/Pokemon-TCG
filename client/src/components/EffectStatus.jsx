@@ -1,20 +1,23 @@
-import React from 'react';
-import { Container } from 'react-bootstrap';
+import React from "react";
+import { Container } from "react-bootstrap";
 
 const EffectStatus = ({ status }) => {
-  const [skillStatus, setSkillStatus] = React.useState('');
-
-  let result = '';
-  if (status.poisoned) result += ' poisoned';
-  if (status.asleep) result += ' asleep';
-  if (status.confused) result += ' confused';
-  if (status.paralyzed) result += ' paralyzed';
-  if (status.immortal) result += ' immortal';
-
+  let result = [];
+  if (status.poisoned) result.push("poisoned");
+  if (status.asleep) result.push("asleep");
+  if (status.confused) result.push("confused");
+  if (status.paralyzed) result.push("paralyzed");
+  if (status.immortal) result.push("immortal");
+  let totalEffect = "";
+  result.forEach((effect) => (totalEffect += effect + " "));
   return (
-    <Container className="center">
-      {result !== '' && <p className="text-danger">{skillStatus}</p>}
-    </Container>
+    <div className="text-center">
+      {(status.poisoned ||
+        status.asleep ||
+        status.confused ||
+        status.paralyzed ||
+        status.immortal) && <p className="text-danger">{totalEffect} </p>}
+    </div>
   );
 };
 
