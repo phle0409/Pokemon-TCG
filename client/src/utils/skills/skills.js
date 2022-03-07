@@ -23,11 +23,11 @@ export const skillCalculate = (
     case "Blind":
       return FlipEffect(damage, "paralyzed");
     case "Ember":
-      return NormalDiscardOne(damage, setZoneModal);
+      return NormalDiscardOne(damage, setZoneModal, selected);
     case "Fire Blast":
-      return NormalDiscardOne(damage, setZoneModal);
+      return NormalDiscardOne(damage, setZoneModal, selected);
     case "Flamethrower":
-      return NormalDiscardOne(damage, setZoneModal);
+      return NormalDiscardOne(damage, setZoneModal, selected);
     case "Take Down":
       return TakeDown(damage, selected, setDamage);
     case `Poisonpowder`:
@@ -37,7 +37,7 @@ export const skillCalculate = (
     case "Bubblebeam":
       return FlipEffect(damage, "paralyzed");
     case "Recover":
-      return Recover(damage, setZoneModal, setHeal);
+      return Recover(damage, setZoneModal, setHeal, selected);
     case "Star Freeze":
       return FlipEffect(damage, "paralyzed");
     case "Twineedle":
@@ -49,7 +49,7 @@ export const skillCalculate = (
     case "Psychic":
       return Psychic(damage, selected);
     case "Barrier":
-      return Barrier(damage, setEffect, setZoneModal);
+      return Barrier(damage, setEffect, setZoneModal, selected);
     case "Doubleslap":
       return Flip2CoinsAttack(damage);
     case "Meditate":
@@ -61,7 +61,7 @@ export const skillCalculate = (
     case `Dream Eater`:
       return DreamEater(damage);
     case `Destiny Bond`:
-      return DestinyBond(damage, setZoneModal);
+      return DestinyBond(damage, setZoneModal, selected);
     case "Psyshock":
       return FlipEffect(damage, "paralyzed");
     case "Thunder Wave":
@@ -93,7 +93,15 @@ export const skillCalculate = (
   }
 };
 
-const discard = (setZoneModal) => {};
+const discard = (setZoneModal, selected) => {
+  setZoneModal({
+    show: true,
+    zone: "Choose energy to discard",
+    cards: selected.effects.attachments,
+    numTargets: 1,
+    action: "discard energy from active",
+  });
+};
 
 const NormalAttack = (damage) => {
   return [damage, null];
@@ -110,8 +118,8 @@ const TakeDown = (damage, selected, setDamage) => {
   return [damage, null, selected.hp];
 };
 
-const NormalDiscardOne = (damage, setZoneModal) => {
-  discard(setZoneModal);
+const NormalDiscardOne = (damage, setZoneModal, selected) => {
+  discard(setZoneModal, selected);
   return [damage, null];
 };
 
@@ -137,8 +145,8 @@ const FlipEffect = (damage, effect) => {
 
 /*****  decklist_brushfire skill *****/
 
-const Recover = (damage, setZoneModal, setHeal) => {
-  discard(setZoneModal);
+const Recover = (damage, setZoneModal, setHeal, selected) => {
+  discard(setZoneModal, selected);
   setHeal(60);
   return [0, null];
 };
@@ -162,8 +170,8 @@ const Psychic = (damage, selected) => {
   return [damage, null];
 };
 
-const Barrier = (damage, setEffect, setZoneModal) => {
-  discard(setZoneModal);
+const Barrier = (damage, setEffect, setZoneModal, selected) => {
+  discard(setZoneModal, selected);
   setEffect("immortal");
   return [damage, null];
 };
@@ -181,10 +189,10 @@ const SleepEffect = (damage, effect) => {
   return [0, effect];
 };
 
-const DestinyBond = (damage, setZoneModal) => {
+const DestinyBond = (damage, setZoneModal, selected) => {
   // TODO: implement proper skill
 
-  discard(setZoneModal);
+  discard(setZoneModal, selected);
   return [20, null];
 };
 
