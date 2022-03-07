@@ -127,6 +127,10 @@ export default function Play() {
       }
     });
 
+    socket.on("wait-opponent", (msg) => {
+      // TODO:  Disable Hand, Active, Bench
+    });
+
     socket.on("player-name", (oppname) => {
       setOpponentName(oppname);
       socket.emit("other-player-name", username);
@@ -159,6 +163,17 @@ export default function Play() {
       setOpponentBench(bench);
       setOpponentPrizes(prizes);
       setOpponentDiscard(discard);
+    });
+
+    socket.on("active-user", (id) => {
+      // If active user
+      if (socket.id === id) {
+        // TODO: Enable hand, active, bend
+
+        // TODO: Send end pharse
+        socket.emit("end-pharse", socket.id);
+        // TODO: Disable hand, active, bend
+      }
     });
 
     socket.on("opponent-attacked", ({ actualDamage, effectSkill }) => {
@@ -320,6 +335,7 @@ export default function Play() {
     let newActive = active;
     // Check if pokemon has immortal effect.
     if (newActive.effects.statusConditions.immortal === true) {
+      socket.emit("toast", `${newActive.name} activated immortal skill.`);
       newActive.effects.statusConditions.immortal = false;
       setActive(newActive);
       socket.emit("played-card", {

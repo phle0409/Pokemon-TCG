@@ -38,7 +38,13 @@ const getUserByID = (id) => {
 };
 
 const getAllUsersByRoom = (roomID) => {
-  return users.find((user) => user.roomID === roomID);
+  return users.filter((user) => user.roomID === roomID);
+};
+
+const flipCoin = () => {
+  let result = true;
+  if (Math.floor(Math.random() * 2) === 0) result = false;
+  return result;
 };
 
 module.exports = {
@@ -48,4 +54,5 @@ module.exports = {
   getUserByID,
   getAllUsersInRoomByID,
   getAllUsersByRoom,
+  flipCoin,
 };
