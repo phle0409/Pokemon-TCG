@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
@@ -9,7 +8,6 @@ import {
   benchToActive,
   discardEnergyFromActive,
   discardEnergyFromBench,
-
 } from "../utils/changeZones.js";
 import Hand from "./Hand.jsx";
 import Bench from "./Bench.jsx";
@@ -20,7 +18,6 @@ import InfoPanel from "./InfoPanel.jsx";
 import AttackModal from "./AttackModal.jsx";
 import ZoneModal from "./ZoneModal.jsx";
 import PkmnToast from "./PkmnToast.jsx";
-
 
 export default function Play() {
   let navigate = useNavigate();
@@ -48,11 +45,11 @@ export default function Play() {
   const [selectedIndex, setSelectedIndex] = React.useState(null);
   const [selected, setSelected] = React.useState(null);
   const [multiSelect, setMultiSelect] = React.useState([]);
-  const [secondaryAction, setSecondaryAction] = React.useState('');
+  const [secondaryAction, setSecondaryAction] = React.useState("");
   const [damage, setDamage] = React.useState(0);
   const [heal, setHeal] = React.useState(0);
 
-  const [effect, setEffect] = React.useState('');
+  const [effect, setEffect] = React.useState("");
 
   const [damageBenched, setDamageBenched] = React.useState({
     index: null,
@@ -160,20 +157,19 @@ export default function Play() {
       setOpponentDiscard(discard);
     });
 
-
-    socket.on('opponent-attacked', ({ damage, effectSkill }) => {
+    socket.on("opponent-attacked", ({ damage, effectSkill }) => {
       console.log(`damage ${damage}, effect: ${effectSkill}`);
       if (damage) damage = 0;
 
       setDamage(damage);
-      if (effectSkill) {
-        setEffect(effectSkill);
-      }
+
+      // Testing
+      // if (effectSkill) {
+      setEffect("asleep");
+      // }
     });
 
-
     socket.on("knockout", () => {
-
       let newPrizes = prizes;
       let prize = newPrizes.pop();
       let newHand = [...hand, prize];
@@ -190,13 +186,11 @@ export default function Play() {
       });
     });
 
-
     socket.on("lass", () => {
       let trainers = [];
       let indices = [];
       hand.forEach((card, i) => {
         if (card.supertype === "Trainer") {
-
           trainers.push(card);
           indices.push(i);
         }
@@ -224,9 +218,7 @@ export default function Play() {
       });
     });
 
-
     socket.on("forced-retreat", (index) => {
-
       const [newActive, newBench] = benchToActive(
         bench,
         index,
@@ -244,7 +236,6 @@ export default function Play() {
         discard,
       });
     });
-
 
     socket.on("forced-energy-discard-active", (multiSelect) => {
       const [newActive, newDiscard] = discardEnergyFromActive(
@@ -264,7 +255,6 @@ export default function Play() {
       });
     });
 
-
     socket.on("forced-energy-discard-bench", (multiSelect, benchIndex) => {
       const [newBench, newDiscard] = discardEnergyFromBench(
         multiSelect,
@@ -283,7 +273,6 @@ export default function Play() {
         prizes,
       });
     });
-
 
     socket.on("toast", (message) => {
       setToast({
@@ -310,7 +299,6 @@ export default function Play() {
     newActive.effects.damage += parseInt(damage);
 
     if (parseInt(newActive.effects.damage) >= parseInt(newActive.hp)) {
-
       socket.emit("toast", `${yourName}'s ${active.name} was knocked out!`);
       socket.emit("knockout");
       const [newActive, newDiscard] = activeToDiscard(
@@ -322,7 +310,6 @@ export default function Play() {
       if (bench.length > 0) setRetreat(true);
       else
         socket.emit(
-
           "toast",
           `${yourName} has no more benched Pokemon. ${opponentName} wins!`
         );
@@ -368,28 +355,27 @@ export default function Play() {
   }, [heal]);
 
   React.useEffect(() => {
-
-    if (effect === '') return;
+    if (effect === "") return;
     let newActive = active;
-    console.log('damage in effect', damage);
+    console.log("damage in effect", damage);
     switch (effect) {
-      case 'posion':
+      case "posion":
         newActive.effects.statusConditions.poisoned = true;
         newActive.effects.statusConditions.posionedDamage = damage;
         break;
-      case 'paralyzed':
+      case "paralyzed":
         newActive.effects.statusConditions.paralyzed = true;
         newActive.effects.statusConditions.paralyzedDamage = damage;
         break;
-      case 'confused':
+      case "confused":
         newActive.effects.statusConditions.confused = true;
         break;
       default:
         newActive.effects.statusConditions.asleep = true;
     }
-    console.log(newActive);
+
     setActive(newActive);
-    setEffect('');
+    setEffect("");
   }, [effect]);
 
   React.useEffect(() => {
@@ -438,13 +424,12 @@ export default function Play() {
     else if (secondaryAction === "search deck") {
       setZoneModal({
         show: true,
-        zone: 'Select 1 card from your deck to put into your hand',
+        zone: "Select 1 card from your deck to put into your hand",
         numTargets: 1,
         cards: deck.cards,
         action: "search deck",
       });
     }
-
 
     setSecondaryAction("");
   }, [secondaryAction]);

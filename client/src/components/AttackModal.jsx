@@ -1,7 +1,7 @@
-import React from "react";
-import { Button, Col, Container, Modal, Row } from "react-bootstrap";
-import EnergyCost from "./EnergyCost.jsx";
-import { skillCalculate } from "../utils/skills/skills";
+import React from 'react';
+import { Button, Col, Container, Modal, Row } from 'react-bootstrap';
+import EnergyCost from './EnergyCost.jsx';
+import { skillCalculate } from '../utils/skills/skills';
 
 export default function AttackModal({
   show,
@@ -20,7 +20,7 @@ export default function AttackModal({
     let isEnoughEnergy = true;
     let result = false;
     for (let cost of costs) {
-      if (cost === "Colorless") {
+      if (cost === 'Colorless') {
         colorless++;
       } else {
         const index = energies.findIndex((energy) => energy === cost);
@@ -44,8 +44,8 @@ export default function AttackModal({
   };
 
   const attackButton = (event) => {
-    const [name, damage, cost] = event.target.id.split("#");
-    const costArray = cost.split(",");
+    const [name, damage, cost] = event.target.id.split('#');
+    const costArray = cost.split(',');
     const energyForCheckSkill = [...selected.effects.energy];
     if (canUseSkill(costArray, energyForCheckSkill)) {
       const [actualDamage, effectSkill] = skillCalculate(
@@ -57,7 +57,7 @@ export default function AttackModal({
         handleHealChange
       );
 
-      socket.emit("attack", { damage, effectSkill });
+      socket.emit('attack', { damage, effectSkill });
     } else {
       console.log('cannot use skill');
     }
@@ -94,7 +94,7 @@ export default function AttackModal({
     setUsesTargeting(false);
   };
 
-  if (!selected || selected.supertype !== "Pokémon")
+  if (!selected || selected.supertype !== 'Pokémon')
     return (
       <Modal
         show={show}
