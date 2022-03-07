@@ -7,8 +7,6 @@ export default function Hand({
   setSelectedIndex,
   retreat,
   setRetreat,
-  forcedAction,
-  setForcedAction,
   setToast,
 }) {
   const handleClick = (e) => {

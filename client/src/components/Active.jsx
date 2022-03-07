@@ -15,8 +15,11 @@ export default function Active({
   active,
   setActive,
   bench,
+  setBench,
   deck,
+  setDeck,
   prizes,
+  setPrizes,
   discard,
   setDiscard,
   selected,
@@ -61,9 +64,9 @@ export default function Active({
         setActive
       );
 
-      socket.emit("toast", `${yourName} attached ${name} to ${active.name}`);
+      socket.emit("toast", `${yourName} attached ${name} to ${newActive.name}`);
 
-      socket.emit({
+      socket.emit("played-card", {
         deck,
         hand: newHand,
         active: newActive,
@@ -80,9 +83,12 @@ export default function Active({
         setActive
       );
 
-      socket.emit("toast", `${yourName} evolved ${active.name} into ${name}!`);
+      socket.emit(
+        "toast",
+        `${yourName} evolved ${active.name} into ${newActive.name}!`
+      );
 
-      socket.emit({
+      socket.emit("played-card", {
         deck,
         hand: newHand,
         active: newActive,
@@ -103,7 +109,7 @@ export default function Active({
 
         socket.emit("toast", `${yourName} used ${name} on ${active.name}`);
 
-        socket.emit({
+        socket.emit("played-card", {
           deck,
           hand: newHand,
           active,
@@ -131,7 +137,7 @@ export default function Active({
 
         socket.emit("toast", `${yourName} used ${name} on ${active.name}`);
 
-        socket.emit({
+        socket.emit("played-card", {
           deck,
           hand: newHand,
           active,
@@ -158,7 +164,7 @@ export default function Active({
 
         socket.emit("toast", `${yourName} attached ${name} to ${active.name}`);
 
-        socket.emit({
+        socket.emit("played-card", {
           deck,
           hand: newHand,
           active: newActive,
@@ -173,6 +179,25 @@ export default function Active({
     setSelectedIndex(null);
     setUsesTargeting(false);
   };
+
+  React.useEffect(() => {
+    if (!socket) return;
+    setDeck(deck);
+    setHand(hand);
+    setActive(active);
+    setBench(bench);
+    setDiscard(discard);
+    setPrizes(prizes);
+
+    socket.emit({
+      deck,
+      hand,
+      active,
+      bench,
+      discard,
+      prizes,
+    });
+  }, [deck, active, hand, active, bench, discard, prizes]);
 
   return (
     <div className="d-flex flex-row justify-content-center">
