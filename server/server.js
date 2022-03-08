@@ -72,8 +72,6 @@ io.on("connection", (socket) => {
 
     socket.on("end-phrase", (id) => {
       let activeId = getIdOpponentInRoom(id);
-      console.log("current id", id);
-      console.log("opponent id", activeId);
       let firstTurn = false;
       io.to(getUserByID(socket.id).roomID).emit("active-user", {
         activeId,
