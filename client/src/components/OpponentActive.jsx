@@ -85,9 +85,9 @@ export default function OpponentActive({
             className="d-flex flex-column align-items-center"
             style={{ width: "7rem" }}
           >
-            <div>{`${opponentActive.hp - opponentActive.effects.damage}/${
-              opponentActive.hp
-            } HP`}</div>
+            <div className="d-flex justify-content-center">{`${
+              opponentActive.hp - opponentActive.effects.damage
+            }/${opponentActive.hp} HP`}</div>
             <EnergyCost energies={opponentActive.effects.energy} />
             <Items items={opponentActive.effects.attachments} />
             <EffectStatus status={opponentActive.effects.statusConditions} />

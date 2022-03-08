@@ -263,8 +263,8 @@ export default function Bench({
                 id={`${card.name}-${card.set.name}-bench-${index}`}
                 onClick={handleClick}
               />
-              <div className="d-flex flex-column" style={{ width: "7rem" }}>
-                <div className="d-flex align-items-center justify-content-center">{`${
+              <div className="d-flex flex-column align-items-center" style={{ width: "7rem" }}>
+                <div className="d-flex justify-content-center">{`${
                   card.hp - card.effects.damage
                 }/${card.hp} HP`}</div>
                 <EnergyCost energies={card.effects.energy} />

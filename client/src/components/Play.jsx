@@ -48,7 +48,6 @@ export default function Play() {
   const [damage, setDamage] = React.useState(0);
   const [heal, setHeal] = React.useState(0);
   const [effect, setEffect] = React.useState("");
-
   const [activePlayer, setActivePlayer] = React.useState(false);
   const [playedEnergy, setPlayedEnergy] = React.useState(false);
   const [endPhrase, setEndPhrase] = React.useState(false);
@@ -159,12 +158,12 @@ export default function Play() {
 
     socket.on("opponent-played-card", (board) => {
       const { deck, hand, active, bench, prizes, discard } = board;
-      if (deck && deck.cards.length > 0) setOpponentDeck(deck);
-      if (hand && hand.length > 0) setOpponentHand(hand);
+      if (deck) setOpponentDeck(deck);
+      if (hand) setOpponentHand(hand);
       if (active) setOpponentActive(active);
-      if (bench && bench.length > 0) setOpponentBench(bench);
-      setOpponentPrizes(prizes);
-      setOpponentDiscard(discard);
+      if (bench) setOpponentBench(bench);
+      if (prizes) setOpponentPrizes(prizes);
+      if (discard) setOpponentDiscard(discard);
     });
 
     socket.on("active-user", ({ activeId, firstTurn }) => {
@@ -178,14 +177,13 @@ export default function Play() {
           text: "Your turn",
         });
         setActivePlayer(true);
-
+        setPlayedEnergy(false);
         if (!firstTurn) setDisableAttack(false);
 
         setDisablePass(false);
         setDisablePlayer(false);
 
         // TODO: Check effect
-
       } else {
         if (firstTurn) {
           setDisablePlayer(false);
@@ -598,7 +596,6 @@ export default function Play() {
         disableAttack={disableAttack}
         disablePass={disablePass}
         opponentActive={opponentActive}
-
       />
       <ZoneModal
         show={zoneModal.show}
