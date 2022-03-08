@@ -49,6 +49,9 @@ export default function Play() {
   const [heal, setHeal] = React.useState(0);
 
   const [effect, setEffect] = React.useState("");
+  const [disablePlayer, setDisablePlayer] = React.useState(false);
+  const [activePlayer, setActivePlayer] = React.useState(false);
+  const [playedEnergy, setPlayedEnergy] = React.useState(false);
 
   const [damageBenched, setDamageBenched] = React.useState({
     index: null,
@@ -128,7 +131,7 @@ export default function Play() {
     });
 
     socket.on("wait-opponent", (msg) => {
-      // TODO:  Disable Hand, Active, Bench
+      setDisablePlayer(true);
     });
 
     socket.on("player-name", (oppname) => {
@@ -168,10 +171,15 @@ export default function Play() {
     socket.on("active-user", (id) => {
       // If active user
       if (socket.id === id) {
+        // set active user
+        setActivePlayer(true);
         // TODO: Enable hand, active, bend
+        setDisablePlayer(false);
+
+        // TODO: Check effect
 
         // TODO: Send end pharse
-        socket.emit("end-pharse", socket.id);
+        // socket.emit("end-pharse", socket.id);
         // TODO: Disable hand, active, bend
       }
     });
@@ -269,6 +277,20 @@ export default function Play() {
       setOpponentBench([]);
     });
   }, [socket]);
+
+  React.useEffect(() => {
+    if (activePlayer) {
+      document.querySelector(".current-player-border").style.backgroundColor =
+        "#89c499";
+      document.querySelector(".opponent-player-border").style.backgroundColor =
+        "#ffffff";
+    } else {
+      document.querySelector(".opponent-player-border").style.backgroundColor =
+        "#89c499";
+      document.querySelector(".current-player-border").style.backgroundColor =
+        "#ffffff";
+    }
+  }, [activePlayer]);
 
   React.useEffect(() => {
     if (forcedAction.action === "") return;
@@ -413,7 +435,6 @@ export default function Play() {
 
     let damageEffect = damage;
     if (!damageEffect) damageEffect = 0;
-    console.log(effect);
 
     switch (effect) {
       case "posion":
@@ -575,15 +596,11 @@ export default function Play() {
       />
       <div className="bg-dark d-flex flex-column w-25 h-100">
         <div
-          className={`${
-            gameStatus.playerTurn === yourName
-              ? `border border-success`
-              : `border border-secondary`
-          }
-        bg-light d-flex flex-column m-1 p-1 h-25 border-2 rounded`}
+          className={`
+         d-flex flex-column m-1 p-1 h-25 border-2 rounded current-player-border`}
         >
           <span>
-            <strong>{yourName}</strong>
+            <strong> Current Player: {yourName}</strong>
           </span>
           <span>Cards in deck: {deck.cards?.length}</span>
           <span>Prize cards: {prizes.length}</span>
@@ -601,9 +618,9 @@ export default function Play() {
             Cards in discard: {discard.length}
           </button>
         </div>
-        <div className="bg-light d-flex flex-column m-1 p-2 h-25 border border-secondary border-2 rounded">
+        <div className="d-flex flex-column m-1 p-2 h-25 border border-secondary border-2 rounded  opponent-player-border">
           <span>
-            <strong>{opponentName}</strong>
+            <strong>Opponent Player: {opponentName}</strong>
           </span>
           <span>Cards in deck: {opponentDeck.cards?.length}</span>
           <span>Prize cards: {opponentPrizes.length}</span>
@@ -728,6 +745,7 @@ export default function Play() {
             setHeal={setHeal}
             setZoneModal={setZoneModal}
             socket={socket}
+            disablePlayer={disablePlayer}
           />
           <Bench
             hand={hand}
@@ -752,6 +770,7 @@ export default function Play() {
             yourName={yourName}
             setZoneModal={setZoneModal}
             socket={socket}
+            disablePlayer={disablePlayer}
           />
         </div>
         <div className="mt-2 bg-primary border border-2 rounded h-25 w-100">
@@ -764,6 +783,7 @@ export default function Play() {
             retreat={retreat}
             setRetreat={setRetreat}
             setToast={setToast}
+            disablePlayer={disablePlayer}
           />
         </div>
       </Container>
