@@ -10,6 +10,7 @@ export default class PokemonCard {
       abilities,
       attacks,
       weaknesses,
+      resistances,
       retreatCost,
       set,
       images,
@@ -23,6 +24,7 @@ export default class PokemonCard {
     this.abilities = abilities;
     this.attacks = attacks;
     this.weaknesses = weaknesses;
+    this.resistances = resistances;
     this.retreatCost = retreatCost;
     this.set = set.name;
     this.image = images.large || images.small;
@@ -38,6 +40,7 @@ export default class PokemonCard {
         immortal: false,
         posionedDamage: 0,
         paralyzedDamage: 0,
+        justPlayed: true
       },
       misc: [],
     };

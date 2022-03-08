@@ -26,7 +26,7 @@ export default function Items({ items }) {
                 overlay={<Tooltip>{item.name}</Tooltip>}
               >
                 <div
-                  className="m-1 item"
+                  className="item"
                   height="16rem"
                   width="16rem"
                   style={{

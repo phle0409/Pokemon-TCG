@@ -47,10 +47,10 @@ export default function Play() {
   const [secondaryAction, setSecondaryAction] = React.useState("");
   const [damage, setDamage] = React.useState(0);
   const [heal, setHeal] = React.useState(0);
-
   const [effect, setEffect] = React.useState("");
 
   const [activePlayer, setActivePlayer] = React.useState(false);
+  const [playedEnergy, setPlayedEnergy] = React.useState(false);
   const [endPhrase, setEndPhrase] = React.useState(false);
   const [disableAttack, setDisableAttack] = React.useState(true);
   const [disablePlayer, setDisablePlayer] = React.useState(true);
@@ -159,10 +159,10 @@ export default function Play() {
 
     socket.on("opponent-played-card", (board) => {
       const { deck, hand, active, bench, prizes, discard } = board;
-      setOpponentDeck(deck);
-      setOpponentHand(hand);
-      setOpponentActive(active);
-      setOpponentBench(bench);
+      if (deck && deck.cards.length > 0) setOpponentDeck(deck);
+      if (hand && hand.length > 0) setOpponentHand(hand);
+      if (active) setOpponentActive(active);
+      if (bench && bench.length > 0) setOpponentBench(bench);
       setOpponentPrizes(prizes);
       setOpponentDiscard(discard);
     });
@@ -171,14 +171,21 @@ export default function Play() {
       // If active user
       if (socket.id === activeId) {
         setToast({ show: true, text: "It's your turn." });
+
         // set active user
+        setToast({
+          show: true,
+          text: "Your turn",
+        });
         setActivePlayer(true);
+
         if (!firstTurn) setDisableAttack(false);
 
         setDisablePass(false);
         setDisablePlayer(false);
 
         // TODO: Check effect
+
       } else {
         if (firstTurn) {
           setDisablePlayer(false);
@@ -366,11 +373,20 @@ export default function Play() {
   }, [endPhrase]);
 
   React.useEffect(() => {
+    if (deck === undefined || deck.cards?.length === 0) return;
+
+    if (activePlayer) {
+      const card = deck.draw(1);
+      setHand([...hand, ...card]);
+    }
+  }, [activePlayer, setActivePlayer]);
+
+  React.useEffect(() => {
     if (damage === 0) return;
     let newActive = active;
     // Check if pokemon has immortal effect.
     if (newActive.effects.statusConditions.immortal === true) {
-      socket.emit("toast", `${newActive.name} activated immortal skill.`);
+      socket.emit("toast", `${newActive.name} was unaffected`);
       newActive.effects.statusConditions.immortal = false;
       setActive(newActive);
       socket.emit("played-card", {
@@ -443,7 +459,7 @@ export default function Play() {
   }, [heal]);
 
   React.useEffect(() => {
-    if (effect === "") return;
+    if (effect === "" || !active) return;
     let newActive = active;
 
     let damageEffect = damage;
@@ -535,7 +551,7 @@ export default function Play() {
 
     while (!openingHandBasic) {
       deck.shuffle();
-      const hand = deck.draw(11);
+      const hand = deck.draw(7);
       setHand(hand);
 
       for (const card of hand) {
@@ -581,6 +597,8 @@ export default function Play() {
         setEndPhrase={setEndPhrase}
         disableAttack={disableAttack}
         disablePass={disablePass}
+        opponentActive={opponentActive}
+
       />
       <ZoneModal
         show={zoneModal.show}
@@ -613,7 +631,7 @@ export default function Play() {
       <div className="bg-dark d-flex flex-column w-25 h-100">
         <div
           className={`
-         d-flex flex-column m-1 p-1 h-25 border-2 rounded current-player-border`}
+         d-flex flex-column m-1 p-1 h-25 border border-2 border-secondary rounded current-player-border`}
         >
           <span>
             <strong> Current Player: {yourName}</strong>
@@ -762,6 +780,8 @@ export default function Play() {
             setZoneModal={setZoneModal}
             socket={socket}
             disablePlayer={disablePlayer}
+            playedEnergy={playedEnergy}
+            setPlayedEnergy={setPlayedEnergy}
           />
           <Bench
             hand={hand}
@@ -787,6 +807,8 @@ export default function Play() {
             setZoneModal={setZoneModal}
             socket={socket}
             disablePlayer={disablePlayer}
+            playedEnergy={playedEnergy}
+            setPlayedEnergy={setPlayedEnergy}
           />
         </div>
         <div className="mt-2 bg-primary border border-2 rounded h-25 w-100">

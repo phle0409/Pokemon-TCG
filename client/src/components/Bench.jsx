@@ -35,6 +35,8 @@ export default function Bench({
   socket,
   yourName,
   disablePlayer,
+  playedEnergy,
+  setPlayedEnergy,
 }) {
   const handleClick = (e) => {
     if (disablePlayer) return;
@@ -57,11 +59,6 @@ export default function Bench({
         prizes,
         discard,
       });
-
-      setSelected(null);
-      setSelectedIndex(null);
-      setUsesTargeting(false);
-      setRetreat(false);
 
       if (selected?.name === "Switch") {
         const [newHand, newDiscard] = handToDiscard(
@@ -102,6 +99,7 @@ export default function Bench({
       setSelectedIndex(null);
       setUsesTargeting(false);
       setRetreat(false);
+      return;
     }
 
     if (!selected) {
@@ -116,26 +114,34 @@ export default function Bench({
     const { supertype, name, subtypes, evolvesFrom } = selected;
 
     if (supertype.includes("Energy")) {
-      const [newHand, newBench] = attachEnergyToBench(
-        hand,
-        selectedIndex,
-        setHand,
-        bench,
-        index,
-        setBench
-      );
-      socket.emit(
-        "toast",
-        `${yourName} attached ${name} to ${newBench[index].name}`
-      );
-      socket.emit("played-card", {
-        deck,
-        hand: newHand,
-        active,
-        bench: newBench,
-        discard,
-        prizes,
-      });
+      if (!playedEnergy) {
+        const [newHand, newBench] = attachEnergyToBench(
+          hand,
+          selectedIndex,
+          setHand,
+          bench,
+          index,
+          setBench
+        );
+        socket.emit(
+          "toast",
+          `${yourName} attached ${name} to ${newBench[index].name}`
+        );
+        socket.emit("played-card", {
+          deck,
+          hand: newHand,
+          active,
+          bench: newBench,
+          discard,
+          prizes,
+        });
+        setPlayedEnergy(true);
+      } else {
+        setToast({
+          show: true,
+          text: "You've already played an energy this turn"
+        });
+      }
     } else if (
       supertype.includes("Pokémon") &&
       evolvesFrom === bench[index].name

@@ -34,8 +34,8 @@ export default function Hand({
 
   return (
     <div className="d-flex flex-row justify-content-center w-100">
-      {hand.length > 0 ? (
-        hand?.map((card, index) => {
+      {hand?.length > 0 ? (
+        hand.map((card, index) => {
           return (
             <img
               className="my-2 mx-1 pkmn-card hand-card"

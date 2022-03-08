@@ -207,7 +207,7 @@ export default function ZoneModal({
         {cards?.map((card, index) => {
           return (
             <img
-              className={`m-1 pkmn-card table-card`}
+              className={`m-1 pkmn-card info-panel`}
               key={`modal-${index}`}
               id={`${card.name}-${card.set.name}-modal-${index}`}
               src={card.image}
