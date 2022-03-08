@@ -17,6 +17,8 @@ export default function AttackModal({
   setToast,
   setEffect,
   setZoneModal,
+  setEndPhrase,
+  disableAttack,
 }) {
   const canUseSkill = (costs, energies) => {
     let colorless = 0;
@@ -50,7 +52,7 @@ export default function AttackModal({
     const [name, damage, cost] = event.target.id.split("#");
     const costArray = cost.split(",");
     const energyForCheckSkill = [...selected.effects.energy];
-    if (canUseSkill(costArray, energyForCheckSkill)) {
+    if (!disableAttack && canUseSkill(costArray, energyForCheckSkill)) {
       const [actualDamage, effectSkill] = skillCalculate(
         name,
         damage,
@@ -61,10 +63,12 @@ export default function AttackModal({
         setZoneModal
       );
       setToast({ show: true, text: `Success use skill ${name}` });
-      console.log(actualDamage, effectSkill);
       socket.emit("attack", { actualDamage, effectSkill });
+      setEndPhrase(true);
     } else {
-      setToast({ show: true, text: `Cannot use skill ${name}` });
+      if (disableAttack) {
+        setToast({ show: true, text: `First turn, Cannot use skill ${name}` });
+      } else setToast({ show: true, text: `Cannot use skill ${name}` });
     }
 
     handleClose();
@@ -97,6 +101,11 @@ export default function AttackModal({
     setSelected(null);
     setSelectedIndex(null);
     setUsesTargeting(false);
+  };
+
+  const passButton = () => {
+    setEndPhrase(true);
+    handleClose();
   };
 
   if (!selected || selected.supertype !== "Pokémon")
@@ -178,7 +187,9 @@ export default function AttackModal({
         </Container>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="dark">Pass</Button>
+        <Button variant="dark" onClick={passButton}>
+          Pass
+        </Button>
         <Button variant="secondary" onClick={handleClose}>
           Cancel
         </Button>
