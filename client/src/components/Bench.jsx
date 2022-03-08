@@ -34,8 +34,10 @@ export default function Bench({
   setToast,
   socket,
   yourName,
+  disablePlayer,
 }) {
   const handleClick = (e) => {
+    if (disablePlayer) return;
     const [pokemonName, set, zone, index] = e.target.id.split("-");
 
     if (retreat) {
@@ -46,7 +48,6 @@ export default function Bench({
         active,
         setActive
       );
-
 
       socket.emit("played-card", {
         deck,
@@ -61,7 +62,6 @@ export default function Bench({
       setSelectedIndex(null);
       setUsesTargeting(false);
       setRetreat(false);
-
 
       if (selected?.name === "Switch") {
         const [newHand, newDiscard] = handToDiscard(
@@ -153,7 +153,7 @@ export default function Bench({
         index,
         setBench
       );
-      
+
       socket.emit(
         "toast",
         `${yourName} evolved ${newBench[index].name} into ${name}!`

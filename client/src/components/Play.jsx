@@ -49,6 +49,9 @@ export default function Play() {
   const [heal, setHeal] = React.useState(0);
 
   const [effect, setEffect] = React.useState("");
+  const [disablePlayer, setDisablePlayer] = React.useState(false);
+  const [activePlayer, setActivePlayer] = React.useState(false);
+  const [playedEnergy, setPlayedEnergy] = React.useState(false);
 
   const [damageBenched, setDamageBenched] = React.useState({
     index: null,
@@ -127,6 +130,10 @@ export default function Play() {
       }
     });
 
+    socket.on("wait-opponent", (msg) => {
+      setDisablePlayer(true);
+    });
+
     socket.on("player-name", (oppname) => {
       setOpponentName(oppname);
       socket.emit("other-player-name", username);
@@ -161,15 +168,30 @@ export default function Play() {
       setOpponentDiscard(discard);
     });
 
-    socket.on("opponent-attacked", ({ damage, effectSkill }) => {
+    socket.on("active-user", (id) => {
+      // If active user
+      if (socket.id === id) {
+        // set active user
+        setActivePlayer(true);
+        // TODO: Enable hand, active, bend
+        setDisablePlayer(false);
 
-      if (!damage) damage = 0;
+        // TODO: Check effect
 
-      setDamage(damage);
+        // TODO: Send end pharse
+        // socket.emit("end-pharse", socket.id);
+        // TODO: Disable hand, active, bend
+      }
+    });
+
+    socket.on("opponent-attacked", ({ actualDamage, effectSkill }) => {
+      console.log(`opponent damage ${actualDamage} effect ${effectSkill}`);
+      if (!actualDamage) actualDamage = 0;
+
+      setDamage(actualDamage);
       if (effectSkill) {
         setEffect(effectSkill);
       }
-
     });
 
     socket.on("knockout", () => {
@@ -222,7 +244,6 @@ export default function Play() {
     });
 
     socket.on("forced-retreat", (index) => {
-
       setForcedAction({
         action: "forced-retreat",
         targetIndex: index,
@@ -258,9 +279,22 @@ export default function Play() {
   }, [socket]);
 
   React.useEffect(() => {
+    if (activePlayer) {
+      document.querySelector(".current-player-border").style.backgroundColor =
+        "#89c499";
+      document.querySelector(".opponent-player-border").style.backgroundColor =
+        "#ffffff";
+    } else {
+      document.querySelector(".opponent-player-border").style.backgroundColor =
+        "#89c499";
+      document.querySelector(".current-player-border").style.backgroundColor =
+        "#ffffff";
+    }
+  }, [activePlayer]);
+
+  React.useEffect(() => {
     if (forcedAction.action === "") return;
     else if (forcedAction.action === "forced-retreat") {
-
       const [newActive, newBench] = benchToActive(
         bench,
         forcedAction.targetIndex,
@@ -277,9 +311,7 @@ export default function Play() {
         prizes,
         discard,
       });
-
     } else if (forcedAction.action === "forced-energy-discard-active") {
-      
       const [newActive, newDiscard] = discardEnergyFromActive(
         forcedAction.indices,
         active,
@@ -295,9 +327,7 @@ export default function Play() {
         discard: newDiscard,
         prizes,
       });
-
     } else if (forcedAction.action === "forced-energy-discard-bench") {
-
       const [newBench, newDiscard] = discardEnergyFromBench(
         forcedAction.indices,
         bench,
@@ -320,7 +350,6 @@ export default function Play() {
       targetIndex: null,
       indices: [],
     });
-
   }, [forcedAction.action]);
 
   React.useEffect(() => {
@@ -328,11 +357,20 @@ export default function Play() {
     let newActive = active;
     // Check if pokemon has immortal effect.
     if (newActive.effects.statusConditions.immortal === true) {
+      socket.emit("toast", `${newActive.name} activated immortal skill.`);
       newActive.effects.statusConditions.immortal = false;
       setActive(newActive);
+      socket.emit("played-card", {
+        deck,
+        hand,
+        active: newActive,
+        bench,
+        prizes,
+        discard,
+      });
+      setDamage(0);
       return;
     }
-
     newActive.effects.damage += parseInt(damage);
 
     if (parseInt(newActive.effects.damage) >= parseInt(newActive.hp)) {
@@ -397,7 +435,6 @@ export default function Play() {
 
     let damageEffect = damage;
     if (!damageEffect) damageEffect = 0;
-    console.log(effect);
 
     switch (effect) {
       case "posion":
@@ -410,6 +447,9 @@ export default function Play() {
         break;
       case "confused":
         newActive.effects.statusConditions.confused = true;
+        break;
+      case "immortal":
+        newActive.effects.statusConditions.immortal = true;
         break;
       default:
         newActive.effects.statusConditions.asleep = true;
@@ -521,8 +561,10 @@ export default function Play() {
         setSelectedIndex={setSelectedIndex}
         setUsesTargeting={setUsesTargeting}
         setHeal={setHeal}
+        setEffect={setEffect}
         socket={socket}
         setToast={setToast}
+        setZoneModal={setZoneModal}
       />
       <ZoneModal
         show={zoneModal.show}
@@ -554,15 +596,11 @@ export default function Play() {
       />
       <div className="bg-dark d-flex flex-column w-25 h-100">
         <div
-          className={`${
-            gameStatus.playerTurn === yourName
-              ? `border border-success`
-              : `border border-secondary`
-          }
-        bg-light d-flex flex-column m-1 p-1 h-25 border-2 rounded`}
+          className={`
+         d-flex flex-column m-1 p-1 h-25 border-2 rounded current-player-border`}
         >
           <span>
-            <strong>{yourName}</strong>
+            <strong> Current Player: {yourName}</strong>
           </span>
           <span>Cards in deck: {deck.cards?.length}</span>
           <span>Prize cards: {prizes.length}</span>
@@ -580,9 +618,9 @@ export default function Play() {
             Cards in discard: {discard.length}
           </button>
         </div>
-        <div className="bg-light d-flex flex-column m-1 p-2 h-25 border border-secondary border-2 rounded">
+        <div className="d-flex flex-column m-1 p-2 h-25 border border-secondary border-2 rounded  opponent-player-border">
           <span>
-            <strong>{opponentName}</strong>
+            <strong>Opponent Player: {opponentName}</strong>
           </span>
           <span>Cards in deck: {opponentDeck.cards?.length}</span>
           <span>Prize cards: {opponentPrizes.length}</span>
@@ -671,7 +709,6 @@ export default function Play() {
             discard={discard}
             setDiscard={setDiscard}
             prizes={prizes}
-            opponentActive={opponentActive}
             selected={selected}
             setSelected={setSelected}
             selectedIndex={selectedIndex}
@@ -708,6 +745,7 @@ export default function Play() {
             setHeal={setHeal}
             setZoneModal={setZoneModal}
             socket={socket}
+            disablePlayer={disablePlayer}
           />
           <Bench
             hand={hand}
@@ -732,6 +770,7 @@ export default function Play() {
             yourName={yourName}
             setZoneModal={setZoneModal}
             socket={socket}
+            disablePlayer={disablePlayer}
           />
         </div>
         <div className="mt-2 bg-primary border border-2 rounded h-25 w-100">
@@ -744,6 +783,7 @@ export default function Play() {
             retreat={retreat}
             setRetreat={setRetreat}
             setToast={setToast}
+            disablePlayer={disablePlayer}
           />
         </div>
       </Container>

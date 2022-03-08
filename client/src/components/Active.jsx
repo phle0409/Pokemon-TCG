@@ -34,8 +34,10 @@ export default function Active({
   setZoneModal,
   setToast,
   socket,
+  disablePlayer,
 }) {
   const handleClick = (e) => {
+    if (disablePlayer) return;
     if (retreat) {
       setToast({
         show: true,

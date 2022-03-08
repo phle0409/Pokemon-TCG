@@ -15,6 +15,8 @@ export default function AttackModal({
   setUsesTargeting,
   setHeal,
   setToast,
+  setEffect,
+  setZoneModal,
 }) {
   const canUseSkill = (costs, energies) => {
     let colorless = 0;
@@ -52,13 +54,15 @@ export default function AttackModal({
       const [actualDamage, effectSkill] = skillCalculate(
         name,
         damage,
-        selected.effects.energy,
         selected,
         setDamage,
-        setHeal
+        setHeal,
+        setEffect,
+        setZoneModal
       );
       setToast({ show: true, text: `Success use skill ${name}` });
-      socket.emit("attack", { damage, effectSkill });
+      console.log(actualDamage, effectSkill);
+      socket.emit("attack", { actualDamage, effectSkill });
     } else {
       setToast({ show: true, text: `Cannot use skill ${name}` });
     }
