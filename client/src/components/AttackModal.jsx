@@ -66,6 +66,7 @@ export default function AttackModal({
       );
       let superEffective = false;
       let notVeryEffective = false;
+
       if (
         opponentActive?.weaknesses &&
         selected.types[0] === opponentActive.weaknesses[0].type

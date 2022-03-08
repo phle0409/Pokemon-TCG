@@ -182,7 +182,10 @@ export default function Play() {
         // set active user
         setActivePlayer(true);
         setPlayedEnergy(false);
-        if (!firstTurn) setDisableAttack(false);
+        if (!firstTurn) {
+          setDisableAttack(false);
+          setDisablePass(false);
+        }
         setDisablePlayer(false);
       } else {
         if (firstTurn) {
