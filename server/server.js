@@ -53,7 +53,7 @@ io.on("connection", (socket) => {
       // join room
       socket.join(user.roomID);
       socket.emit("message", "join");
-      socket.emit("wait-opponent", `wait`);
+
       if (isRoomFull(roomID)) {
         let users = getAllUsersByRoom(roomID);
         let firstTurn = true;
@@ -62,7 +62,7 @@ io.on("connection", (socket) => {
           if (!flipCoin()) {
             activeId = users[1].id;
           }
-          io.to(getUserByID(socket.id).roomID).emit("active-user", {
+          io.to(roomID).emit("active-user", {
             activeId,
             firstTurn,
           });
@@ -72,8 +72,6 @@ io.on("connection", (socket) => {
 
     socket.on("end-phrase", (id) => {
       let activeId = getIdOpponentInRoom(id);
-      console.log("current id", id);
-      console.log("opponent id", activeId);
       let firstTurn = false;
       io.to(getUserByID(socket.id).roomID).emit("active-user", {
         activeId,

@@ -48,11 +48,13 @@ export default function Play() {
   const [damage, setDamage] = React.useState(0);
   const [heal, setHeal] = React.useState(0);
   const [effect, setEffect] = React.useState("");
-  const [disablePlayer, setDisablePlayer] = React.useState(false);
+
   const [activePlayer, setActivePlayer] = React.useState(false);
   const [playedEnergy, setPlayedEnergy] = React.useState(false);
   const [endPhrase, setEndPhrase] = React.useState(false);
-  const [disableAttack, setDisableAttack] = React.useState(false);
+  const [disableAttack, setDisableAttack] = React.useState(true);
+  const [disablePlayer, setDisablePlayer] = React.useState(true);
+  const [disablePass, setDisablePass] = React.useState(true);
 
   const [damageBenched, setDamageBenched] = React.useState({
     index: null,
@@ -131,10 +133,6 @@ export default function Play() {
       }
     });
 
-    socket.on("wait-opponent", (msg) => {
-      setDisablePlayer(true);
-    });
-
     socket.on("player-name", (oppname) => {
       setOpponentName(oppname);
       socket.emit("other-player-name", username);
@@ -172,24 +170,27 @@ export default function Play() {
     socket.on("active-user", ({ activeId, firstTurn }) => {
       // If active user
       if (socket.id === activeId) {
-        console.log(activeId, firstTurn);
-        console.log(deck);
+        setToast({ show: true, text: "It's your turn." });
+
         // set active user
         setToast({
           show: true,
           text: "Your turn",
         });
         setActivePlayer(true);
-        setPlayedEnergy(false);
-        if (firstTurn) setDisableAttack(true);
-        else setDisableAttack(false);
+
+        if (!firstTurn) setDisableAttack(false);
+
+        setDisablePass(false);
         setDisablePlayer(false);
 
         // TODO: Check effect
-        // TODO: Send end pharse
-        // socket.emit("end-pharse", socket.id);
-        // TODO: Disable hand, active, bend
+
       } else {
+        if (firstTurn) {
+          setDisablePlayer(false);
+        }
+        setDisablePass(true);
         setActivePlayer(false);
       }
     });
@@ -595,7 +596,9 @@ export default function Play() {
         setZoneModal={setZoneModal}
         setEndPhrase={setEndPhrase}
         disableAttack={disableAttack}
+        disablePass={disablePass}
         opponentActive={opponentActive}
+
       />
       <ZoneModal
         show={zoneModal.show}
