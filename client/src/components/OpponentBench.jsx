@@ -111,7 +111,7 @@ export default function OpponentBench({
                 id={`${card.name}-${card.set.name}-opponentbench-${index}`}
                 onClick={handleClick}
               />
-              <div className="d-flex flex-column" style={{ width: "7rem" }}>
+              <div className="d-flex flex-column align-items-center" style={{ width: "7rem" }}>
                 <div className="d-flex align-items-center justify-content-center">
                   {`${card.hp - card.effects.damage}/${card.hp} HP`}
                 </div>

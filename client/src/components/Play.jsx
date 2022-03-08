@@ -161,10 +161,10 @@ export default function Play() {
 
     socket.on("opponent-played-card", (board) => {
       const { deck, hand, active, bench, prizes, discard } = board;
-      setOpponentDeck(deck);
-      setOpponentHand(hand);
-      setOpponentActive(active);
-      setOpponentBench(bench);
+      if (deck && deck.cards.length > 0) setOpponentDeck(deck);
+      if (hand && hand.length > 0) setOpponentHand(hand);
+      if (active) setOpponentActive(active);
+      if (bench && bench.length > 0) setOpponentBench(bench);
       setOpponentPrizes(prizes);
       setOpponentDiscard(discard);
     });
@@ -173,16 +173,16 @@ export default function Play() {
       // If active user
       if (socket.id === activeId) {
         console.log(activeId, firstTurn);
+        console.log(deck);
         // set active user
         setToast({
           show: true,
-          text: "Your turn"
-        })
+          text: "Your turn",
+        });
         setActivePlayer(true);
         setPlayedEnergy(false);
         if (firstTurn) setDisableAttack(true);
         else setDisableAttack(false);
-        // TODO: Enable hand, active, bend
         setDisablePlayer(false);
 
         // TODO: Check effect
@@ -372,11 +372,20 @@ export default function Play() {
   }, [endPhrase]);
 
   React.useEffect(() => {
+    if (deck === undefined || deck.cards?.length === 0) return;
+
+    if (activePlayer) {
+      const card = deck.draw(1);
+      setHand([...hand, ...card]);
+    }
+  }, [activePlayer, setActivePlayer]);
+
+  React.useEffect(() => {
     if (damage === 0) return;
     let newActive = active;
     // Check if pokemon has immortal effect.
     if (newActive.effects.statusConditions.immortal === true) {
-      socket.emit("toast", `${newActive.name} activated immortal skill.`);
+      socket.emit("toast", `${newActive.name} was unaffected`);
       newActive.effects.statusConditions.immortal = false;
       setActive(newActive);
       socket.emit("played-card", {
@@ -449,7 +458,7 @@ export default function Play() {
   }, [heal]);
 
   React.useEffect(() => {
-    if (effect === "") return;
+    if (effect === "" || !active) return;
     let newActive = active;
 
     let damageEffect = damage;
@@ -541,7 +550,7 @@ export default function Play() {
 
     while (!openingHandBasic) {
       deck.shuffle();
-      const hand = deck.draw(11);
+      const hand = deck.draw(7);
       setHand(hand);
 
       for (const card of hand) {
@@ -586,6 +595,7 @@ export default function Play() {
         setZoneModal={setZoneModal}
         setEndPhrase={setEndPhrase}
         disableAttack={disableAttack}
+        opponentActive={opponentActive}
       />
       <ZoneModal
         show={zoneModal.show}
