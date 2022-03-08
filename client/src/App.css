@@ -76,6 +76,10 @@ body,
   animation: gelatine 0.5s ease 2;
 }
 
+.side-panel {
+  width: 20rem;
+}
+
 .info-panel {
   animation: fade-in-down 0.5s ease 1;
 }

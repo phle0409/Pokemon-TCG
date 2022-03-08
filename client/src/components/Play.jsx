@@ -1,7 +1,7 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
-import { Container } from "react-bootstrap";
+import { ButtonGroup, Button, Container } from "react-bootstrap";
 import { fetchDeck } from "../utils/createDeck.js";
 import {
   activeToDiscard,
@@ -625,51 +625,68 @@ export default function Play() {
         prizes={prizes}
         socket={socket}
       />
-      <div className="bg-dark d-flex flex-column w-25 h-100">
+      <div className="side-panel bg-dark d-flex flex-column h-100">
         <div
           className={`
-         d-flex flex-column m-1 p-1 h-25 border border-2 border-secondary rounded current-player-border`}
+         d-flex flex-column justify-content-between m-1 p-2 border border-2 border-secondary rounded current-player-border`}
         >
-          <span>
-            <strong> Current Player: {yourName}</strong>
+          <span className="mb-2">
+            <strong>{yourName}</strong>
           </span>
-          <span>Cards in deck: {deck.cards?.length}</span>
-          <span>Prize cards: {prizes.length}</span>
-          <span>Cards in hand: {hand.length}</span>
-          <button
-            onClick={() => {
-              setZoneModal({
-                show: true,
-                zone: "Your discard pile",
-                numTargets: 0,
-                cards: discard,
-              });
-            }}
-          >
-            Cards in discard: {discard.length}
-          </button>
+          <ButtonGroup size="sm">
+            <Button>
+              <i className="bi bi-box"></i> {deck?.cards?.length}
+            </Button>
+            <Button>
+              <i className="bi bi-square"></i> {hand?.length}
+            </Button>
+            <Button
+              onClick={() => {
+                setZoneModal({
+                  show: true,
+                  zone: "Your discard pile",
+                  numTargets: 0,
+                  cards: discard,
+                });
+              }}
+            >
+              <i className="bi bi-arrow-down-circle"></i> {discard?.length}
+            </Button>
+            <Button>
+              <i className="bi bi-star"></i> {prizes?.length}
+            </Button>
+          </ButtonGroup>
         </div>
-        <div className="d-flex flex-column m-1 p-2 h-25 border border-secondary border-2 rounded  opponent-player-border">
-          <span>
-            <strong>Opponent Player: {opponentName}</strong>
+        <div className="d-flex flex-column justify-content-between m-1 p-2 border border-secondary border-2 rounded  opponent-player-border">
+          <span className="mb-2">
+            <strong>{opponentName}</strong>
           </span>
-          <span>Cards in deck: {opponentDeck.cards?.length}</span>
-          <span>Prize cards: {opponentPrizes.length}</span>
-          <span>Cards in hand: {opponentHand.length}</span>
-          <button
-            onClick={() =>
-              setZoneModal({
-                show: true,
-                zone: "Your opponent's discard pile",
-                numTargets: 0,
-                cards: opponentDiscard,
-              })
-            }
-          >
-            Cards in discard: {opponentDiscard.length}
-          </button>
+          <ButtonGroup size="sm" variant="dark">
+            <Button>
+              <i className="bi bi-box"></i> {opponentDeck?.cards?.length || "0"}
+            </Button>
+            <Button>
+              <i className="bi bi-square"></i> {opponentHand?.length}
+            </Button>
+            <Button
+              onClick={() => {
+                setZoneModal({
+                  show: true,
+                  zone: "Your opponent's discard pile",
+                  numTargets: 0,
+                  cards: opponentDiscard,
+                });
+              }}
+            >
+              <i className="bi bi-arrow-down-circle"></i>{" "}
+              {opponentDiscard?.length}
+            </Button>
+            <Button>
+              <i className="bi bi-star"></i> {opponentPrizes?.length}
+            </Button>
+          </ButtonGroup>
         </div>
-        <div className="bg-light d-flex flex-column m-1 p-2 h-50 border border-secondary border-2 rounded">
+        <div className="bg-light d-flex flex-column flex-grow-1 m-1 p-2 border border-secondary border-2 rounded">
           <InfoPanel
             selected={selected}
             setSelected={setSelected}
@@ -808,7 +825,7 @@ export default function Play() {
             setPlayedEnergy={setPlayedEnergy}
           />
         </div>
-        <div className="mt-2 bg-primary border border-2 rounded h-25 w-100">
+        <div className="d-flex justify-content-center mt-2 bg-primary border border-2 rounded h-25 w-100">
           <Hand
             hand={hand}
             setHand={setHand}
