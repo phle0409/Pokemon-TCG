@@ -66,12 +66,15 @@ export default function AttackModal({
       );
       let superEffective = false;
       let notVeryEffective = false;
-      if (opponentActive?.weaknesses && selected.types[0] === opponentActive.weaknesses[0].type) {
+      if (
+        opponentActive?.weaknesses &&
+        selected.types[0] === opponentActive.weaknesses[0].type
+      ) {
         superEffective = true;
         actualDamage *= 2;
       }
       if (
-        opponentActive.resistances &&
+        opponentActive?.resistances &&
         selected.types[0] === opponentActive.resistances[0].type
       ) {
         notVeryEffective = true;
@@ -123,7 +126,7 @@ export default function AttackModal({
     }
     const { retreatCost, effects } = selected;
 
-    if (effects.energy.length < retreatCost.length) {
+    if (retreatCost?.length && effects.energy.length < retreatCost.length) {
       setToast({
         show: true,
         text: "You do not have enough energy to retreat",
@@ -131,13 +134,15 @@ export default function AttackModal({
       return;
     }
 
-    setZoneModal({
-      show: true,
-      zone: `Choose ${retreatCost.length} energy to discard`,
-      numTargets: retreatCost.length,
-      cards: effects.attachments,
-      action: "discard energy from active",
-    });
+    if (retreatCost?.length > 0) {
+      setZoneModal({
+        show: true,
+        zone: `Choose ${retreatCost.length} energy to discard`,
+        numTargets: retreatCost.length,
+        cards: effects.attachments,
+        action: "discard energy from active",
+      });
+    }
 
     setSelected(null);
     setSelectedIndex(null);
