@@ -1,5 +1,5 @@
-import React from 'react';
-import { Container, Tab, Tabs } from 'react-bootstrap';
+import React from "react";
+import { Container, Tab, Tabs } from "react-bootstrap";
 
 export default function HowToPlay() {
   return (
@@ -12,7 +12,7 @@ export default function HowToPlay() {
         <Tab eventKey="intro" title="Intro">
           <div className="row bg-light">
             <div className="col-5">
-              <h2 class="text-secondary fw-bold">Intro Pokémon TCG</h2>
+              <h2 className="text-secondary fw-bold">Intro Pokémon TCG</h2>
               <p className="lead">
                 The Pokémon Trading Card Game is a 2-player game in which
                 players use 60-card decks to battle. In the Pokémon TCG, players
@@ -24,14 +24,14 @@ export default function HowToPlay() {
             <div className="col-7">
               <img
                 className="img-fluid"
-                src={require('../images/how_to_play/intro.png')}
+                src={require("../images/how_to_play/intro.png")}
                 alt="intro"
               />
             </div>
           </div>
         </Tab>
         <Tab eventKey="info" title="General Game Info">
-          <h1 class="text-secondary fw-bold text-center">
+          <h1 className="text-secondary fw-bold text-center">
             Pokemon TCG Basic Concepts
           </h1>
           <section className="bg-light my-3">
@@ -49,7 +49,7 @@ export default function HowToPlay() {
               <div className="col-7">
                 <img
                   className="img-fluid"
-                  src={require('../images/how_to_play/prize_card.png')}
+                  src={require("../images/how_to_play/prize_card.png")}
                   alt="prize_card"
                 />
               </div>
@@ -61,7 +61,7 @@ export default function HowToPlay() {
               <div className="col-7">
                 <img
                   className="img-fluid"
-                  src={require('../images/how_to_play/energy_card.png')}
+                  src={require("../images/how_to_play/energy_card.png")}
                   alt="prize_card"
                 />
               </div>
@@ -122,12 +122,12 @@ export default function HowToPlay() {
               <div className="col-7">
                 <img
                   className="img-fluid"
-                  src={require('../images/how_to_play/part_1.png')}
+                  src={require("../images/how_to_play/part_1.png")}
                   alt="prize_card"
                 />
                 <img
                   className="img-fluid"
-                  src={require('../images/how_to_play/part_2.png')}
+                  src={require("../images/how_to_play/part_2.png")}
                   alt="prize_card"
                 />
               </div>
@@ -155,7 +155,7 @@ export default function HowToPlay() {
               <div className="col-7">
                 <img
                   className="img-fluid"
-                  src={require('../images/how_to_play/type_1.png')}
+                  src={require("../images/how_to_play/type_1.png")}
                   alt="prize_card"
                 />
               </div>
@@ -174,7 +174,7 @@ export default function HowToPlay() {
               <div className="col-7">
                 <img
                   className="img-fluid"
-                  src={require('../images/how_to_play/type_2.png')}
+                  src={require("../images/how_to_play/type_2.png")}
                   alt="prize_card"
                 />
               </div>
@@ -194,7 +194,7 @@ export default function HowToPlay() {
               <div className="col-7">
                 <img
                   className="img-fluid"
-                  src={require('../images/how_to_play/type_3.png')}
+                  src={require("../images/how_to_play/type_3.png")}
                   alt="type_3"
                 />
               </div>
@@ -203,13 +203,13 @@ export default function HowToPlay() {
         </Tab>
 
         <Tab eventKey="play" title="How To Play">
-          <h1 class="text-secondary fw-bold text-center">How To Play</h1>
+          <h1 className="text-secondary fw-bold text-center">How To Play</h1>
 
           <section className="bg-white my-4 ">
             <div className="row">
               <div className="col-6">
                 <h3 className="pt-3 text-info fw-bold ps-2">
-                  {' '}
+                  {" "}
                   Setting Up To Play
                 </h3>
                 <ol className="ps-5">
@@ -245,7 +245,7 @@ export default function HowToPlay() {
               <div className="col-6">
                 <img
                   className="img-fluid"
-                  src={require('../images/how_to_play/setting_up.png')}
+                  src={require("../images/how_to_play/setting_up.png")}
                   alt="setting_up"
                 />
               </div>
@@ -297,7 +297,7 @@ export default function HowToPlay() {
                         <div className="col-6">
                           <img
                             className="img-fluid"
-                            src={require('../images/how_to_play/attack.png')}
+                            src={require("../images/how_to_play/attack.png")}
                             alt="attack"
                           />
                         </div>
