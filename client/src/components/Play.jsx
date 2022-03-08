@@ -51,6 +51,9 @@ export default function Play() {
   const [disablePlayer, setDisablePlayer] = React.useState(false);
   const [activePlayer, setActivePlayer] = React.useState(false);
   const [playedEnergy, setPlayedEnergy] = React.useState(false);
+  const [endPhrase, setEndPhrase] = React.useState(false);
+  const [disableAttack, setDisableAttack] = React.useState(false);
+
   const [damageBenched, setDamageBenched] = React.useState({
     index: null,
     damage: 0,
@@ -166,12 +169,15 @@ export default function Play() {
       setOpponentDiscard(discard);
     });
 
-    socket.on("active-user", (id) => {
+    socket.on("active-user", ({ activeId, firstTurn }) => {
       // If active user
-      if (socket.id === id) {
+      if (socket.id === activeId) {
+        console.log(activeId, firstTurn);
         // set active user
         setActivePlayer(true);
         setPlayedEnergy(false);
+        if (firstTurn) setDisableAttack(true);
+        else setDisableAttack(false);
         // TODO: Enable hand, active, bend
         setDisablePlayer(false);
 
@@ -179,6 +185,8 @@ export default function Play() {
         // TODO: Send end pharse
         // socket.emit("end-pharse", socket.id);
         // TODO: Disable hand, active, bend
+      } else {
+        setActivePlayer(false);
       }
     });
 
@@ -349,6 +357,15 @@ export default function Play() {
       indices: [],
     });
   }, [forcedAction.action]);
+
+  React.useEffect(() => {
+    if (!endPhrase) return;
+
+    socket.emit("end-phrase", socket.id);
+    setDisablePlayer(true);
+
+    setEndPhrase(false);
+  }, [endPhrase]);
 
   React.useEffect(() => {
     if (damage === 0) return;
@@ -563,6 +580,8 @@ export default function Play() {
         socket={socket}
         setToast={setToast}
         setZoneModal={setZoneModal}
+        setEndPhrase={setEndPhrase}
+        disableAttack={disableAttack}
       />
       <ZoneModal
         show={zoneModal.show}

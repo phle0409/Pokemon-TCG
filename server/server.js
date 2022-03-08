@@ -15,9 +15,9 @@ const {
   userJoinRoom,
   userLeaveRoom,
   getUserByID,
-  getAllUsersInRoomByID,
   getAllUsersByRoom,
   flipCoin,
+  getIdOpponentInRoom,
 } = require("./users/users");
 
 app.use(cors());
@@ -56,15 +56,30 @@ io.on("connection", (socket) => {
       socket.emit("wait-opponent", `wait`);
       if (isRoomFull(roomID)) {
         let users = getAllUsersByRoom(roomID);
+        let firstTurn = true;
         if (users) {
-          let firstID = users[0].id;
-          // if (!flipCoin()) {
-          //   firstID = users[1].id;
-          // }
-          io.to(getUserByID(socket.id).roomID).emit("active-user", firstID);
+          let activeId = users[0].id;
+          if (!flipCoin()) {
+            activeId = users[1].id;
+          }
+          io.to(getUserByID(socket.id).roomID).emit("active-user", {
+            activeId,
+            firstTurn,
+          });
         }
       }
     }
+
+    socket.on("end-phrase", (id) => {
+      let activeId = getIdOpponentInRoom(id);
+      console.log("current id", id);
+      console.log("opponent id", activeId);
+      let firstTurn = false;
+      io.to(getUserByID(socket.id).roomID).emit("active-user", {
+        activeId,
+        firstTurn,
+      });
+    });
 
     socket.on("player-joined", (id) => {
       const user = getUserByID(socket.id);

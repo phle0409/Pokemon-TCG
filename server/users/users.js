@@ -29,7 +29,15 @@ const getAllUsersInRoomByID = (id) => {
   const user = users.find((user) => user.id === id);
   if (user) {
     const room = user.roomID;
-    return users.find((user) => user.roomID === room);
+    return users.filter((user) => user.roomID === room);
+  }
+};
+
+const getIdOpponentInRoom = (currentId) => {
+  const usersRoom = getAllUsersInRoomByID(currentId);
+  if (usersRoom) {
+    const opponent = usersRoom.filter((user) => user.id != currentId);
+    return opponent[0].id;
   }
 };
 
@@ -55,4 +63,5 @@ module.exports = {
   getAllUsersInRoomByID,
   getAllUsersByRoom,
   flipCoin,
+  getIdOpponentInRoom,
 };
