@@ -20,6 +20,8 @@ export const isTargetedItem = (item) => {
       return true;
     case "Professor Oak":
       return false;
+    case "Super Energy Removal":
+      return true;
     case "Super Potion":
       return true;
     case "Switch":

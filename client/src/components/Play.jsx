@@ -1,7 +1,7 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
-import { Container } from "react-bootstrap";
+import { ButtonGroup, Button, Container } from "react-bootstrap";
 import { fetchDeck } from "../utils/createDeck.js";
 import {
   activeToDiscard,
@@ -49,7 +49,6 @@ export default function Play() {
   const [damage, setDamage] = React.useState(0);
   const [heal, setHeal] = React.useState(0);
   const [effect, setEffect] = React.useState("");
-
   const [activePlayer, setActivePlayer] = React.useState(false);
   const [playedEnergy, setPlayedEnergy] = React.useState(false);
   const [endPhrase, setEndPhrase] = React.useState(false);
@@ -161,12 +160,12 @@ export default function Play() {
 
     socket.on("opponent-played-card", (board) => {
       const { deck, hand, active, bench, prizes, discard } = board;
-      if (deck && deck.cards.length > 0) setOpponentDeck(deck);
-      if (hand && hand.length > 0) setOpponentHand(hand);
-      if (active) setOpponentActive(active);
-      if (bench && bench.length > 0) setOpponentBench(bench);
-      setOpponentPrizes(prizes);
-      setOpponentDiscard(discard);
+      if (deck) setOpponentDeck(deck);
+      if (hand) setOpponentHand(hand);
+      setOpponentActive(active);
+      if (bench) setOpponentBench(bench);
+      if (prizes) setOpponentPrizes(prizes);
+      if (discard) setOpponentDiscard(discard);
     });
 
     socket.on("active-user", ({ activeId, firstTurn }) => {
@@ -174,16 +173,16 @@ export default function Play() {
       if (socket.id === activeId) {
         setToast({ show: true, text: "It's your turn." });
 
+
         setToast({
           show: true,
           text: "Your turn",
         });
+
         // set active user
         setActivePlayer(true);
-
+        setPlayedEnergy(false);
         if (!firstTurn) setDisableAttack(false);
-
-        setDisablePass(false);
         setDisablePlayer(false);
       } else {
         if (firstTurn) {
@@ -287,6 +286,10 @@ export default function Play() {
       setOpponentBench([]);
     });
   }, [socket]);
+
+  React.useEffect(() => {
+    if (disablePass && active && opponentActive) setDisablePass(false);
+  }, [active, opponentActive]);
 
   React.useEffect(() => {
     if (activePlayer) {
@@ -571,6 +574,17 @@ export default function Play() {
         cards: deck.cards,
         action: "search deck",
       });
+    } else if (secondaryAction === "make opponent active discard 2 energy") {
+      let targets = opponentActive.effects.energy.length;
+      if (targets > 2) targets = 2;
+
+      setZoneModal({
+        show: true,
+        zone: "Select up to 2 energy cards to discard from the opponent",
+        numTargets: targets,
+        cards: opponentActive.effects.attachments,
+        action: "make opponent discard energy from active",
+      });
     }
 
     setSecondaryAction("");
@@ -657,51 +671,68 @@ export default function Play() {
         prizes={prizes}
         socket={socket}
       />
-      <div className="bg-dark d-flex flex-column w-25 h-100">
+      <div className="side-panel bg-dark d-flex flex-column h-100">
         <div
           className={`
-         d-flex flex-column m-1 p-1 h-25 border border-2 border-secondary rounded current-player-border`}
+         d-flex flex-column justify-content-between m-1 p-2 border border-2 border-secondary rounded current-player-border`}
         >
-          <span>
-            <strong> Current Player: {yourName}</strong>
+          <span className="mb-2">
+            <strong>{yourName}</strong>
           </span>
-          <span>Cards in deck: {deck.cards?.length}</span>
-          <span>Prize cards: {prizes.length}</span>
-          <span>Cards in hand: {hand.length}</span>
-          <button
-            onClick={() => {
-              setZoneModal({
-                show: true,
-                zone: "Your discard pile",
-                numTargets: 0,
-                cards: discard,
-              });
-            }}
-          >
-            Cards in discard: {discard.length}
-          </button>
+          <ButtonGroup size="sm">
+            <Button>
+              <i className="bi bi-box"></i> {deck?.cards?.length}
+            </Button>
+            <Button>
+              <i className="bi bi-square"></i> {hand?.length}
+            </Button>
+            <Button
+              onClick={() => {
+                setZoneModal({
+                  show: true,
+                  zone: "Your discard pile",
+                  numTargets: 0,
+                  cards: discard,
+                });
+              }}
+            >
+              <i className="bi bi-arrow-down-circle"></i> {discard?.length}
+            </Button>
+            <Button>
+              <i className="bi bi-star"></i> {prizes?.length}
+            </Button>
+          </ButtonGroup>
         </div>
-        <div className="d-flex flex-column m-1 p-2 h-25 border border-secondary border-2 rounded  opponent-player-border">
-          <span>
-            <strong>Opponent Player: {opponentName}</strong>
+        <div className="d-flex flex-column justify-content-between m-1 p-2 border border-secondary border-2 rounded  opponent-player-border">
+          <span className="mb-2">
+            <strong>{opponentName}</strong>
           </span>
-          <span>Cards in deck: {opponentDeck.cards?.length}</span>
-          <span>Prize cards: {opponentPrizes.length}</span>
-          <span>Cards in hand: {opponentHand.length}</span>
-          <button
-            onClick={() =>
-              setZoneModal({
-                show: true,
-                zone: "Your opponent's discard pile",
-                numTargets: 0,
-                cards: opponentDiscard,
-              })
-            }
-          >
-            Cards in discard: {opponentDiscard.length}
-          </button>
+          <ButtonGroup size="sm" variant="dark">
+            <Button>
+              <i className="bi bi-box"></i> {opponentDeck?.cards?.length || "0"}
+            </Button>
+            <Button>
+              <i className="bi bi-square"></i> {opponentHand?.length}
+            </Button>
+            <Button
+              onClick={() => {
+                setZoneModal({
+                  show: true,
+                  zone: "Your opponent's discard pile",
+                  numTargets: 0,
+                  cards: opponentDiscard,
+                });
+              }}
+            >
+              <i className="bi bi-arrow-down-circle"></i>{" "}
+              {opponentDiscard?.length}
+            </Button>
+            <Button>
+              <i className="bi bi-star"></i> {opponentPrizes?.length}
+            </Button>
+          </ButtonGroup>
         </div>
-        <div className="bg-light d-flex flex-column m-1 p-2 h-50 border border-secondary border-2 rounded">
+        <div className="bg-light d-flex flex-column flex-grow-1 m-1 p-2 border border-secondary border-2 rounded">
           <InfoPanel
             selected={selected}
             setSelected={setSelected}
@@ -727,6 +758,7 @@ export default function Play() {
             yourName={yourName}
             setToast={setToast}
             setZoneModal={setZoneModal}
+            disableAttack={disableAttack}
             socket={socket}
           />
         </div>
@@ -840,13 +872,11 @@ export default function Play() {
             setPlayedEnergy={setPlayedEnergy}
           />
         </div>
-        <div className="mt-2 bg-primary border border-2 rounded h-25 w-100">
+        <div className="d-flex justify-content-center mt-2 bg-primary border border-2 rounded h-25 w-100">
           <Hand
             hand={hand}
-            setHand={setHand}
             setSelected={setSelected}
             setSelectedIndex={setSelectedIndex}
-            selectedIndex={selectedIndex}
             retreat={retreat}
             setRetreat={setRetreat}
             setToast={setToast}

@@ -2,10 +2,8 @@ import React from "react";
 
 export default function Hand({
   hand,
-  setHand,
   setSelected,
   setSelectedIndex,
-  selectedIndex,
   retreat,
   setRetreat,
   setToast,
@@ -33,7 +31,7 @@ export default function Hand({
   };
 
   return (
-    <div className="d-flex flex-row justify-content-center w-100">
+    <div className="d-flex flex-row justify-content-center">
       {hand?.length > 0 ? (
         hand.map((card, index) => {
           return (
