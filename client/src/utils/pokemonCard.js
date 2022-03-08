@@ -38,6 +38,7 @@ export default class PokemonCard {
         immortal: false,
         posionedDamage: 0,
         paralyzedDamage: 0,
+        justPlayed: true
       },
       misc: [],
     };

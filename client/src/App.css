@@ -8,6 +8,30 @@ body,
   height: 100vh;
 }
 
+* {
+  font-family: "Roboto Mono", monospace;
+}
+
+.main-content {
+  max-width: 64rem;
+}
+
+.pre-deck {
+  height: auto;
+  width: 50%;
+}
+
+.pre-deck:hover {
+  cursor: pointer;
+}
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 24rem;
+}
+
 .pkmn-card {
   height: 6.125rem;
   transition: 0.5s;

@@ -35,6 +35,8 @@ export default function Active({
   setToast,
   socket,
   disablePlayer,
+  playedEnergy,
+  setPlayedEnergy
 }) {
   const handleClick = (e) => {
     if (disablePlayer) return;
@@ -58,24 +60,35 @@ export default function Active({
     const { supertype, name, evolvesFrom } = selected;
 
     if (supertype.includes("Energy")) {
-      const [newHand, newActive] = attachEnergyToActive(
-        hand,
-        selectedIndex,
-        setHand,
-        active,
-        setActive
-      );
+      if (!playedEnergy) {
+        const [newHand, newActive] = attachEnergyToActive(
+          hand,
+          selectedIndex,
+          setHand,
+          active,
+          setActive
+        );
 
-      socket.emit("toast", `${yourName} attached ${name} to ${newActive.name}`);
+        socket.emit(
+          "toast",
+          `${yourName} attached ${name} to ${newActive.name}`
+        );
 
-      socket.emit("played-card", {
-        deck,
-        hand: newHand,
-        active: newActive,
-        bench,
-        discard,
-        prizes,
-      });
+        socket.emit("played-card", {
+          deck,
+          hand: newHand,
+          active: newActive,
+          bench,
+          discard,
+          prizes,
+        });
+        setPlayedEnergy(true);
+      } else {
+        setToast({
+          show: true,
+          text: "You've already played an energy this turn"
+        });
+      }
     } else if (supertype.includes("Pokémon") && evolvesFrom === active.name) {
       const [newHand, newActive] = evolveActive(
         hand,

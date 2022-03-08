@@ -47,12 +47,10 @@ export default function Play() {
   const [secondaryAction, setSecondaryAction] = React.useState("");
   const [damage, setDamage] = React.useState(0);
   const [heal, setHeal] = React.useState(0);
-
   const [effect, setEffect] = React.useState("");
   const [disablePlayer, setDisablePlayer] = React.useState(false);
   const [activePlayer, setActivePlayer] = React.useState(false);
   const [playedEnergy, setPlayedEnergy] = React.useState(false);
-
   const [damageBenched, setDamageBenched] = React.useState({
     index: null,
     damage: 0,
@@ -173,11 +171,11 @@ export default function Play() {
       if (socket.id === id) {
         // set active user
         setActivePlayer(true);
+        setPlayedEnergy(false);
         // TODO: Enable hand, active, bend
         setDisablePlayer(false);
 
         // TODO: Check effect
-
         // TODO: Send end pharse
         // socket.emit("end-pharse", socket.id);
         // TODO: Disable hand, active, bend
@@ -746,6 +744,8 @@ export default function Play() {
             setZoneModal={setZoneModal}
             socket={socket}
             disablePlayer={disablePlayer}
+            playedEnergy={playedEnergy}
+            setPlayedEnergy={setPlayedEnergy}
           />
           <Bench
             hand={hand}
@@ -771,6 +771,8 @@ export default function Play() {
             setZoneModal={setZoneModal}
             socket={socket}
             disablePlayer={disablePlayer}
+            playedEnergy={playedEnergy}
+            setPlayedEnergy={setPlayedEnergy}
           />
         </div>
         <div className="mt-2 bg-primary border border-2 rounded h-25 w-100">
