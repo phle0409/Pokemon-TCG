@@ -78,11 +78,36 @@ export default function AttackModal({
   const retreatButton = () => {
     //TODO force discard energy
 
-    setRetreat(true);
+    /*
+      const { retreatCost, effects } = selected;
+
+      if(effects.energy.length < retreatCost.length) {
+        setToast({
+          show: true, 
+          text: "You do not have enough energy to retreat"
+        })
+        return;
+      }
+
+      setZoneModal({
+        show: true,
+        zone: `Choose ${retreatCost.length} energy to discard`
+        numTargets: retreatCost.length,
+        cards: effects.attachments
+        action: "discard energy from active"
+      })
+    */
+    if (selected.effects.energy.length > 0) {
+      selected.effects.energy.splice(0, 1);
+      setSelected(null);
+      setSelectedIndex(null);
+      setUsesTargeting(false);
+      setRetreat(true);
+    } else {
+      setToast({ show: true, text: `Cannot use retreat` });
+    }
+
     handleClose();
-    setSelected(null);
-    setSelectedIndex(null);
-    setUsesTargeting(false);
   };
 
   const passButton = () => {
