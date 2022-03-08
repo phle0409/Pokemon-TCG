@@ -99,7 +99,7 @@ export default function ZoneModal({
       });
     }
 
-    if (action === "discard energy from active") {
+    if (action === "discard energy from active" || action === "super energy removal active") {
       const [newActive, newDiscard] = discardEnergyFromActive(
         multiSelect,
         active,
@@ -115,6 +115,12 @@ export default function ZoneModal({
         discard: newDiscard,
         prizes,
       });
+
+      if(action === "super energy removal active") {
+        setSecondaryAction("make opponent active discard 2 energy");
+      }
+
+      //TODO implement super energy removal for bench
     }
 
     if (action === "discard energy from bench") {

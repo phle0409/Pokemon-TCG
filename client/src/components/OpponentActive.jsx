@@ -27,12 +27,18 @@ export default function OpponentActive({
   const handleClick = (e) => {
     const [name, set, zone] = e.target.id.split("-");
 
-    if (selected.name === "Energy Removal") {
+    if (
+      selected.name === "Energy Removal" ||
+      selected.name === "Super Energy Removal"
+    ) {
       if (opponentActive.effects.energy.length < 1) {
         setToast({
           show: true,
           text: `${opponentActive.name} has no energy to discard`,
         });
+        setSelected(null);
+        setSelectedIndex(null);
+        setUsesTargeting(false);
         return;
       }
 
@@ -44,13 +50,23 @@ export default function OpponentActive({
         setDiscard
       );
 
-      setZoneModal({
-        show: true,
-        zone: "Select an energy to discard from your opponent's active",
-        numTargets: 1,
-        cards: opponentActive.effects.attachments,
-        action: "make opponent discard energy from active",
-      });
+      if (selected.name === "Energy Removal") {
+        setZoneModal({
+          show: true,
+          zone: "Select an energy to discard from your opponent's active",
+          numTargets: 1,
+          cards: opponentActive.effects.attachments,
+          action: "make opponent discard energy from active",
+        });
+      } else {
+        setZoneModal({
+          show: true,
+          zone: "Select an energy to discard from your active",
+          numTargets: 1,
+          cards: active.effects.attachments,
+          action: "super energy removal active",
+        });
+      }
 
       socket.emit(`${yourName} used ${selected.name} on ${opponentActive}!`);
       socket.emit({
@@ -61,11 +77,11 @@ export default function OpponentActive({
         discard: newDiscard,
         prizes,
       });
-
-      setSelected(null);
-      setSelectedIndex(null);
-      setUsesTargeting(false);
     }
+
+    setSelected(null);
+    setSelectedIndex(null);
+    setUsesTargeting(false);
   };
 
   return (

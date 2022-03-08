@@ -2,10 +2,8 @@ import React from "react";
 
 export default function Hand({
   hand,
-  setHand,
   setSelected,
   setSelectedIndex,
-  selectedIndex,
   retreat,
   setRetreat,
   setToast,

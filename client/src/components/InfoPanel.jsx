@@ -30,6 +30,7 @@ export default function InfoPanel({
   setToast,
   socket,
   setZoneModal,
+  disableAttack,
 }) {
   const [action, setAction] = React.useState("");
   const [infoText, setInfoText] = React.useState("");
@@ -212,10 +213,20 @@ export default function InfoPanel({
     }
   }, [selected, selectedIndex, setSelected, setSelectedIndex]);
 
+  if (disableAttack && !selected && !active) {
+    return (
+      <div className="d-flex flex-column justify-content-center align-items-center h-100 info-panel">
+        <div className="text-center">Select a Basic Pokemon from your hand to place into active</div>
+      </div>
+    );
+  }
+
   if (retreat) {
     return (
       <div className="d-flex flex-column justify-content-center align-items-center h-100 info-panel">
-        <div className="text-center">Select a benched Pokemon to place into active</div>
+        <div className="text-center">
+          Select a benched Pokemon to place into active
+        </div>
       </div>
     );
   }

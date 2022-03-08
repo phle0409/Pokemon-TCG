@@ -95,7 +95,10 @@ export default function AttackModal({
           superEffective ? "It's super effective!" : ""
         } ${notVeryEffective ? "It's not very effective..." : ""}`
       );
-      setTimeout(() => socket.emit("attack", { actualDamage, effectSkill }), 2000);
+      setTimeout(
+        () => socket.emit("attack", { actualDamage, effectSkill }),
+        2000
+      );
       setEndPhrase(true);
     } else {
       if (disableAttack) {
@@ -111,43 +114,44 @@ export default function AttackModal({
   };
 
   const retreatButton = () => {
-    //TODO force discard energy
-
-    /*
-      const { retreatCost, effects } = selected;
-
-      if(effects.energy.length < retreatCost.length) {
-        setToast({
-          show: true, 
-          text: "You do not have enough energy to retreat"
-        })
-        return;
-      }
-
-      setZoneModal({
+    if (disablePass) {
+      setToast({
         show: true,
-        zone: `Choose ${retreatCost.length} energy to discard`
-        numTargets: retreatCost.length,
-        cards: effects.attachments
-        action: "discard energy from active"
-      })
-    */
-    if (selected.effects.energy.length > 0) {
-      selected.effects.energy.splice(selected.effects.energy.length - 1, 1);
-      setSelected(null);
-      setSelectedIndex(null);
-      setUsesTargeting(false);
-      setRetreat(true);
-    } else {
-      setToast({ show: true, text: `Cannot use retreat` });
+        text: `Waiting on opponent to play an active Pokemon`,
+      });
+      return;
     }
+    const { retreatCost, effects } = selected;
+
+    if (effects.energy.length < retreatCost.length) {
+      setToast({
+        show: true,
+        text: "You do not have enough energy to retreat",
+      });
+      return;
+    }
+
+    setZoneModal({
+      show: true,
+      zone: `Choose ${retreatCost.length} energy to discard`,
+      numTargets: retreatCost.length,
+      cards: effects.attachments,
+      action: "discard energy from active",
+    });
+
+    setSelected(null);
+    setSelectedIndex(null);
+    setRetreat(true);
 
     handleClose();
   };
 
   const passButton = () => {
     if (disablePass) {
-      setToast({ show: true, text: `Cannot Pass when it's not your turn.` });
+      setToast({
+        show: true,
+        text: `Waiting on opponent to play an active Pokemon`,
+      });
     } else {
       setToast({ show: true, text: "Player has ended turn." });
       setEndPhrase(true);

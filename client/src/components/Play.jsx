@@ -160,7 +160,7 @@ export default function Play() {
       const { deck, hand, active, bench, prizes, discard } = board;
       if (deck) setOpponentDeck(deck);
       if (hand) setOpponentHand(hand);
-      if (active) setOpponentActive(active);
+      setOpponentActive(active);
       if (bench) setOpponentBench(bench);
       if (prizes) setOpponentPrizes(prizes);
       if (discard) setOpponentDiscard(discard);
@@ -172,15 +172,9 @@ export default function Play() {
         setToast({ show: true, text: "It's your turn." });
 
         // set active user
-        setToast({
-          show: true,
-          text: "Your turn",
-        });
         setActivePlayer(true);
         setPlayedEnergy(false);
         if (!firstTurn) setDisableAttack(false);
-
-        setDisablePass(false);
         setDisablePlayer(false);
 
         // TODO: Check effect
@@ -286,6 +280,10 @@ export default function Play() {
       setOpponentBench([]);
     });
   }, [socket]);
+
+  React.useEffect(() => {
+    if (disablePass && active && opponentActive) setDisablePass(false);
+  }, [active, opponentActive]);
 
   React.useEffect(() => {
     if (activePlayer) {
@@ -539,6 +537,17 @@ export default function Play() {
         cards: deck.cards,
         action: "search deck",
       });
+    } else if (secondaryAction === "make opponent active discard 2 energy") {
+      let targets = opponentActive.effects.energy.length;
+      if (targets > 2) targets = 2;
+
+      setZoneModal({
+        show: true,
+        zone: "Select up to 2 energy cards to discard from the opponent",
+        numTargets: targets,
+        cards: opponentActive.effects.attachments,
+        action: "make opponent discard energy from active",
+      });
     }
 
     setSecondaryAction("");
@@ -712,6 +721,7 @@ export default function Play() {
             yourName={yourName}
             setToast={setToast}
             setZoneModal={setZoneModal}
+            disableAttack={disableAttack}
             socket={socket}
           />
         </div>
@@ -828,10 +838,8 @@ export default function Play() {
         <div className="d-flex justify-content-center mt-2 bg-primary border border-2 rounded h-25 w-100">
           <Hand
             hand={hand}
-            setHand={setHand}
             setSelected={setSelected}
             setSelectedIndex={setSelectedIndex}
-            selectedIndex={selectedIndex}
             retreat={retreat}
             setRetreat={setRetreat}
             setToast={setToast}
