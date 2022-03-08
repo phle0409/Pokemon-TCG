@@ -186,7 +186,7 @@ export default function Play() {
         // socket.emit("end-pharse", socket.id);
         // TODO: Disable hand, active, bend
       } else {
-        console.log("active user is: ", activeId);
+        setActivePlayer(false);
       }
     });
 
