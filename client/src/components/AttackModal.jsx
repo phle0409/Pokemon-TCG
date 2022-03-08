@@ -20,8 +20,6 @@ export default function AttackModal({
   setEndPhrase,
   disableAttack,
   disablePass,
-  opponentActive,
-
 }) {
   const canUseSkill = (costs, energies) => {
     let colorless = 0;
@@ -56,7 +54,7 @@ export default function AttackModal({
     const costArray = cost.split(",");
     const energyForCheckSkill = [...selected.effects.energy];
     if (!disableAttack && canUseSkill(costArray, energyForCheckSkill)) {
-      let [actualDamage, effectSkill] = skillCalculate(
+      const [actualDamage, effectSkill] = skillCalculate(
         name,
         damage,
         selected,
@@ -65,50 +63,13 @@ export default function AttackModal({
         setEffect,
         setZoneModal
       );
-      let superEffective = false;
-      let notVeryEffective = false;
-      if (selected.types[0] === opponentActive.weaknesses[0].type) {
-        superEffective = true;
-        actualDamage *= 2;
-      }
-      if (
-        opponentActive.resistances &&
-        selected.types[0] === opponentActive.resistances[0].type
-      ) {
-        notVeryEffective = true;
-        actualDamage -= parseInt(30);
-      }
-      if (
-        selected.effects.attachments.find((attachment) => {
-          return attachment.name === "PlusPower";
-        })
-      ) {
-        actualDamage += parseInt(10);
-      }
-      if (opponentActive.effects.attachments.includes("Defender")) {
-        actualDamage -= parseInt(20);
-        //TODO detach defender
-      }
-
-      /*
-        )
-      */
-      socket.emit(
-        "toast",
-        `${selected.name} used ${name}! ${
-          superEffective ? "It's super effective!" : ""
-        } ${notVeryEffective ? "It's not very effective..." : ""}`
-      );
+      setToast({ show: true, text: `Success use skill ${name}` });
       socket.emit("attack", { actualDamage, effectSkill });
-      setTimeout(() => setEndPhrase(true), 2000);
+      setEndPhrase(true);
     } else {
       if (disableAttack) {
-        setToast({ show: true, text: `You cannot attack on your first turn` });
-      } else
-        setToast({
-          show: true,
-          text: `You don't have enough energy to use ${name}`,
-        });
+        setToast({ show: true, text: `First turn, Cannot use skill ${name}` });
+      } else setToast({ show: true, text: `Cannot use skill ${name}` });
     }
 
     handleClose();
@@ -117,25 +78,6 @@ export default function AttackModal({
   const retreatButton = () => {
     //TODO force discard energy
 
-    /*
-      const { retreatCost, effects } = selected;
-
-      if(effects.energy.length < retreatCost.length) {
-        setToast({
-          show: true, 
-          text: "You do not have enough energy to retreat"
-        })
-        return;
-      }
-
-      setZoneModal({
-        show: true,
-        zone: `Choose ${retreatCost.length} energy to discard`
-        numTargets: retreatCost.length,
-        cards: effects.attachments
-        action: "discard energy from active"
-      })
-    */
     setRetreat(true);
     handleClose();
     setSelected(null);

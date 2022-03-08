@@ -93,7 +93,7 @@ const PrePage = () => {
             onClick={(e) => handleClick("brush")}
             onMouseEnter={(e) => handleMouseEnter("brush")}
             onMouseLeave={(e) => handleMouseLeave("brush")}
-            className="d-flex align-items-center justify-content-center"
+            className="d-flex align-items-center justify-content-center pre-deck"
             id="pre-deck-brush"
           >
             <img
@@ -106,7 +106,7 @@ const PrePage = () => {
             onClick={(e) => handleClick("black")}
             onMouseEnter={(e) => handleMouseEnter("black")}
             onMouseLeave={(e) => handleMouseLeave("black")}
-            className="d-flex align-items-center justify-content-center"
+            className="d-flex align-items-center justify-content-center pre-deck"
             id="pre-deck-black"
           >
             <img
@@ -119,7 +119,7 @@ const PrePage = () => {
             onClick={(e) => handleClick("overgrowth")}
             onMouseEnter={(e) => handleMouseEnter("overgrowth")}
             onMouseLeave={(e) => handleMouseLeave("overgrowth")}
-            className="d-flex align-items-center justify-content-center"
+            className="d-flex align-items-center justify-content-center pre-deck"
             id="pre-deck-overgrowth"
           >
             <img
@@ -132,7 +132,7 @@ const PrePage = () => {
             onClick={(e) => handleClick("zap")}
             onMouseEnter={(e) => handleMouseEnter("zap")}
             onMouseLeave={(e) => handleMouseLeave("zap")}
-            className="d-flex align-items-center justify-content-center rounded"
+            className="d-flex align-items-center justify-content-center rounded pre-deck"
             id="pre-deck-zap"
           >
             <img
@@ -174,7 +174,9 @@ const PrePage = () => {
               </Button>
             </div>
             {isMissing && (
-              <div className="text-danger text-center mb-2">{warningMessage}</div>
+              <div className="text-danger text-center mb-2">
+                {warningMessage}
+              </div>
             )}
           </Form>
         </Container>
