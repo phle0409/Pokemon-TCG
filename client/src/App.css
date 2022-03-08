@@ -62,15 +62,16 @@ body,
 }
 
 .table-card {
-  animation: fade-in-down 1s ease 1;
+  backface-visibility: visible !important;
+	animation: flip 1s ease 1;
 }
 
-.energy {
+.energy, .item {
   animation: gelatine 0.5s ease 2;
 }
 
-.item {
-  animation: gelatine 0.5s ease 2;
+.info-panel {
+  animation: fade-in-down 0.5s ease 1;
 }
 
 @keyframes bounce-in-right {
@@ -115,4 +116,27 @@ body,
   75% {
     transform: scale(0.95, 1.05);
   }
+}
+
+@keyframes flip {
+	0% {
+		transform: perspective(400px) rotateY(0);
+		animation-timing-function: ease-out;
+	}
+	40% {
+		transform: perspective(400px) translateZ(150px) rotateY(170deg);
+		animation-timing-function: ease-out;
+	}
+	50% {
+		transform: perspective(400px) translateZ(150px) rotateY(190deg) scale(1);
+		animation-timing-function: ease-in;
+	}
+	80% {
+		transform: perspective(400px) rotateY(360deg) scale(.95);
+		animation-timing-function: ease-in;
+	}
+	100% {
+		transform: perspective(400px) scale(1);
+		animation-timing-function: ease-in;
+	}
 }

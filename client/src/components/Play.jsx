@@ -174,6 +174,10 @@ export default function Play() {
       if (socket.id === activeId) {
         console.log(activeId, firstTurn);
         // set active user
+        setToast({
+          show: true,
+          text: "Your turn"
+        })
         setActivePlayer(true);
         setPlayedEnergy(false);
         if (firstTurn) setDisableAttack(true);
@@ -614,7 +618,7 @@ export default function Play() {
       <div className="bg-dark d-flex flex-column w-25 h-100">
         <div
           className={`
-         d-flex flex-column m-1 p-1 h-25 border-2 rounded current-player-border`}
+         d-flex flex-column m-1 p-1 h-25 border border-2 border-secondary rounded current-player-border`}
         >
           <span>
             <strong> Current Player: {yourName}</strong>

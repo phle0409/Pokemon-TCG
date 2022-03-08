@@ -62,13 +62,14 @@ export default function AttackModal({
         setEffect,
         setZoneModal
       );
-      setToast({ show: true, text: `Success use skill ${name}` });
+      socket.emit("toast", `${selected.name} used ${name}!`);
       socket.emit("attack", { actualDamage, effectSkill });
-      setEndPhrase(true);
+      setTimeout(() => setEndPhrase(true), 3000);
     } else {
       if (disableAttack) {
-        setToast({ show: true, text: `First turn, Cannot use skill ${name}` });
-      } else setToast({ show: true, text: `Cannot use skill ${name}` });
+        setToast({ show: true, text: `You cannot attack on your first turn` });
+      } else 
+        setToast({ show: true, text: `You don't have enough energy to use ${name}` });
     }
 
     handleClose();

@@ -166,7 +166,7 @@ export default function InfoPanel({
 
     setSelected(null);
     setSelectedIndex(null);
-    setUsesTargeting(false); 
+    setUsesTargeting(false);
   };
 
   React.useEffect(() => {
@@ -212,13 +212,21 @@ export default function InfoPanel({
     }
   }, [selected, selectedIndex, setSelected, setSelectedIndex]);
 
-  if (!selected || (selected === active && !retreat)) return <div></div>;
+  if (retreat) {
+    return (
+      <div className="d-flex flex-column justify-content-center align-items-center h-100 info-panel">
+        <div className="text-center">Select a benched Pokemon to place into active</div>
+      </div>
+    );
+  }
+
+  if (!selected || selected === active) return <div></div>;
 
   //TODO add infoText when forced to retreat
 
   return (
-    <div className="d-flex flex-column justify-content-center align-items-center h-100">
-      <div className="mb-4 text-center">
+    <div className="d-flex flex-column justify-content-center align-items-center h-100 info-panel">
+      <div className="mb-2 text-center">
         <strong>{infoText}</strong>
       </div>
       <ButtonGroup>

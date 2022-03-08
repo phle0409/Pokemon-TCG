@@ -1,6 +1,6 @@
 import { flipCoin } from "./skils_util";
 let effectSkill = null;
-let leakSplapDamage = 30;
+let leakSlapDamage = 30;
 export const skillCalculate = (
   name,
   damage,
@@ -12,7 +12,7 @@ export const skillCalculate = (
 ) => {
   switch (name) {
     /*****  decklist_brushfire skill *****/
-    case "Horn Hazzard":
+    case "Horn Hazard":
       return FlipAttack(damage);
     case "Lure":
       return Lure(damage);
@@ -20,7 +20,7 @@ export const skillCalculate = (
       return FlipEffect(damage, "posion");
     case "Confuse Ray":
       return FlipEffect(damage, "confused");
-    case "Blind":
+    case "Bind":
       return FlipEffect(damage, "paralyzed");
     case "Ember":
       return NormalDiscardOne(damage, setZoneModal, selected);
@@ -212,12 +212,12 @@ const Selfdestruct = (damage) => {
 /*****  decklist_blackout skill *****/
 
 const LeekSlap = () => {
-  if (leakSplapDamage === 30) {
+  if (leakSlapDamage === 30) {
     if (!flipCoin()) {
-      leakSplapDamage = 0;
+      leakSlapDamage = 0;
     }
   }
-  return [leakSplapDamage, null];
+  return [leakSlapDamage, null];
 };
 
 const Withdraw = (setEffect) => {

@@ -60,11 +60,6 @@ export default function Bench({
         discard,
       });
 
-      setSelected(null);
-      setSelectedIndex(null);
-      setUsesTargeting(false);
-      setRetreat(false);
-
       if (selected?.name === "Switch") {
         const [newHand, newDiscard] = handToDiscard(
           [selectedIndex],
@@ -104,6 +99,7 @@ export default function Bench({
       setSelectedIndex(null);
       setUsesTargeting(false);
       setRetreat(false);
+      return;
     }
 
     if (!selected) {

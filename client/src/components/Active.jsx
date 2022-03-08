@@ -57,6 +57,8 @@ export default function Active({
       return;
     }
 
+    console.log(active);
+
     const { supertype, name, evolvesFrom } = selected;
 
     if (supertype.includes("Energy")) {
@@ -227,7 +229,7 @@ export default function Active({
             id={`${active.name}-${active.set.name}-active`}
             onClick={handleClick}
           />
-          <div className="d-flex flex-column" style={{ width: "7rem" }}>
+          <div className="d-flex flex-column align-items-center" style={{ width: "7rem" }}>
             <div className="d-flex justify-content-center">{`${
               active.hp - active.effects.damage
             }/${active.hp} HP`}</div>
