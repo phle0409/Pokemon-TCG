@@ -19,7 +19,9 @@ export default function AttackModal({
   setZoneModal,
   setEndPhrase,
   disableAttack,
+  disablePass,
   opponentActive,
+
 }) {
   const canUseSkill = (costs, energies) => {
     let colorless = 0;
@@ -142,7 +144,13 @@ export default function AttackModal({
   };
 
   const passButton = () => {
-    setEndPhrase(true);
+    if (disablePass) {
+      setToast({ show: true, text: `Cannot Pass when it's not your turn.` });
+    } else {
+      setToast({ show: true, text: "Player has ended turn." });
+      setEndPhrase(true);
+    }
+
     handleClose();
   };
 
