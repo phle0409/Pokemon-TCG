@@ -98,7 +98,7 @@ export default function AttackModal({
       })
     */
     if (selected.effects.energy.length > 0) {
-      selected.effects.energy.splice(0, 1);
+      selected.effects.energy.splice(selected.effects.energy.length - 1, 1);
       setSelected(null);
       setSelectedIndex(null);
       setUsesTargeting(false);
