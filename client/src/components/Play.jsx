@@ -18,6 +18,7 @@ import InfoPanel from "./InfoPanel.jsx";
 import AttackModal from "./AttackModal.jsx";
 import ZoneModal from "./ZoneModal.jsx";
 import PkmnToast from "./PkmnToast.jsx";
+import { flipCoin } from "../utils/skills/skils_util";
 
 export default function Play() {
   const [socket, setSocket] = React.useState(null);
@@ -55,6 +56,7 @@ export default function Play() {
   const [disableAttack, setDisableAttack] = React.useState(true);
   const [disablePlayer, setDisablePlayer] = React.useState(true);
   const [disablePass, setDisablePass] = React.useState(true);
+  const [checkEffect, setCheckEffect] = React.useState(false);
 
   const [damageBenched, setDamageBenched] = React.useState({
     index: null,
@@ -172,20 +174,17 @@ export default function Play() {
       if (socket.id === activeId) {
         setToast({ show: true, text: "It's your turn." });
 
-        // set active user
         setToast({
           show: true,
           text: "Your turn",
         });
+        // set active user
         setActivePlayer(true);
 
         if (!firstTurn) setDisableAttack(false);
 
         setDisablePass(false);
         setDisablePlayer(false);
-
-        // TODO: Check effect
-
       } else {
         if (firstTurn) {
           setDisablePlayer(false);
@@ -459,6 +458,37 @@ export default function Play() {
   }, [heal]);
 
   React.useEffect(() => {
+    // Check Effect
+    if (!checkEffect) return;
+    if (active) {
+      const status = active.effects.statusConditions;
+      for (const property in status) {
+        switch (property) {
+          case "poisoned":
+            if (status[property]) {
+              console.log("success deal poison damage");
+              setDamage(10);
+            }
+            break;
+          case "asleep":
+            if (status[property]) {
+              // disable attack and retreat
+              if (flipCoin) {
+                status.asleep = false;
+              }
+            } else {
+              // Enable attack and retreat
+            }
+            break;
+          default:
+            break;
+        }
+      }
+      setCheckEffect(false);
+    }
+  }, [checkEffect]);
+
+  React.useEffect(() => {
     if (effect === "" || !active) return;
     let newActive = active;
 
@@ -598,7 +628,6 @@ export default function Play() {
         disableAttack={disableAttack}
         disablePass={disablePass}
         opponentActive={opponentActive}
-
       />
       <ZoneModal
         show={zoneModal.show}
