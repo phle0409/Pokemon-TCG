@@ -1,8 +1,8 @@
 export const decklist_brushfire = [
   // { name: "Ninetales", set: "Base", quantity: 1 },
   { name: "Weedle", set: "Base", quantity: 4 },
-  // { name: "Tangela", set: "Base", quantity: 2 },
-  { name: "Nidoran ♂", set: "Base", quantity: 4 },
+  { name: "Tangela", set: "Base", quantity: 2 },
+  // { name: "Nidoran ♂", set: "Base", quantity: 4 },
   // { name: "Arcanine", set: "Base", quantity: 1 },
   // { name: "Growlithe", set: "Base", quantity: 2 },
   // { name: "Charmeleon", set: "Base", quantity: 2 },
@@ -16,7 +16,7 @@ export const decklist_brushfire = [
   // { name: "Gust of Wind", set: "Base", quantity: 1 },
   // { name: "Energy Removal", set: "Base", quantity: 1 },
   { name: "Grass Energy", set: "Base", quantity: 10 },
-  { name: "Fire Energy", set: "Base", quantity: 18 },
+  // { name: "Fire Energy", set: "Base", quantity: 18 },
 ];
 
 export const decklist_overgrowth = [

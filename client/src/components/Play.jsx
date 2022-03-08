@@ -173,12 +173,12 @@ export default function Play() {
       if (socket.id === activeId) {
         setToast({ show: true, text: "It's your turn." });
 
-
         setToast({
           show: true,
           text: "Your turn",
         });
-
+        // Check effect
+        setCheckEffect(true);
         // set active user
         setActivePlayer(true);
         setPlayedEnergy(false);
@@ -466,6 +466,7 @@ export default function Play() {
     if (active) {
       const status = active.effects.statusConditions;
       for (const property in status) {
+        console.log(property, " the effect in check Effect");
         switch (property) {
           case "poisoned":
             if (status[property]) {
