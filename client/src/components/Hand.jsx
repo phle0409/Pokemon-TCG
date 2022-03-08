@@ -9,8 +9,10 @@ export default function Hand({
   retreat,
   setRetreat,
   setToast,
+  disablePlayer,
 }) {
   const handleClick = (e) => {
+    if (disablePlayer) return;
     if (retreat) {
       setToast({
         text: "You must selected a benched Pokemon to place into active",

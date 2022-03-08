@@ -52,14 +52,15 @@ io.on("connection", (socket) => {
       const user = userJoinRoom(socket.id, username, roomID);
       // join room
       socket.join(user.roomID);
+      socket.emit("message", "join");
       socket.emit("wait-opponent", `wait`);
       if (isRoomFull(roomID)) {
         let users = getAllUsersByRoom(roomID);
         if (users) {
           let firstID = users[0].id;
-          if (!flipCoin()) {
-            firstID = users[1].id;
-          }
+          // if (!flipCoin()) {
+          //   firstID = users[1].id;
+          // }
           io.to(getUserByID(socket.id).roomID).emit("active-user", firstID);
         }
       }
