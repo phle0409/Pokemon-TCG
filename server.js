@@ -23,8 +23,6 @@ const {
 
 app.use(cors());
 
-app.use(express.static(path.resolve(__dirname, "./client/build")));
-
 app.get("/cards", async (req, res) => {
   const promise = await axios(
     "https://api.pokemontcg.io/v2/cards?q=set.id:base1",

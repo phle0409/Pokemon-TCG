@@ -1,0 +1,39 @@
+{
+  "files": {
+    "main.css": "/static/css/main.cabd1eee.css",
+    "main.js": "/static/js/main.bb7994bf.js",
+    "static/js/787.e00a1212.chunk.js": "/static/js/787.e00a1212.chunk.js",
+    "static/media/energy_card.png": "/static/media/energy_card.a2d290847bb0c418e5f7.png",
+    "static/media/attack.png": "/static/media/attack.5567cf2fdb81cede573e.png",
+    "static/media/brushfire.png": "/static/media/brushfire.7b27822a0561c9acb248.png",
+    "static/media/overgrowth.png": "/static/media/overgrowth.769bafc66d6a5ac89894.png",
+    "static/media/blackout.png": "/static/media/blackout.019c2ee7668d46af9641.png",
+    "static/media/zap.png": "/static/media/zap.3128c419ea5ce7d47468.png",
+    "static/media/prize_card.png": "/static/media/prize_card.fabdc760cb19bce387e1.png",
+    "static/media/part_1.png": "/static/media/part_1.80e739411146df2c357e.png",
+    "static/media/intro.png": "/static/media/intro.9e54cd45423e59d1b3cb.png",
+    "static/media/part_2.png": "/static/media/part_2.50aa2f5f6af6c93e8d2e.png",
+    "static/media/setting_up.png": "/static/media/setting_up.d4cc8369679934de40b6.png",
+    "static/media/type_1.png": "/static/media/type_1.6dd07ac2291487b02e37.png",
+    "static/media/type_3.png": "/static/media/type_3.4ce75c8f178b16374784.png",
+    "static/media/type_2.png": "/static/media/type_2.f318b120de9d32a6ae7c.png",
+    "static/media/bootstrap-icons.woff?": "/static/media/bootstrap-icons.c1d7432ee75fa194e499.woff",
+    "static/media/bootstrap-icons.woff2?": "/static/media/bootstrap-icons.a13b815539b49de48d23.woff2",
+    "static/media/Leafeon.ico": "/static/media/Leafeon.431af26c243bb6078628.ico",
+    "static/media/Snorlax.ico": "/static/media/Snorlax.827bb34548273e8a67a4.ico",
+    "static/media/Grass.png": "/static/media/Grass.d9e9c913add8bffef9be.png",
+    "static/media/Fire.png": "/static/media/Fire.e3167a6865a691ad274f.png",
+    "static/media/Psychic.png": "/static/media/Psychic.359c8c61693e89a9470e.png",
+    "static/media/Fighting.png": "/static/media/Fighting.f134ee3d57667e9c958c.png",
+    "static/media/Water.png": "/static/media/Water.99fc67017a63fb621dc9.png",
+    "static/media/Lightning.png": "/static/media/Lightning.701e796b61ff3257b025.png",
+    "index.html": "/index.html",
+    "main.cabd1eee.css.map": "/static/css/main.cabd1eee.css.map",
+    "main.bb7994bf.js.map": "/static/js/main.bb7994bf.js.map",
+    "787.e00a1212.chunk.js.map": "/static/js/787.e00a1212.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.cabd1eee.css",
+    "static/js/main.bb7994bf.js"
+  ]
+}

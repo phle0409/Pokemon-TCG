@@ -27,21 +27,22 @@ const createDeck = (decklist, cardpool) => {
 export const fetchDeck = async (decklist) => {
   let deck;
 
-  switch(decklist) {
+  switch (decklist) {
     case "brush":
-    deck = decklist_brushfire;
-    break;
+      deck = decklist_brushfire;
+      break;
     case "black":
-    deck = decklist_blackout;
-    break;
+      deck = decklist_blackout;
+      break;
     case "overgrowth":
-    deck = decklist_overgrowth;
-    break;
+      deck = decklist_overgrowth;
+      break;
     default:
-    deck = decklist_zap;
-    break;
+      deck = decklist_zap;
+      break;
   }
 
+  // const promise = await fetch("https://mighty-crag-86175.herokuapp.com/cards")
   const promise = await fetch("http://localhost:8080/cards")
     .then((res) => {
       return res.json();
