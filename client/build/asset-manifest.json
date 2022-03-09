@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/static/css/main.cabd1eee.css",
-    "main.js": "/static/js/main.f55e0714.js",
+    "main.js": "/static/js/main.bb7994bf.js",
     "static/js/787.e00a1212.chunk.js": "/static/js/787.e00a1212.chunk.js",
     "static/media/energy_card.png": "/static/media/energy_card.a2d290847bb0c418e5f7.png",
     "static/media/attack.png": "/static/media/attack.5567cf2fdb81cede573e.png",
@@ -29,11 +29,11 @@
     "static/media/Lightning.png": "/static/media/Lightning.701e796b61ff3257b025.png",
     "index.html": "/index.html",
     "main.cabd1eee.css.map": "/static/css/main.cabd1eee.css.map",
-    "main.f55e0714.js.map": "/static/js/main.f55e0714.js.map",
+    "main.bb7994bf.js.map": "/static/js/main.bb7994bf.js.map",
     "787.e00a1212.chunk.js.map": "/static/js/787.e00a1212.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.cabd1eee.css",
-    "static/js/main.f55e0714.js"
+    "static/js/main.bb7994bf.js"
   ]
 }

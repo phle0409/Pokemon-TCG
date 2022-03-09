@@ -42,8 +42,8 @@ export const fetchDeck = async (decklist) => {
       break;
   }
 
-  const promise = await fetch("https://mighty-crag-86175.herokuapp.com/cards")
-    // const promise = await fetch("http://localhost:8080/cards")
+  // const promise = await fetch("https://mighty-crag-86175.herokuapp.com/cards")
+  const promise = await fetch("http://localhost:8080/cards")
     .then((res) => {
       return res.json();
     })
