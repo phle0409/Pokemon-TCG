@@ -53,6 +53,8 @@ export default function Play() {
   const [playedEnergy, setPlayedEnergy] = React.useState(false);
   const [endPhrase, setEndPhrase] = React.useState(false);
   const [disableAttack, setDisableAttack] = React.useState(true);
+  const [disableRetreat, setDisableRetreat] = React.useState(false);
+
   const [disablePlayer, setDisablePlayer] = React.useState(true);
   const [disablePass, setDisablePass] = React.useState(true);
   const [checkEffect, setCheckEffect] = React.useState(false);
@@ -168,6 +170,15 @@ export default function Play() {
       if (discard) setOpponentDiscard(discard);
     });
 
+    socket.on("opponent-attacked", ({ actualDamage, effectSkill }) => {
+      if (!actualDamage) actualDamage = 0;
+
+      setDamage(actualDamage);
+      if (effectSkill) {
+        setEffect(effectSkill);
+      }
+    });
+
     socket.on("active-user", ({ activeId, firstTurn }) => {
       // If active user
       if (socket.id === activeId) {
@@ -178,6 +189,7 @@ export default function Play() {
           text: "Your turn",
         });
         // Check effect
+        console.log("succesfully call check effect");
         setCheckEffect(true);
         // set active user
         setActivePlayer(true);
@@ -193,16 +205,6 @@ export default function Play() {
         }
         setDisablePass(true);
         setActivePlayer(false);
-      }
-    });
-
-    socket.on("opponent-attacked", ({ actualDamage, effectSkill }) => {
-      console.log(`opponent damage ${actualDamage} effect ${effectSkill}`);
-      if (!actualDamage) actualDamage = 0;
-
-      setDamage(actualDamage);
-      if (effectSkill) {
-        setEffect(effectSkill);
       }
     });
 
@@ -469,22 +471,30 @@ export default function Play() {
     if (active) {
       const status = active.effects.statusConditions;
       for (const property in status) {
-        console.log(property, " the effect in check Effect");
         switch (property) {
           case "poisoned":
             if (status[property]) {
-              console.log("success deal poison damage");
               setDamage(10);
+              socket.emit("toast", `Poisoned effect on ${active.name} `);
             }
             break;
           case "asleep":
+            console.log(property, status[property]);
             if (status[property]) {
-              // disable attack and retreat
-              if (flipCoin) {
+              socket.emit("toast", `Asleep effect on ${active.name} `);
+
+              if (flipCoin()) {
                 status.asleep = false;
+                socket.emit("played-card", {
+                  deck,
+                  hand,
+                  active,
+                  bench,
+                  prizes,
+                  discard,
+                });
+                socket.emit("toast", `${active.name} wakes up`);
               }
-            } else {
-              // Enable attack and retreat
             }
             break;
           default:
@@ -644,6 +654,7 @@ export default function Play() {
         setZoneModal={setZoneModal}
         setEndPhrase={setEndPhrase}
         disableAttack={disableAttack}
+        disableRetreat={disableRetreat}
         disablePass={disablePass}
         opponentActive={opponentActive}
       />
