@@ -160,11 +160,6 @@ export default function Bench({
         setBench
       );
 
-      socket.emit(
-        "toast",
-        `${yourName} evolved ${newBench[index].name} into ${name}!`
-      );
-
       socket.emit("played-card", {
         deck,
         hand: newHand,

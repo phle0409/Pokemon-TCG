@@ -116,6 +116,7 @@ export default function AttackModal({
       ) {
         notVeryEffective = true;
         actualDamage -= parseInt(30);
+        if(actualDamage < 0) actualDamage = 0;
       }
       if (
         selected.effects.attachments.find((attachment) => {
@@ -126,6 +127,7 @@ export default function AttackModal({
       }
       if (opponentActive?.effects.attachments.includes("Defender")) {
         actualDamage -= parseInt(20);
+        if(actualDamage < 0) actualDamage = 0;
         //TODO detach defender
       }
 

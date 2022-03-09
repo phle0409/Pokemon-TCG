@@ -279,9 +279,14 @@ export default function Play() {
       });
     });
 
+    socket.on("game-over", () => {
+      setDisablePlayer(true);
+    });
+
     socket.on("player-left", ({ username, id }) => {
       setOpponentActive(null);
       setOpponentBench([]);
+      socket.emit("game-over");
     });
   }, [socket]);
 
@@ -443,11 +448,13 @@ export default function Play() {
         setDiscard
       );
       if (bench.length > 0) setRetreat(true);
-      else
+      else {
         socket.emit(
           "toast",
           `${yourName} has no more benched Pokemon. ${opponentName} wins!`
         );
+        socket.emit("game-over");
+      }
 
       // socket.emit("update-opponent");
 
@@ -613,6 +620,7 @@ export default function Play() {
       socket.emit(
         `${yourName} has drawn all their prize cards. ${yourName} wins!`
       );
+      socket.emit("game-over")
   }, [deck, prizes]);
 
   React.useEffect(() => {

@@ -141,6 +141,10 @@ io.on("connection", (socket) => {
     socket.on("knockout", () => {
       socket.broadcast.to(getUserByID(socket.id).roomID).emit("knockout");
     });
+
+    socket.on("game-over", () => {
+      io.to(getUserByID(socket.id).roomID).emit("game-over");
+    });
   });
 
   socket.on("disconnect", () => {
