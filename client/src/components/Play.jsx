@@ -54,6 +54,7 @@ export default function Play() {
   const [endPhrase, setEndPhrase] = React.useState(false);
   const [disableAttack, setDisableAttack] = React.useState(true);
   const [disableRetreat, setDisableRetreat] = React.useState(false);
+  const [updateKnockOut, setUpdateKnockOut] = React.useState(false);
 
   const [disablePlayer, setDisablePlayer] = React.useState(true);
   const [disablePass, setDisablePass] = React.useState(true);
@@ -114,6 +115,7 @@ export default function Play() {
       const deck = await fetchDeck(decklist);
       preGameSetup(deck);
       const newSocket = await io(`https://mighty-crag-86175.herokuapp.com`);
+      // const newSocket = await io(`http://localhost:8080`);
       setSocket(newSocket);
     })();
   }, []);
@@ -213,15 +215,7 @@ export default function Play() {
       let newHand = [...hand, prize];
       setHand(newHand);
       setPrizes(newPrizes);
-
-      socket.emit("played-card", {
-        deck,
-        hand: newHand,
-        active,
-        bench,
-        prizes: newPrizes,
-        discard,
-      });
+      setUpdateKnockOut(true);
     });
 
     socket.on("lass", () => {
@@ -290,6 +284,22 @@ export default function Play() {
       setOpponentBench([]);
     });
   }, [socket]);
+
+  React.useEffect(() => {
+    if (!updateKnockOut) return;
+    console.log(active, "active", "get Update in Knockout");
+    console.log(bench, "bench", "get Update in Knockout");
+    socket.emit("played-card", {
+      deck,
+      hand,
+      active,
+      bench,
+      prizes,
+      discard,
+    });
+
+    setUpdateKnockOut(false);
+  }, [updateKnockOut]);
 
   React.useEffect(() => {
     if (disablePass && active && opponentActive) setDisablePass(false);
@@ -438,6 +448,8 @@ export default function Play() {
           "toast",
           `${yourName} has no more benched Pokemon. ${opponentName} wins!`
         );
+
+      // socket.emit("update-opponent");
 
       socket.emit("played-card", {
         deck,

@@ -159,6 +159,10 @@ const PrePage = () => {
                 <option value="1">Red</option>
                 <option value="2">Lucas</option>
                 <option value="3">Ethan</option>
+                <option value="4">Grant</option>
+                <option value="5">Viola</option>
+                <option value="6">Korrina</option>
+                <option value="7">Ramos</option>
               </Form.Select>
             </Form.Group>
             <div className="my-3">
