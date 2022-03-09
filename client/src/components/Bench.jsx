@@ -139,7 +139,7 @@ export default function Bench({
       } else {
         setToast({
           show: true,
-          text: "You've already played an energy this turn"
+          text: "You've already played an energy this turn",
         });
       }
     } else if (
@@ -158,11 +158,6 @@ export default function Bench({
         bench,
         index,
         setBench
-      );
-
-      socket.emit(
-        "toast",
-        `${yourName} evolved ${newBench[index].name} into ${name}!`
       );
 
       socket.emit("played-card", {
@@ -263,7 +258,10 @@ export default function Bench({
                 id={`${card.name}-${card.set.name}-bench-${index}`}
                 onClick={handleClick}
               />
-              <div className="d-flex flex-column align-items-center" style={{ width: "7rem" }}>
+              <div
+                className="d-flex flex-column align-items-center"
+                style={{ width: "7rem" }}
+              >
                 <div className="d-flex justify-content-center">{`${
                   card.hp - card.effects.damage
                 }/${card.hp} HP`}</div>

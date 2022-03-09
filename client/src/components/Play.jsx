@@ -114,8 +114,8 @@ export default function Play() {
     (async () => {
       const deck = await fetchDeck(decklist);
       preGameSetup(deck);
-      // const newSocket = await io(`https://mighty-crag-86175.herokuapp.com`);
-      const newSocket = await io(`http://localhost:8080`);
+      const newSocket = await io(`https://mighty-crag-86175.herokuapp.com`);
+      // const newSocket = await io(`http://localhost:8080`);
       setSocket(newSocket);
     })();
   }, []);
@@ -136,6 +136,10 @@ export default function Play() {
       } else {
         socket.emit("player-joined", username);
       }
+    });
+
+    socket.on("game-over", () => {
+      setDisablePlayer(true);
     });
 
     socket.on("player-name", (oppname) => {
@@ -443,13 +447,13 @@ export default function Play() {
         setDiscard
       );
       if (bench.length > 0) setRetreat(true);
-      else
+      else {
         socket.emit(
           "toast",
           `${yourName} has no more benched Pokemon. ${opponentName} wins!`
         );
-
-      // socket.emit("update-opponent");
+        socket.emit("game-over");
+      }
 
       socket.emit("played-card", {
         deck,
@@ -609,10 +613,12 @@ export default function Play() {
         `${yourName} has no more cards in their deck. ${opponentName} wins!`
       );
 
-    if (gameStatus.gameStarted && prizes.length === 0)
+    if (gameStatus.gameStarted && prizes.length === 0) {
       socket.emit(
         `${yourName} has drawn all their prize cards. ${yourName} wins!`
       );
+      socket.emit("game-over");
+    }
   }, [deck, prizes]);
 
   React.useEffect(() => {
