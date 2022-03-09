@@ -40,7 +40,6 @@ app.get("/cards", async (req, res) => {
 
 const io = socketio(server, {
   cors: true,
-  origins: ["http://localhost:3000"],
 });
 
 io.on("connection", (socket) => {
