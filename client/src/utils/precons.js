@@ -56,7 +56,7 @@ export const decklist_zap = [
   // { name: "Potion", set: "Base", quantity: 1 },
   // { name: "Gust of Wind", set: "Base", quantity: 2 },
   // { name: "Bill", set: "Base", quantity: 2 },
-  { name: "Lightning Energy", set: "Base", quantity: 12 },
+  // { name: "Lightning Energy", set: "Base", quantity: 12 },
   { name: "Psychic Energy", set: "Base", quantity: 16 },
 ];
 

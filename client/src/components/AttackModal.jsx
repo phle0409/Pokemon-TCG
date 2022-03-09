@@ -21,6 +21,7 @@ export default function AttackModal({
   disableAttack,
   disablePass,
   opponentActive,
+  disableRetreat,
 }) {
   const canUseSkill = (costs, energies) => {
     let colorless = 0;
@@ -50,7 +51,26 @@ export default function AttackModal({
     return result;
   };
 
+  const effectSkill = (msg) => {
+    // Effect
+    let result = false;
+    const status = selected.effects.statusConditions;
+    if (status.asleep) {
+      result = true;
+      setToast({
+        show: true,
+        text: `You cannot ${msg} when you're asleep. `,
+      });
+    }
+    return result;
+  };
+
   const attackButton = (event) => {
+    if (effectSkill("attack")) {
+      handleClose();
+      return;
+    }
+
     const [name, damage, cost] = event.target.id.split("#");
     const costArray = cost.split(",");
     const energyForCheckSkill = [...selected.effects.energy];
@@ -87,7 +107,7 @@ export default function AttackModal({
       ) {
         actualDamage += parseInt(10);
       }
-      if (opponentActive.effects.attachments.includes("Defender")) {
+      if (opponentActive?.effects.attachments.includes("Defender")) {
         actualDamage -= parseInt(20);
         //TODO detach defender
       }
@@ -98,11 +118,12 @@ export default function AttackModal({
           superEffective ? "It's super effective!" : ""
         } ${notVeryEffective ? "It's not very effective..." : ""}`
       );
-      setTimeout(
-        () => socket.emit("attack", { actualDamage, effectSkill }),
-        2000
-      );
-      setEndPhrase(true);
+      socket.emit("attack", { actualDamage, effectSkill });
+
+      setTimeout(() => {
+        setToast({ show: true, text: `End Turn` });
+        setEndPhrase(true);
+      }, 2000);
     } else {
       if (disableAttack) {
         setToast({ show: true, text: `You cannot attack on your first turn` });
@@ -117,6 +138,11 @@ export default function AttackModal({
   };
 
   const retreatButton = () => {
+    if (effectSkill("retreat")) {
+      handleClose();
+      return;
+    }
+
     if (disablePass) {
       setToast({
         show: true,
