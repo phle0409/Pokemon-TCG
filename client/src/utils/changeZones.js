@@ -60,7 +60,7 @@ export const benchToActive = (
   let newActive = bench[benchIndex];
   let newBench = bench;
   newBench.splice(benchIndex, 1);
-  if(active) newBench = [...newBench, active];
+  if (active) newBench = [...newBench, active];
   setBench(newBench);
   setActive(newActive);
   return [newActive, newBench];
@@ -84,7 +84,8 @@ export const handToActive = (hand, handIndex, setHand, setActive) => {
 };
 
 export const handToBench = (hand, handIndex, setHand, bench, setBench) => {
-  let newBench = [...bench, hand[handIndex]];
+  let card = hand[handIndex];
+  let newBench = [...bench, card];
   let newHand = hand;
   newHand.splice(handIndex, 1);
   setBench(newBench);

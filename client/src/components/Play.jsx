@@ -616,11 +616,12 @@ export default function Play() {
         `${yourName} has no more cards in their deck. ${opponentName} wins!`
       );
 
-    if (gameStatus.gameStarted && prizes.length === 0)
+    if (gameStatus.gameStarted && prizes.length === 0) {
       socket.emit(
         `${yourName} has drawn all their prize cards. ${yourName} wins!`
       );
-      socket.emit("game-over")
+      socket.emit("game-over");
+    }
   }, [deck, prizes]);
 
   React.useEffect(() => {

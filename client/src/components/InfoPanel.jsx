@@ -77,7 +77,9 @@ export default function InfoPanel({
       let trainerPlayed = false;
 
       if (selected.name === "Bill") {
-        setHand([...hand, ...deck.draw(2)]);
+        let cards = deck.draw(2);
+        let newHand = [...hand, ...cards];
+        setHand(newHand);
         trainerPlayed = true;
       } else if (selected.name === "Professor Oak") {
         setDiscard([...discard, ...hand]);
