@@ -5,6 +5,7 @@ const server = http.createServer(app);
 const socketio = require("socket.io");
 const axios = require("axios");
 const cors = require("cors");
+const path = require("path");
 require("dotenv").config();
 const PORT = process.env.PORT || 3000;
 const PKMN_API_KEY = process.env.PKMN_API_KEY;
@@ -21,6 +22,8 @@ const {
 } = require("./users/users");
 
 app.use(cors());
+
+app.use(express.static(path.resolve(__dirname, "./client/build")));
 
 app.get("/cards", async (req, res) => {
   const promise = await axios(
