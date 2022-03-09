@@ -43,7 +43,7 @@ export const decklist_zap = [
   // { name: "Kadabra", set: "Base", quantity: 1 },
   // { name: "Jynx", set: "Base", quantity: 2 },
   // { name: "Haunter", set: "Base", quantity: 2 },
-  { name: "Gastly", set: "Base", quantity: 3 },
+  // { name: "Gastly", set: "Base", quantity: 3 },
   { name: "Drowzee", set: "Base", quantity: 2 },
   { name: "Abra", set: "Base", quantity: 3 },
   // { name: "Pikachu", set: "Base", quantity: 4 },

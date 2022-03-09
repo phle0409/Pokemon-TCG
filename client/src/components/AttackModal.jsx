@@ -2,6 +2,7 @@ import React from "react";
 import { Button, Col, Container, Modal, Row } from "react-bootstrap";
 import EnergyCost from "./EnergyCost.jsx";
 import { skillCalculate } from "../utils/skills/skills";
+import { flipCoin } from "../utils/skills/skils_util.js";
 
 export default function AttackModal({
   show,
@@ -21,7 +22,6 @@ export default function AttackModal({
   disableAttack,
   disablePass,
   opponentActive,
-  disableRetreat,
 }) {
   const canUseSkill = (costs, energies) => {
     let colorless = 0;
@@ -62,6 +62,14 @@ export default function AttackModal({
         text: `You cannot ${msg} when you're asleep. `,
       });
     }
+    if (status.paralyzed) {
+      result = true;
+      setToast({
+        show: true,
+        text: `You cannot ${msg} when you're paralyzed. `,
+      });
+    }
+
     return result;
   };
 
@@ -75,6 +83,15 @@ export default function AttackModal({
     const costArray = cost.split(",");
     const energyForCheckSkill = [...selected.effects.energy];
     if (!disableAttack && canUseSkill(costArray, energyForCheckSkill)) {
+      //Confused Effect
+      if (selected.effects.statusConditions.confused) {
+        if (flipCoin()) {
+          setDamage(30);
+          handleClose();
+          return;
+        }
+      }
+
       let [actualDamage, effectSkill] = skillCalculate(
         name,
         damage,
@@ -173,6 +190,17 @@ export default function AttackModal({
     setSelected(null);
     setSelectedIndex(null);
     setRetreat(true);
+
+    // Confused effect
+    const status = selected.effects.statusConditions;
+    if (status.confused) {
+      setToast({
+        show: true,
+        text: `${selected.name} is paralyzed now`,
+      });
+      status.paralyzed = true;
+      status.confused = false;
+    }
 
     handleClose();
   };
