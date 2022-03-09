@@ -189,7 +189,6 @@ export default function Play() {
           text: "Your turn",
         });
         // Check effect
-        console.log("succesfully call check effect");
         setCheckEffect(true);
         // set active user
         setActivePlayer(true);
@@ -372,9 +371,24 @@ export default function Play() {
 
   React.useEffect(() => {
     if (!endPhrase) return;
-
-    socket.emit("end-phrase", socket.id);
     setDisablePlayer(true);
+    socket.emit("end-phrase", socket.id);
+
+    // Clean Effect
+    if (active) {
+      const status = active.effects.statusConditions;
+      if (status.paralyzed) {
+        status.paralyzed = false;
+        socket.emit("played-card", {
+          deck,
+          hand,
+          active,
+          bench,
+          prizes,
+          discard,
+        });
+      }
+    }
 
     setEndPhrase(false);
   }, [endPhrase]);
@@ -473,13 +487,14 @@ export default function Play() {
       for (const property in status) {
         switch (property) {
           case "poisoned":
+            console.log(property, status[property]);
             if (status[property]) {
+              console.log("can use poison in checkEffect");
               setDamage(10);
               socket.emit("toast", `Poisoned effect on ${active.name} `);
             }
             break;
           case "asleep":
-            console.log(property, status[property]);
             if (status[property]) {
               socket.emit("toast", `Asleep effect on ${active.name} `);
 
@@ -495,6 +510,16 @@ export default function Play() {
                 });
                 socket.emit("toast", `${active.name} wakes up`);
               }
+            }
+            break;
+          case "paralyzed":
+            if (status[property]) {
+              socket.emit("toast", `Paralyzed effect on ${active.name} `);
+            }
+            break;
+          case "confused":
+            if (status[property]) {
+              socket.emit("toast", `Confused effect on ${active.name} `);
             }
             break;
           default:
@@ -654,7 +679,6 @@ export default function Play() {
         setZoneModal={setZoneModal}
         setEndPhrase={setEndPhrase}
         disableAttack={disableAttack}
-        disableRetreat={disableRetreat}
         disablePass={disablePass}
         opponentActive={opponentActive}
       />
