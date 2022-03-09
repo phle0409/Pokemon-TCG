@@ -88,6 +88,10 @@ export default function AttackModal({
         if (flipCoin()) {
           setDamage(30);
           handleClose();
+          setTimeout(() => {
+            setToast({ show: true, text: `End Turn` });
+            setEndPhrase(true);
+          }, 2000);
           return;
         }
       }
