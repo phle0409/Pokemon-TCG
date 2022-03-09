@@ -113,7 +113,7 @@ export default function Play() {
     (async () => {
       const deck = await fetchDeck(decklist);
       preGameSetup(deck);
-      const newSocket = await io(`http://localhost:8080`);
+      const newSocket = await io(`https://mighty-crag-86175.herokuapp.com`);
       setSocket(newSocket);
     })();
   }, []);
