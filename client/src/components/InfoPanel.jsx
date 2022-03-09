@@ -77,9 +77,7 @@ export default function InfoPanel({
       let trainerPlayed = false;
 
       if (selected.name === "Bill") {
-        let cards = deck.draw(2);
-        let newHand = [...hand, ...cards];
-        setHand(newHand);
+        setHand([...hand, ...deck.draw(2)]);
         trainerPlayed = true;
       } else if (selected.name === "Professor Oak") {
         setDiscard([...discard, ...hand]);
@@ -216,7 +214,9 @@ export default function InfoPanel({
   if (disableAttack && !selected && !active) {
     return (
       <div className="d-flex flex-column justify-content-center align-items-center h-100 info-panel">
-        <div className="text-center">Select a Basic Pokemon from your hand to place into active</div>
+        <div className="text-center">
+          Select a Basic Pokemon from your hand to place into active
+        </div>
       </div>
     );
   }
