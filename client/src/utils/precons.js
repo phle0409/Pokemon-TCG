@@ -1,8 +1,8 @@
 export const decklist_brushfire = [
   // { name: "Ninetales", set: "Base", quantity: 1 },
   { name: "Weedle", set: "Base", quantity: 4 },
-  // { name: "Tangela", set: "Base", quantity: 2 },
-  { name: "Nidoran ♂", set: "Base", quantity: 4 },
+  { name: "Tangela", set: "Base", quantity: 2 },
+  // { name: "Nidoran ♂", set: "Base", quantity: 4 },
   // { name: "Arcanine", set: "Base", quantity: 1 },
   // { name: "Growlithe", set: "Base", quantity: 2 },
   // { name: "Charmeleon", set: "Base", quantity: 2 },
@@ -16,7 +16,7 @@ export const decklist_brushfire = [
   // { name: "Gust of Wind", set: "Base", quantity: 1 },
   // { name: "Energy Removal", set: "Base", quantity: 1 },
   { name: "Grass Energy", set: "Base", quantity: 10 },
-  { name: "Fire Energy", set: "Base", quantity: 18 },
+  // { name: "Fire Energy", set: "Base", quantity: 18 },
 ];
 
 export const decklist_overgrowth = [
@@ -44,7 +44,7 @@ export const decklist_zap = [
   // { name: "Kadabra", set: "Base", quantity: 1 },
   // { name: "Jynx", set: "Base", quantity: 2 },
   // { name: "Haunter", set: "Base", quantity: 2 },
-  { name: "Gastly", set: "Base", quantity: 3 },
+  // { name: "Gastly", set: "Base", quantity: 3 },
   { name: "Drowzee", set: "Base", quantity: 2 },
   { name: "Abra", set: "Base", quantity: 3 },
   // { name: "Pikachu", set: "Base", quantity: 4 },
@@ -57,7 +57,7 @@ export const decklist_zap = [
   // { name: "Potion", set: "Base", quantity: 1 },
   // { name: "Gust of Wind", set: "Base", quantity: 2 },
   // { name: "Bill", set: "Base", quantity: 2 },
-  { name: "Lightning Energy", set: "Base", quantity: 12 },
+  // { name: "Lightning Energy", set: "Base", quantity: 12 },
   { name: "Psychic Energy", set: "Base", quantity: 16 },
 ];
 

@@ -53,6 +53,8 @@ export default function Play() {
   const [playedEnergy, setPlayedEnergy] = React.useState(false);
   const [endPhrase, setEndPhrase] = React.useState(false);
   const [disableAttack, setDisableAttack] = React.useState(true);
+  const [disableRetreat, setDisableRetreat] = React.useState(false);
+
   const [disablePlayer, setDisablePlayer] = React.useState(true);
   const [disablePass, setDisablePass] = React.useState(true);
   const [checkEffect, setCheckEffect] = React.useState(false);
@@ -168,17 +170,26 @@ export default function Play() {
       if (discard) setOpponentDiscard(discard);
     });
 
+    socket.on("opponent-attacked", ({ actualDamage, effectSkill }) => {
+      if (!actualDamage) actualDamage = 0;
+
+      setDamage(actualDamage);
+      if (effectSkill) {
+        setEffect(effectSkill);
+      }
+    });
+
     socket.on("active-user", ({ activeId, firstTurn }) => {
       // If active user
       if (socket.id === activeId) {
         setToast({ show: true, text: "It's your turn." });
 
-
         setToast({
           show: true,
           text: "Your turn",
         });
-
+        // Check effect
+        setCheckEffect(true);
         // set active user
         setActivePlayer(true);
         setPlayedEnergy(false);
@@ -193,16 +204,6 @@ export default function Play() {
         }
         setDisablePass(true);
         setActivePlayer(false);
-      }
-    });
-
-    socket.on("opponent-attacked", ({ actualDamage, effectSkill }) => {
-      console.log(`opponent damage ${actualDamage} effect ${effectSkill}`);
-      if (!actualDamage) actualDamage = 0;
-
-      setDamage(actualDamage);
-      if (effectSkill) {
-        setEffect(effectSkill);
       }
     });
 
@@ -370,9 +371,24 @@ export default function Play() {
 
   React.useEffect(() => {
     if (!endPhrase) return;
-
-    socket.emit("end-phrase", socket.id);
     setDisablePlayer(true);
+    socket.emit("end-phrase", socket.id);
+
+    // Clean Effect
+    if (active) {
+      const status = active.effects.statusConditions;
+      if (status.paralyzed) {
+        status.paralyzed = false;
+        socket.emit("played-card", {
+          deck,
+          hand,
+          active,
+          bench,
+          prizes,
+          discard,
+        });
+      }
+    }
 
     setEndPhrase(false);
   }, [endPhrase]);
@@ -471,19 +487,39 @@ export default function Play() {
       for (const property in status) {
         switch (property) {
           case "poisoned":
+            console.log(property, status[property]);
             if (status[property]) {
-              console.log("success deal poison damage");
+              console.log("can use poison in checkEffect");
               setDamage(10);
+              socket.emit("toast", `Poisoned effect on ${active.name} `);
             }
             break;
           case "asleep":
             if (status[property]) {
-              // disable attack and retreat
-              if (flipCoin) {
+              socket.emit("toast", `Asleep effect on ${active.name} `);
+
+              if (flipCoin()) {
                 status.asleep = false;
+                socket.emit("played-card", {
+                  deck,
+                  hand,
+                  active,
+                  bench,
+                  prizes,
+                  discard,
+                });
+                socket.emit("toast", `${active.name} wakes up`);
               }
-            } else {
-              // Enable attack and retreat
+            }
+            break;
+          case "paralyzed":
+            if (status[property]) {
+              socket.emit("toast", `Paralyzed effect on ${active.name} `);
+            }
+            break;
+          case "confused":
+            if (status[property]) {
+              socket.emit("toast", `Confused effect on ${active.name} `);
             }
             break;
           default:
