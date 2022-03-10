@@ -216,7 +216,9 @@ export default function InfoPanel({
   if (disableAttack && !selected && !active) {
     return (
       <div className="d-flex flex-column justify-content-center align-items-center h-100 info-panel">
-        <div className="text-center">Select a Basic Pokemon from your hand to place into active</div>
+        <div className="text-center">
+          Select a Basic Pokemon from your hand to place into active
+        </div>
       </div>
     );
   }

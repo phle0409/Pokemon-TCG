@@ -283,9 +283,14 @@ export default function Play() {
       });
     });
 
+    socket.on("game-over", () => {
+      setDisablePlayer(true);
+    });
+
     socket.on("player-left", ({ username, id }) => {
       setOpponentActive(null);
       setOpponentBench([]);
+      socket.emit("game-over");
     });
   }, [socket]);
 
